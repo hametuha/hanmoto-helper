@@ -12,10 +12,17 @@ Display book information with isbn
 
 ## Description
 
-This plugin integrates [Slack](https://slack.com) and WordPress.
+Display Book information with ISBN. Works fine with [Shortcake](https://ja.wordpress.org/plugins/shortcode-ui/).
 
 ## Install
 
+Download from [Release](https://github.com/hametuha/isbn-beautify/releases).
+
+If you are experienced developer, clone this repo and run command below:
+
+```
+npm install && npm run gulp build
+```
 
 ## Changelog
 
