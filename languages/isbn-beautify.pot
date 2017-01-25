@@ -1,0 +1,55 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISBN Beautify\n"
+"POT-Creation-Date: 2017-01-25 17:40+0900\n"
+"PO-Revision-Date: 2017-01-25 17:40+0900\n"
+"Last-Translator: Takahashi Fumiki <takahashi.fumiki@hametuha.co.jp>\n"
+"Language-Team: Takahashi Fumiki <takahashi.fumiki@hametuha.co.jp>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.7.1\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: node_modules\n"
+"X-Poedit-SearchPathExcluded-1: vendor\n"
+
+#: functions/api.php:39
+#, php-format
+msgid "Method %s is not allowed."
+msgstr ""
+
+#: functions/api.php:56
+msgid "Failed to parse response. something might be wrong."
+msgstr ""
+
+#: functions/api.php:138
+msgid "Author"
+msgstr ""
+
+#: functions/api.php:142
+msgid "Publisher"
+msgstr ""
+
+#: functions/api.php:146
+msgid "ISBN"
+msgstr ""
+
+#: functions/api.php:150
+msgid "Publish Date"
+msgstr ""
+
+#: hooks/shortcode.php:25
+msgid "Book Information"
+msgstr ""
+
+#: isbn-beautify.php:36
+#, php-format
+msgid "[ERROR] ISBN Beautify requires PHP %s but your PHP is %s."
+msgstr ""
