@@ -1,18 +1,23 @@
-# ISBN Beautify
+# Hanmoto Helper
 
-Tags: isbn, book
-Contributors: Takahashi_Fumiki  
-Tested up to: 4.7.1
-Requires at least: 4.6.0  
+Tags: publisher, isbn, book
+Contributors: hametuha, Takahashi_Fumiki  
+Tested up to: 5.8  
+Requires at least: 5.5.0  
 Stable Tag: 1.0.0  
 License: GPLv3 or later  
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
-Display book information with isbn
+Display information of you books with 
 
 ## Description
 
-Display Book information with ISBN. Works fine with [Shortcake](https://ja.wordpress.org/plugins/shortcode-ui/).
+Display Book information with ISBN.
+
+- Shortcode `` supported.
+- Block Supported.
+- Custom Post Type to save book detail.
+- Syncing with OpenBD.
 
 ## Install
 

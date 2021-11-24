@@ -1,2 +1,6 @@
 node_modules/
-assets/
+dist/
+wordpress/
+vendor/
+package-lock.json
+composer.lock

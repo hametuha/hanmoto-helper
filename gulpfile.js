@@ -1,53 +1,113 @@
-var gulp        = require('gulp'),
-    fs          = require('fs'),
-    $           = require('gulp-load-plugins')(),
-    pngquant    = require('imagemin-pngquant'),
-    eventStream = require('event-stream');
+const gulp = require( 'gulp' );
+const fs = require( 'fs' );
+const $ = require( 'gulp-load-plugins' )();
+const webpack = require( 'webpack-stream' );
+const webpackBundle = require( 'webpack' );
+const named = require( 'vinyl-named' );
+const { dumpSetting } = require('@kunoichi/grab-deps');
 
-// Sass task
-gulp.task('sass',function(){
-  return gulp.src(['./src/scss/**/*.scss'])
-    .pipe($.plumber({
-      errorHandler: $.notify.onError('<%= error.message %>')
-    }))
-    .pipe($.sassBulkImport())
-    .pipe($.sass({
-      errLogToConsole: true,
-      outputStyle: 'compressed',
-      sourceComments: 'normal',
-      sourcemap: true,
-      includePaths: [
-        './src/scss'
-      ]
-    }))
-    .pipe( $.autoprefixer({
-      browsers: ['last 2 versions']
-    }) )
-    .pipe(gulp.dest('./assets/css'));
-});
+let plumber = true;
 
+// Sassのタスク
+gulp.task( 'sass', function () {
 
-// Image min
-gulp.task('imagemin', function(){
-  return gulp.src('./src/img/**/*')
-    .pipe($.imagemin({
-      progressive: true,
-      svgoPlugins: [{removeViewBox: false}],
-      use: [pngquant()]
-    }))
-    .pipe(gulp.dest('./assets/img'));
-});
+	return gulp.src( [ './assets/scss/**/*.scss' ] )
+		.pipe( $.plumber( {
+			errorHandler: $.notify.onError( '<%= error.message %>' )
+		} ) )
+		.pipe( $.sassGlob() )
+		.pipe( $.sourcemaps.init() )
+		.pipe( $.sass( {
+			errLogToConsole: true,
+			outputStyle: 'compressed',
+			sourceComments: false,
+			sourcemap: true,
+			includePaths: [
+				'./assets/sass',
+				'./vendor',
+				'./node_modules/bootstrap-sass/assets/stylesheets',
+				'./vendor/hametuha'
+			]
+		} ) )
+		.pipe( $.autoprefixer() )
+		.pipe( $.sourcemaps.write( './map' ) )
+		.pipe( gulp.dest( './dist/css' ) );
+} );
+
+// Style lint.
+gulp.task( 'stylelint', function () {
+	let task = gulp.src( [ './assets/scss/**/*.scss' ] );
+	if ( plumber ) {
+		task = task.pipe( $.plumber() );
+	}
+	return task.pipe( $.stylelint( {
+		reporters: [
+			{
+				formatter: 'string',
+				console: true,
+			},
+		],
+	} ) );
+} );
+
+// Package jsx.
+gulp.task( 'jsx', function () {
+	return gulp.src( [
+		'./assets/js/**/*.js',
+	] )
+		.pipe( $.plumber( {
+			errorHandler: $.notify.onError( '<%= error.message %>' )
+		} ) )
+		.pipe( named( (file) =>  {
+			return file.relative.replace(/\.[^\.]+$/, '');
+		} ) )
+		.pipe( webpack( require( './webpack.config.js' ), webpackBundle ) )
+		.pipe( gulp.dest( './dist/js' ) );
+} );
+
+// ESLint
+gulp.task( 'eslint', function () {
+	let task = gulp.src( [
+		'./assets/js/**/*.js',
+	] );
+	if ( plumber ) {
+		task = task.pipe( $.plumber() );
+	}
+	return task.pipe( $.eslint( { useEslintrc: true } ) )
+		.pipe( $.eslint.format() );
+} );
 
 // watch
-gulp.task('watch',function(){
-  // Make SASS
-  gulp.watch('./src/scss/**/*.scss',['sass']);
-  // Minify Image
-  gulp.watch('./src/img/**/*',['imagemin']);
-});
+gulp.task( 'watch', function ( done ) {
+	// Make SASS
+	gulp.watch( 'assets/scss/**/*.scss', gulp.parallel( 'sass', 'stylelint' ) );
+	// Bundle JS
+	gulp.watch( [ 'assets/js/**/*.{js,jsx}' ], gulp.parallel( 'jsx', 'eslint' ) );
+	// Dump setting.
+	gulp.watch( [
+		'dist/js/**/*.js',
+		'dist/css/**/*.css',
+	], gulp.task( 'dump' ) );
+	done();
+} );
+
+// Dump dependencies.
+gulp.task( 'dump', ( done ) => {
+	dumpSetting( 'dist' );
+	done();
+} );
+
+// Toggle plumber.
+gulp.task( 'noplumber', ( done ) => {
+	plumber = false;
+	done();
+} );
 
 // Build
-gulp.task('build', ['sass', 'imagemin']);
+gulp.task( 'build', gulp.series( gulp.parallel( 'jsx', 'sass' ), 'dump' ) );
 
 // Default Tasks
-gulp.task('default', ['watch']);
+gulp.task( 'default', gulp.series( 'watch' ) );
+
+// Lint
+gulp.task( 'lint', gulp.series( 'noplumber', gulp.parallel( 'stylelint', 'eslint' ) ) );

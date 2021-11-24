@@ -1,37 +1,49 @@
 {
-  "name": "isbn-beautify",
-  "version": "1.0.0",
-  "description": "Tags: isbn, book Contributors: Takahashi_Fumiki   Tested up to: 4.7.1 Requires at least: 4.6.0   Stable Tag: 1.0.0   License: GPLv3 or later   License URI: http://www.gnu.org/licenses/gpl-3.0.txt",
-  "main": "gulpfile.js",
-  "scripts": {
-    "start": "gulp default",
-    "default": "gulp build && gulp watch",
-    "gulp": "gulp"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hametuha/isbn-beautify.git"
-  },
-  "keywords": [
-    "WordPress",
-    "OpenBD"
-  ],
-  "author": "fumikito <guy@hametuha.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/hametuha/isbn-beautify/issues"
-  },
-  "homepage": "https://github.com/hametuha/isbn-beautify#readme",
-  "devDependencies": {
-    "event-stream": "^3.3.4",
-    "gulp": "^3.9.1",
-    "gulp-autoprefixer": "^3.1.1",
-    "gulp-imagemin": "^3.1.1",
-    "gulp-load-plugins": "^1.4.0",
-    "gulp-notify": "^2.2.0",
-    "gulp-plumber": "^1.1.0",
-    "gulp-sass": "^3.1.0",
-    "gulp-sass-bulk-import": "^1.0.1",
-    "imagemin-pngquant": "^5.0.0"
-  }
+	"name": "hanmoto-helper",
+	"main": "gulpfile.js",
+	"scripts": {
+		"start": "wp-env start",
+		"update": "wp-env start --update",
+		"stop": "wp-env stop",
+		"cli": "wp-env run cli wp",
+		"cli:test": "wp-env run tests-cli wp",
+		"package": "gulp build",
+		"watch": "gulp watch",
+		"display": "gulp bs",
+		"gulp": "gulp",
+		"lint": "gulp lint",
+		"gulp:task": "gulp --tasks",
+		"fix:js": "eslint --fix -c .eslintrc assets/js",
+		"fix:css": "stylelint --fix assets/scss"
+	},
+	"author": "Hametuha INC.",
+	"license": "LGPL-3.0-or-later",
+	"devDependencies": {
+		"@babel/core": "^7.1.0",
+		"@babel/plugin-transform-react-jsx": "^7.0.0",
+		"@babel/preset-env": "^7.1.0",
+		"@kunoichi/grab-deps": "^1.2.2",
+		"@wordpress/env": "^4.0",
+		"@wordpress/eslint-plugin": "^9.0",
+		"babel-eslint": "^10.0.1",
+		"babel-loader": "^8.0.5",
+		"eslint": "^7.13",
+		"gulp": "^4.0.0",
+		"gulp-autoprefixer": "^7.0.0",
+		"gulp-eslint": "^6.0.0",
+		"gulp-load-plugins": "^2.0",
+		"gulp-notify": "^3.2.0",
+		"gulp-plumber": "^1.2.0",
+		"gulp-rename": "^1.4.0",
+		"gulp-sass": "^4.0.2",
+		"gulp-sass-glob": "^1.0.9",
+		"gulp-sourcemaps": "^3.0",
+		"gulp-stylelint": "^13.0.0",
+		"stylelint": "^13.13.1",
+		"stylelint-config-wordpress": "^17.0.0",
+		"vinyl-named": "^1.1.0",
+		"webpack": "^5.3",
+		"webpack-stream": "^6.1"
+	},
+	"dependencies": {}
 }
