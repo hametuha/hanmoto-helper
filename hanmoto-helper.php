@@ -43,6 +43,9 @@ function hanmoto_root_dir() {
  * Register hooks.
  */
 function hanmoto_plugin_init() {
+	// Functions.
+	require_once  __DIR__ . '/includes/utility.php';
+	// autoloader.
 	load_plugin_textdomain( 'hanmoto', true, basename( __DIR__ ) . '/languages' );
 	$autoloader = __DIR__ . '/vendor/autoload.php';
 	if ( file_exists( $autoloader ) ) {

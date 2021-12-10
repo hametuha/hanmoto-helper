@@ -4,6 +4,8 @@ namespace Hametuha\HanmotoHelper\Utility;
 
 
 use cli\Table;
+use Hametuha\HanmotoHelper\Controller\PostType;
+use PHP_CodeSniffer\Standards\Squiz\Sniffs\CSS\OpacitySniff;
 
 /**
  * Utility command for hanmoto helper.
@@ -13,7 +15,8 @@ use cli\Table;
  */
 class Commands extends \WP_CLI_Command {
 
-	use OpenDbApi;
+	use OpenDbApi,
+		SettingsAccessor;
 
 	/**
 	 * Get detailed information of books.
@@ -45,7 +48,7 @@ class Commands extends \WP_CLI_Command {
 		}
 		$details = $this->openbd_get( $result );
 		$table = new Table();
-		$table->setHeaders( [ 'ISBN', 'Title', 'Author', 'Category', 'Price' ] );
+		$table->setHeaders( [ 'ISBN', 'Title', 'Author', 'Category', 'Price', 'Published' ] );
 		foreach ( $details as $detail ) {
 			$table->addRow( [
 				$detail['onix']['RecordReference'],
@@ -55,8 +58,27 @@ class Commands extends \WP_CLI_Command {
 				}, $detail['onix']['DescriptiveDetail']['Contributor'] ) ),
 				$detail['onix']['DescriptiveDetail']['Subject'][0]['SubjectCode'],
 				$detail['onix']['ProductSupply']['SupplyDetail']['Price'][0]['PriceAmount'],
+				preg_replace( '/(\d{4})(\d{2})(\d{2})/', '$1/$2/$3', $detail['summary']['pubdate'] ),
 			] );
 		}
 		$table->display();
+	}
+
+	/**
+	 * Sync posts.
+	 *
+	 */
+	public function sync() {
+		$ids = $this->option()->get_publisher_ids();
+		if ( empty( $ids ) ) {
+			\WP_CLI::error( 'Publisher ID not set.' );
+		}
+		\WP_CLI::line( sprintf( 'Syncing %s...', implode( ', ', $ids ) ) );
+		$result = PostType::get_instance()->sync();
+		if ( is_wp_error( $result ) ) {
+			\WP_CLI::error( $result->get_error_message() );
+		}
+		list( $created, $updated, $failed ) = $result;
+		\WP_CLI::success( sprintf( 'Created %d, Updated %d, Failed %d' , $created, $updated, $failed ) );
 	}
 }

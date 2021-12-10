@@ -1,6 +1,10 @@
 {
-	"plugins": [ "." ],
+	"plugins": [
+		".",
+		"https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip"
+	],
 	"themes": [
-		"https://downloads.wordpress.org/theme/twentytwenty.latest-stable.zip"
+		"https://downloads.wordpress.org/theme/twentytwenty.latest-stable.zip",
+		"https://downloads.wordpress.org/theme/storefront.latest-stable.zip"
 	]
 }

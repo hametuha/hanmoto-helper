@@ -1,0 +1,136 @@
+.hanmoto-block-wrapper {
+	margin: 2em;
+}
+
+.hanmoto-block-empty {
+	background-color: #eee;
+	min-height: 300px;
+	padding: 100px;
+	text-align: center;
+	box-sizing: border-box;
+}
+
+.hanmoto-book {
+
+	&-card {
+		display: flex;
+		margin: 1.5em auto;
+		padding-bottom: 1.5em;
+		border-bottom: 1px solid #eee;
+
+		&:first-child {
+			border-top: 1px solid #eee;
+			padding-top: 1.5em;
+		}
+
+		@media only screen and ( max-width: 450px ) {
+			display: block;
+		}
+	}
+
+	&-cover {
+		width: auto;
+		height: auto;
+		text-align: center;
+		max-width: 100%;
+		@media only screen and ( max-width: 450px ) {
+			display: block;
+			margin-bottom: 1em;
+		}
+	}
+
+	&-image {
+		margin-right: auto;
+		margin-left: auto;
+	}
+
+	&-detail {
+		padding: 0 1.5em;
+	}
+
+	&-title {
+		font-weight: 700;
+		margin: 0 0 0.5em;
+	}
+
+	&-author {
+		font-size: smaller;
+		margin: 0.5em 0 1em;
+	}
+
+	&-properties {
+		margin: 1.5em 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		font-size: smaller;
+
+		dt {
+			flex: 0 1 25%;
+			margin:0 0 0.5em;
+		}
+
+		dd {
+			flex: 0 1 75%;
+			width: 100%;
+			margin: 0 0 0.5em;
+		}
+	}
+
+	&-actions {
+		margin: 1.5em 0;
+
+		&-list {
+			margin: 0;
+			padding: 0;
+			display: flex;
+			justify-content: start;
+		}
+
+		&-item {
+			list-style: none;
+			margin-left: 1em;
+
+			&:first-child {
+				margin-left: 0;
+			}
+		}
+
+		&-link {
+			display: inline-block;
+			font-size: 14px;
+			padding: 3px 10px;
+			border: currentColor 2px solid;
+
+			&:link,
+			&:visited {
+				color: #06c;
+				text-decoration: none !important;
+				border-color: currentColor;
+			}
+
+			&:hover,
+			&:active {
+				background-color: #06c;
+				color: #fff !important;
+				text-decoration: none !important;
+			}
+
+			@each $brand, $color in (
+				amazon: #e47911,
+				hanmoto: #c00,
+			) {
+				&[href*="#{$brand}."] {
+					&:link,
+					&:visited {
+						color: $color;
+					}
+					&:hover,
+					&:active {
+						background-color: $color;
+					}
+				}
+			}
+		}
+	}
+}
