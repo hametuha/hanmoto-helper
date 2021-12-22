@@ -27,7 +27,7 @@ class Commands extends \WP_CLI_Command {
 	 */
 	public function detail( $args ) {
 		list( $isbn ) = $args;
-		$result = $this->openbd_get( $isbn );
+		$result       = $this->openbd_get( $isbn );
 		if ( is_wp_error( $result ) ) {
 			\WP_CLI::error( $result->get_error_message() );
 		}
@@ -48,7 +48,7 @@ class Commands extends \WP_CLI_Command {
 			\WP_CLI::error( 'No Book Found.' );
 		}
 		$details = $this->openbd_get( $result );
-		$table = new Table();
+		$table   = new Table();
 		$table->setHeaders( [ 'ISBN', 'Title', 'Author', 'Category', 'Price', 'Published' ] );
 		foreach ( $details as $detail ) {
 			$table->addRow( [
@@ -80,7 +80,7 @@ class Commands extends \WP_CLI_Command {
 			\WP_CLI::error( $result->get_error_message() );
 		}
 		list( $created, $updated, $failed ) = $result;
-		\WP_CLI::success( sprintf( 'Created %d, Updated %d, Failed %d' , $created, $updated, $failed ) );
+		\WP_CLI::success( sprintf( 'Created %d, Updated %d, Failed %d', $created, $updated, $failed ) );
 	}
 
 	/**
@@ -93,9 +93,9 @@ class Commands extends \WP_CLI_Command {
 		if ( ! class_exists( 'WooCommerce' ) ) {
 			\WP_CLI::error( 'WooCommerce is not active.' );
 		}
-		$args[] = 'now';
+		$args[]              = 'now';
 		list( $days, $date ) = $args;
-		$orders = WooCommerceOrder::get_instance()->get_order_to_capture( $days, $date );
+		$orders              = WooCommerceOrder::get_instance()->get_order_to_capture( $days, $date );
 		if ( empty( $orders ) ) {
 			\WP_CLI::success( 'No orders matched.' );
 			exit;

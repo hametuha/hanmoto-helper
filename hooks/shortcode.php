@@ -27,9 +27,9 @@ add_action( 'register_shortcode_ui', function () {
 		'listItemImage' => 'dashicons-book-alt',
 		'attrs'         => [
 			[
-				'label'    => 'ISBN',
-				'attr'     => 'isbn',
-				'type'     => 'text',
+				'label' => 'ISBN',
+				'attr'  => 'isbn',
+				'type'  => 'text',
 			],
 		],
 	] );

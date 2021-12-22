@@ -71,7 +71,7 @@ class Settings extends Singleton {
 							'<input name="%s" type="text" value="%s" placeholder="%s" class="regular-text" />',
 							esc_attr( $option_id ),
 							esc_attr( $value ),
-							esc_attr__( $setting['placeholder'] )
+							esc_attr( $setting['placeholder'] )
 						);
 						break;
 					case 'textarea':

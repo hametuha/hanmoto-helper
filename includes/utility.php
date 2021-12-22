@@ -42,7 +42,7 @@ function hanmoto_actions( $book ) {
 	];
 	// Others.
 	$associate = \Hametuha\HanmotoHelper\Controller\Settings::get_instance()->get_setting( 'associate_id' ) ?: 'hametuha-22';
-	$links[] = [
+	$links[]   = [
 		'id'        => 'amazon',
 		'label'     => __( 'Amazon', 'hanmoto' ),
 		'url'       => sprintf( 'https://www.amazon.co.jp/dp/%s?tag=%s&linkCode=ogi&th=1&psc=1&language=ja_JP', hanmoto_isbn10( $book['summary']['isbn'] ), $associate ),

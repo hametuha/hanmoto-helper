@@ -28,8 +28,8 @@ trait OpenDbApi {
 	 * @return \WP_Error|array
 	 */
 	public function openbd_get( $isbn ) {
-		$isbn = (array) $isbn;
-		$url = add_query_arg( [
+		$isbn   = (array) $isbn;
+		$url    = add_query_arg( [
 			'isbn' => implode( ',', array_map( 'trim', $isbn ) ),
 		], $this->openbd_url( 'get' ) );
 		$result = wp_remote_get( $url );
@@ -72,7 +72,7 @@ trait OpenDbApi {
 		$prefix = [];
 		foreach ( $codes as $code ) {
 			foreach ( $ids as $id ) {
-				$prefix[] = $code. $country_code . $id;
+				$prefix[] = $code . $country_code . $id;
 			}
 		}
 		return array_values( array_filter( $list, function( $isbn ) use ( $prefix ) {
@@ -103,7 +103,7 @@ trait OpenDbApi {
 				$result = wp_remote_get( add_query_arg( $params, $endpoint ) );
 				break;
 			case 'POST':
-				$result = wp_remote_post( $endpoint,  );
+				$result                   = wp_remote_post( $endpoint, );
 				$curl_opt[ CURLOPT_POST ] = true;
 				$params_escaped           = [];
 				foreach ( $params as $key => $value ) {
@@ -112,7 +112,8 @@ trait OpenDbApi {
 				$curl_opt[ CURLOPT_POSTFIELDS ] = $params_escaped;
 				break;
 			default:
-				return new WP_Error( 400, sprintf( __( 'Method %s is not allowed.', 'isbn-beautify' ), $method ) );
+				// translators: %s is method.
+				return new \WP_Error( 400, sprintf( __( 'Method %s is not allowed.', 'isbn-beautify' ), $method ) );
 				break;
 		}
 		$curl_opt[ CURLOPT_URL ] = $endpoint;

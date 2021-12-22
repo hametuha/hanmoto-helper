@@ -98,10 +98,10 @@ class WooCommerceSetting extends Singleton {
 					],
 				],
 				[
-					'title'       => __( '注文説明URL', 'hanmoto' ),
-					'id'          => 'hanmoto_retail_desc_url',
-					'type'        => 'url',
-					'desc'        => __( 'より詳細なURLがある場合は入力してください。', 'hanmoto' ),
+					'title' => __( '注文説明URL', 'hanmoto' ),
+					'id'    => 'hanmoto_retail_desc_url',
+					'type'  => 'url',
+					'desc'  => __( 'より詳細なURLがある場合は入力してください。', 'hanmoto' ),
 				],
 				[
 					'type' => 'sectionend',

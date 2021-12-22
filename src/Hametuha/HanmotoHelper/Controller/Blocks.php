@@ -33,8 +33,8 @@ class Blocks extends Singleton {
 			'render_callback' => [ $this, 'render_callback' ],
 		] );
 		wp_localize_script( 'hanmoto-isbn-block', 'HanmotoIsbnBlockVars', [
-			'name'  => $this->block_name(),
-			'label' => $this->block_label(),
+			'name'       => $this->block_name(),
+			'label'      => $this->block_label(),
 			'attributes' => $this->block_attributes(),
 		] );
 	}
@@ -64,7 +64,7 @@ class Blocks extends Singleton {
 	 */
 	protected function block_attributes() {
 		return [
-			'isbn' => [
+			'isbn'  => [
 				'type'    => 'string',
 				'default' => '',
 			],
@@ -84,8 +84,8 @@ class Blocks extends Singleton {
 	 */
 	public function render_callback( $attributes, $content ) {
 		$attributes = wp_parse_args( $attributes, $this->block_attributes() );
-		$style = $attributes['style'];
-		$isbn  = array_map( 'trim', array_filter( preg_split( '/(\r\n|\r|\n)/u', $attributes['isbn'] ), function( $var ) {
+		$style      = $attributes['style'];
+		$isbn       = array_map( 'trim', array_filter( preg_split( '/(\r\n|\r|\n)/u', $attributes['isbn'] ), function( $var ) {
 			return preg_match( '/\d{13}/u', $var );
 		} ) );
 		return $this->render_isbn( $isbn, $style );

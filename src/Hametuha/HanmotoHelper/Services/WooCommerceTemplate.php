@@ -59,32 +59,33 @@ class WooCommerceTemplate extends Singleton {
 	 * @return void
 	 */
 	public function product_meta() {
-		$output = [];
+		$output  = [];
 		$post_id = get_the_ID();
 		// ISBN.
 		$isbn = get_post_meta( $post_id, PostType::META_KEY_ISBN, true );
 		if ( $isbn ) {
-			$output []= sprintf( '<span class="isbn hanmoto-meta">ISBN: <code>%s</code></span>', esc_html( $isbn ) );
+			$output [] = sprintf( '<span class="isbn hanmoto-meta">ISBN: <code>%s</code></span>', esc_html( $isbn ) );
 		}
 		// Publisher.
 		$publisher = get_post_meta( $post_id, 'hanmoto_publisher', true );
 		if ( $publisher ) {
-			$output []= sprintf( '<span class="publisher hanmoto-meta">%s: <strong>%s</strong></span>', esc_html__( '発行者', 'hanmoto' ), esc_html( $publisher ) );
+			$output [] = sprintf( '<span class="publisher hanmoto-meta">%s: <strong>%s</strong></span>', esc_html__( '発行者', 'hanmoto' ), esc_html( $publisher ) );
 		}
 		// Published date.
 		$date = get_post_meta( $post_id, 'hanmoto_published_at', true );
 		if ( $date ) {
-			$output []= sprintf( '<span class="published_at  hanmoto-meta">%s: %s</span>', esc_html__( '発売日', 'hanmoto' ), esc_html( mysql2date( get_option( 'date_format' ), $date ) ) );
+			$output [] = sprintf( '<span class="published_at  hanmoto-meta">%s: %s</span>', esc_html__( '発売日', 'hanmoto' ), esc_html( mysql2date( get_option( 'date_format' ), $date ) ) );
 		}
 		// Page lenght.
 		$pages = get_post_meta( $post_id, 'hanmoto_pages', true );
 		if ( is_numeric( $pages ) ) {
-			$length = sprintf( _n( '%sページ', '%sページ', $pages, 'hanmoto' ), number_format( $pages ) );
-			$output []= sprintf( '<span class="page_length hanmoto-meta">%s: %s</span>', esc_html__( '長さ', 'hanmoto' ), esc_html( $length ) );
+			// translators: %s is page length.
+			$length    = sprintf( _n( '%sページ', '%sページ', $pages, 'hanmoto' ), number_format( $pages ) );
+			$output [] = sprintf( '<span class="page_length hanmoto-meta">%s: %s</span>', esc_html__( '長さ', 'hanmoto' ), esc_html( $length ) );
 		}
 		// Can order
 		if ( $this->helper->product_can_order( $post_id ) ) {
-			$output []= sprintf( '<span class="book_shop_order hanmoto-meta">%s: <a href="#tab-title-book_shop_order">%s</a></span>', esc_html__( '書店注文', 'hanmoto' ), esc_html__( '可能', 'hanmoto' ) );
+			$output [] = sprintf( '<span class="book_shop_order hanmoto-meta">%s: <a href="#tab-title-book_shop_order">%s</a></span>', esc_html__( '書店注文', 'hanmoto' ), esc_html__( '可能', 'hanmoto' ) );
 		}
 		$output = apply_filters( 'hanmoto_single_meta', $output, $post_id );
 		echo implode( "\n", $output );
@@ -101,7 +102,7 @@ class WooCommerceTemplate extends Singleton {
 			return;
 		}
 		$actions = array_filter( hanmoto_actions( $book ), function( $link ) {
-			return ! in_array( $link['id'], [ 'hanmoto', 'direct' ] );
+			return ! in_array( $link['id'], [ 'hanmoto', 'direct' ], true );
 		} );
 		if ( empty( $actions ) ) {
 			return;
@@ -117,6 +118,7 @@ class WooCommerceTemplate extends Singleton {
 				esc_attr( $link['id'] ),
 				esc_url( $link['url'] ),
 				esc_attr( implode( ' ', $rel ) ),
+				// translators: %s is shop name.
 				esc_html( sprintf( __( '%sで買う', 'hanmoto' ), $link['label'] ) )
 			);
 		}
@@ -132,7 +134,7 @@ class WooCommerceTemplate extends Singleton {
 	 */
 	public function tabs( $tabs ) {
 		if ( $this->helper->product_can_order( get_the_ID() ) ) {
-			$tabs[ 'book_shop_order' ] = [
+			$tabs['book_shop_order'] = [
 				'title'    => __( '書店注文情報', 'hanmoto' ),
 				'priority' => 40,
 				'callback' => [ $this, 'tab_content' ],
@@ -161,30 +163,32 @@ class WooCommerceTemplate extends Singleton {
 			}
 			$props = [];
 			// Coupon.
-			$coupon    = $this->order->get_shop_coupon();
+			$coupon = $this->order->get_shop_coupon();
 			if ( $coupon ) {
-				$props[ 'rate' ] = [
+				$props['rate'] = [
 					'label' => __( '掛け率', 'hanmoto' ),
 					'value' => sprintf( '%s%%', 100 - $coupon->get_amount() ),
 					'desc'  => '',
 				];
 			}
 			$props['date'] = [
-					'label' => __( '請求日', 'hanmoto' ),
-					'value' => sprintf( esc_html__( '%d日後請求確定', 'hanmoto' ), $this->helper->get_capture_date() ),
-					'desc'  => esc_html__( '注文日から指定の日数が経過すると請求が確定します。', 'hanmoto' ),
+				'label' => __( '請求日', 'hanmoto' ),
+				// translators: %d is days.
+				'value' => sprintf( esc_html__( '%d日後請求確定', 'hanmoto' ), $this->helper->get_capture_date() ),
+				'desc'  => esc_html__( '注文日から指定の日数が経過すると請求が確定します。', 'hanmoto' ),
 			];
-			$order_sheet = get_post_meta( get_the_ID(), 'hanmoto_order_sheet', true );
+			$order_sheet   = get_post_meta( get_the_ID(), 'hanmoto_order_sheet', true );
 			if ( $order_sheet ) {
 				$props['order_sheet'] = [
 					'label' => __( '注文書', 'hanmoto' ),
+					// translators: %s is URL.
 					'value' => wp_kses_post( sprintf( __( '<a href="%s" target="_blank" rel="noopener noreferrer">注文用FAX</a>', 'hanmoto' ), esc_url( $order_sheet ) ) ),
 					'desc'  => esc_html__( 'ダウンロードしてご利用ください。', 'hanmoto' ),
 				];
 			}
 			$url = get_option( 'hanmoto_retail_external_url' );
 			if ( $url ) {
-				$label = get_option( 'hanmoto_retail_external_label' ) ?: __( '外部注文サイト', 'hanmoto' );
+				$label               = get_option( 'hanmoto_retail_external_label' ) ?: __( '外部注文サイト', 'hanmoto' );
 				$props['order_site'] = [
 					'label' => __( '他の注文方法', 'hanmoto' ),
 					'value' => sprintf(
@@ -204,6 +208,7 @@ class WooCommerceTemplate extends Singleton {
 					foreach ( $actions as $action ) {
 						$props['hanmoto'] = [
 							'label' => __( '参考情報', 'hanmoto' ),
+							// translators: %s is URL.
 							'value' => wp_kses_post( sprintf( __( '<a href="%s" target="_blank" rel="noopener noreferrer">版元ドットコムの情報を見る</a>', 'hanmoto' ), esc_url( $action['url'] ) ) ),
 						];
 					}
@@ -238,26 +243,38 @@ class WooCommerceTemplate extends Singleton {
 
 			<?php
 			// Book shop registration.
-			if ( ! current_user_can( 'book_shop' ) ) : ?>
+			if ( ! current_user_can( 'book_shop' ) ) :
+				?>
 				<h3><?php esc_html_e( '書店として登録', 'hanmoto' ); ?></h3>
 				<ol>
 					<?php if ( ! is_user_logged_in() ) : ?>
 						<li>
-							<?php echo wp_kses_post( sprintf(
+							<?php
+							echo wp_kses_post( sprintf(
+								// translators: %1$s is URL.
 								__( '<a href="%1$s">ユーザー登録</a>または<a href="%1$s">ログイン</a>をしてください。', 'hanmoto' ),
 								esc_url( wc_get_page_permalink( 'myaccount' ) )
-							) ) ?>
+							) )
+							?>
 						</li>
 					<?php endif; ?>
 					<li>
-						<?php echo wp_kses_post( sprintf(
+						<?php
+						echo wp_kses_post( sprintf(
+							// translators: %1$s is URL.
 							__( '<a href="%1$s">マイアカウント</a>の「住所 ＞ 請求先情報」を書店の住所にし、「書店として登録」にチェックを入れてください。', 'hanmoto' ),
 							esc_url( wc_get_page_permalink( 'myaccount' ) )
-						) ) ?>
+						) )
+						?>
 					</li>
 				</ol>
 			<?php else : ?>
-				<p class="description"><?php printf( esc_html__( 'こんにちは、%sさん。書店として登録済みです。', 'hanmoto' ), esc_html( wp_get_current_user()->display_name ) ) ?></p>
+				<p class="description">
+					<?php
+					// translators: %s is customer's name.
+					printf( esc_html__( 'こんにちは、%sさん。書店として登録済みです。', 'hanmoto' ), esc_html( wp_get_current_user()->display_name ) );
+					?>
+				</p>
 			<?php endif; ?>
 
 		</div>

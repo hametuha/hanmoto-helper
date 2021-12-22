@@ -39,15 +39,15 @@ class PostType extends Singleton {
 	 */
 	public function create_post_type() {
 		$post_type_args = apply_filters( 'hanmoto_post_type_args', [
-			'label'  => __( 'Books', 'hanmoto' ),
-			'labels' => [
+			'label'        => __( 'Books', 'hanmoto' ),
+			'labels'       => [
 				'singular_name' => __( 'Book', 'hanmoto' ),
 			],
-			'public'  => false,
-			'show_ui' => true,
+			'public'       => false,
+			'show_ui'      => true,
 			'show_in_rest' => true,
-			'menu_icon'  => 'dashicons-book',
-			'supports' =>  [ 'title', 'editor', 'author', 'custom-fields' ],
+			'menu_icon'    => 'dashicons-book',
+			'supports'     => [ 'title', 'editor', 'author', 'custom-fields' ],
 		] );
 		register_post_type( 'books', $post_type_args );
 	}
@@ -99,16 +99,16 @@ class PostType extends Singleton {
 		$updated = 0;
 		$created = 0;
 		$failed  = 0;
-		$isbns = array_map( function( $book ) {
+		$isbns   = array_map( function( $book ) {
 			return $book['summary']['isbn'];
 		}, $books );
-		$exists = [];
+		$exists  = [];
 		// Get existing posts.
 		$per_page = 100;
 		$paged    = 1;
 		while ( true ) {
 			$query = new \WP_Query( [
-				'post_type' => $this->option()->post_type,
+				'post_type'       => $this->option()->post_type,
 				'posts_page_page' => $per_page,
 				'paged'           => $paged,
 				'meta_query'      => [
@@ -128,9 +128,9 @@ class PostType extends Singleton {
 			$paged++;
 		}
 		foreach ( $books as $book ) {
-			$isbn  = $book['summary']['isbn'];
-			$title = $book['summary']['title'];
-			$args = [
+			$isbn      = $book['summary']['isbn'];
+			$title     = $book['summary']['title'];
+			$args      = [
 				'post_type'  => $this->option()->post_type,
 				'post_name'  => $isbn,
 				'post_title' => $title,
@@ -140,7 +140,7 @@ class PostType extends Singleton {
 			if ( isset( $exists[ $isbn ] ) ) {
 				// Existing.
 				$args['ID'] = $exists[ $isbn ];
-				$on_update = true;
+				$on_update  = true;
 			} else {
 				// Newly create.
 				$args['post_status'] = 'publish';

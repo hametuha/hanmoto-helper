@@ -56,8 +56,8 @@ class WooCommerceHelper extends Singleton {
 	 */
 	public function get_product_rate( $product = null ) {
 		$product = wc_get_product( $product );
-		$meta = get_post_meta( $product->id, self::META_KEY_RESALE_RATE, true );
-		$rate = $this->get_global_rate();
+		$meta    = get_post_meta( $product->id, self::META_KEY_RESALE_RATE, true );
+		$rate    = $this->get_global_rate();
 		if ( $meta && is_numeric( $meta ) ) {
 			$rate = (float) $meta;
 		}
@@ -171,16 +171,16 @@ class WooCommerceHelper extends Singleton {
 				] );
 
 				woocommerce_wp_text_input( [
-					'id'          => 'hanmoto_published_at',
-					'value'       => get_post_meta( $product_object->id, 'hanmoto_published_at', true ),
-					'label'       => __( '発行日', 'hanmoto' ),
-					'type'        => 'date',
+					'id'    => 'hanmoto_published_at',
+					'value' => get_post_meta( $product_object->id, 'hanmoto_published_at', true ),
+					'label' => __( '発行日', 'hanmoto' ),
+					'type'  => 'date',
 				] );
 
 				woocommerce_wp_text_input( [
 					'id'          => 'hanmoto_pages',
 					'value'       => get_post_meta( $product_object->id, 'hanmoto_pages', true ),
-					'type'   => 'number',
+					'type'        => 'number',
 					'label'       => __( 'ページ数', 'hanmoto' ),
 					'placeholder' => 'e.g. 304',
 				] );
@@ -218,15 +218,15 @@ class WooCommerceHelper extends Singleton {
 				] );
 
 				woocommerce_wp_textarea_input( [
-					'id'          => 'hanmoto_promotion_tools',
-					'value'       => get_post_meta( $product_object->id, 'hanmoto_promotion_tools', true ),
-					'label'       => __( '販促ツールなど', 'hanmoto' ),
+					'id'    => 'hanmoto_promotion_tools',
+					'value' => get_post_meta( $product_object->id, 'hanmoto_promotion_tools', true ),
+					'label' => __( '販促ツールなど', 'hanmoto' ),
 				] );
 
 				?>
 			</div>
 		</div>
-	<?php
+		<?php
 	}
 
 	/**
@@ -236,7 +236,7 @@ class WooCommerceHelper extends Singleton {
 	 */
 	public function get_product_book( $product = null ) {
 		$product = wc_get_product( $product );
-		$isbn = get_post_meta( $product->id, PostType::META_KEY_ISBN, true );
+		$isbn    = get_post_meta( $product->id, PostType::META_KEY_ISBN, true );
 		if ( ! $isbn ) {
 			return null;
 		}

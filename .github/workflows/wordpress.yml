@@ -3,12 +3,12 @@ name: Deploy Plugin
 on:
   push:
     branches:
-      - main
+      - master
     tags:
       - '*'
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   test:
@@ -48,7 +48,7 @@ jobs:
         run: bash bin/install-wp-tests.sh wordpress root root 127.0.0.1:3306 ${{ matrix.wp }}
 
       - name: Check PHP syntax
-        run: composer test
+        run: composer lint
 
   assets:
     name: Assets Test

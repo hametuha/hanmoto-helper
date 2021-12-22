@@ -28,7 +28,7 @@ class RestBookInfo extends RestApiPattern {
 	 * @return string[]
 	 */
 	protected function methods() {
-		return ['GET'];
+		return [ 'GET' ];
 	}
 
 	/**
@@ -44,7 +44,7 @@ class RestBookInfo extends RestApiPattern {
 					return $post && $this->option()->post_type === $post->post_type;
 				},
 			],
-			'isbn' => [
+			'isbn'    => [
 				'type'              => 'string',
 				'default'           => '',
 				'validate_callback' => function( $var ) {

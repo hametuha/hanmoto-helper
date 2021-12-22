@@ -23,7 +23,7 @@ trait Accessor {
 	 * @return mixed
 	 */
 	public function __get( $name ) {
-		switch( $name ) {
+		switch ( $name ) {
 			case 'helper':
 				return WooCommerceHelper::get_instance();
 			case 'order':

@@ -9,10 +9,9 @@
 /* global HanmotoIsbnBlockVars: false */
 
 const { serverSideRender: ServerSideRender } = wp;
-const { __, sprintf } = wp.i18n;
+const { __ } = wp.i18n;
 const { registerBlockType } = wp.blocks;
 const { InspectorControls } = wp.blockEditor;
-const { select } = wp.data;
 const { PanelBody, SelectControl, TextareaControl } = wp.components;
 
 //

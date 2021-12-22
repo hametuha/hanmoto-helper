@@ -49,7 +49,7 @@ class WooCommerceOrder extends Singleton {
 		add_action( 'init', [ $this, 'register_status' ] );
 		add_filter( 'wc_order_statuses', [ $this, 'order_statuses' ] );
 		add_action( 'woocommerce_order_status_processing', [ $this, 'set_processing_date' ], 1 );
-		add_filter( 'click_post_for_woo_imported_order_status', [ $this, 'imported_order_status' ], 10, 2);
+		add_filter( 'click_post_for_woo_imported_order_status', [ $this, 'imported_order_status' ], 10, 2 );
 		// Notifications.
 		add_action( 'woocommerce_thankyou_order_received_text', [ $this, 'thank_you_notice' ], 10, 2 );
 		add_action( 'woocommerce_email_order_details', [ $this, 'processing_email' ], 10, 4 );
@@ -70,7 +70,8 @@ class WooCommerceOrder extends Singleton {
 			'exclude_from_search'       => false,
 			'show_in_admin_all_list'    => true,
 			'show_in_admin_status_list' => true,
-			'label_count'               => _n_noop( '出荷済み (%s)', '出荷済み(%s)', 'hanmoto' )
+			// translators: %s is number.
+			'label_count'               => _n_noop( '出荷済み (%s)', '出荷済み(%s)', 'hanmoto' ),
 		] );
 	}
 
@@ -103,9 +104,9 @@ class WooCommerceOrder extends Singleton {
 	public function meta_cap( $caps, $cap, $user_id ) {
 		if ( 'book_shop' === $cap ) {
 			if ( get_user_meta( $user_id, 'is_book_shop', true ) ) {
-				$caps []= 'read';
+				$caps [] = 'read';
 			} else {
-				$caps []= 'do_not_allow';
+				$caps [] = 'do_not_allow';
 			}
 			$caps = array_values( array_filter( $caps, function( $c ) {
 				return 'book_shop' !== $c;
@@ -163,7 +164,7 @@ class WooCommerceOrder extends Singleton {
 	 *
 	 * @return void
 	 */
-	public function book_shop_form( $value  ) {
+	public function book_shop_form( $value ) {
 		wp_enqueue_script( 'hanmoto-book-shop-account' );
 		wp_localize_script( 'hanmoto-book-shop-account', 'HanmotoBookShopAccount', [
 			'confirm_on'  => __( '請求先住所を書店として登録します。よろしいですか？', 'hanmoto' ),
@@ -174,7 +175,7 @@ class WooCommerceOrder extends Singleton {
 		<h2><?php esc_html_e( '書店登録', 'hanmoto' ); ?></h2>
 		<p>
 			<label>
-				<input type="checkbox" value="1" id="hanmoto-is-book-shop"<?php checked( current_user_can( 'book_shop' ) ) ?> />
+				<input type="checkbox" value="1" id="hanmoto-is-book-shop"<?php checked( current_user_can( 'book_shop' ) ); ?> />
 				<?php esc_html_e( '書店として利用する', 'hanmoto' ); ?>
 			</label>
 		</p>
@@ -208,7 +209,7 @@ class WooCommerceOrder extends Singleton {
 	 * @return array
 	 */
 	public function custom_coupon_type( $discount_types ) {
-		$discount_types[ self::COUPON_TYPE ] =__( '書店注文', 'hanmoto' );
+		$discount_types[ self::COUPON_TYPE ] = __( '書店注文', 'hanmoto' );
 		return $discount_types;
 	}
 
@@ -292,7 +293,7 @@ class WooCommerceOrder extends Singleton {
 	 * @return bool
 	 */
 	public function is_shop_order( $order ) {
-		$order = wc_get_order( $order );
+		$order       = wc_get_order( $order );
 		$shop_coupon = $this->get_shop_coupon();
 		if ( ! $shop_coupon ) {
 			return false;
@@ -341,8 +342,8 @@ class WooCommerceOrder extends Singleton {
 	 */
 	public function get_discount_amount( $discount, $discounting_amount, $cart_item, $single, $coupon ) {
 		if ( $this->is_shop_coupon( $coupon ) ) {
-			$rate = min( 100, $coupon->get_amount() ) / 100;
-			$discount = $cart_item[ 'line_subtotal' ] / $cart_item['quantity'] * $rate;
+			$rate     = min( 100, $coupon->get_amount() ) / 100;
+			$discount = $cart_item['line_subtotal'] / $cart_item['quantity'] * $rate;
 		}
 		return $discount;
 	}
@@ -400,6 +401,7 @@ class WooCommerceOrder extends Singleton {
 		}
 		$now = current_time( 'mysql', true );
 		update_post_meta( $order_id, self::META_KEY_WILL_CAPTURE, $now );
+		// translators: %s is date.
 		$order->add_order_note( sprintf( __( 'この注文は%sに請求されます。', 'hanmoto' ), $this->will_captured( $order ) ) );
 	}
 
@@ -444,7 +446,7 @@ class WooCommerceOrder extends Singleton {
 		if ( ! $format ) {
 			$format = get_option( 'date_format' );
 		}
-		$ordered = strtotime( get_post_meta( $order->get_id(), self::META_KEY_WILL_CAPTURE, true ) );
+		$ordered  = strtotime( get_post_meta( $order->get_id(), self::META_KEY_WILL_CAPTURE, true ) );
 		$ordered += 60 * 60 * 24 * WooCommerceSetting::capture_days();
 		return date_i18n( $format, $ordered );
 	}
@@ -456,7 +458,7 @@ class WooCommerceOrder extends Singleton {
 	 * @return \WC_Email[]
 	 */
 	public function email_classes( $emails ) {
-		$emails[ 'hanmoto-shipping-notice' ] = new ShippingNotice();
+		$emails['hanmoto-shipping-notice'] = new ShippingNotice();
 		return $emails;
 	}
 
@@ -475,9 +477,9 @@ class WooCommerceOrder extends Singleton {
 		if ( 'now' === $date ) {
 			$date = current_time( 'mysql', true );
 		}
-		$time = strtotime( $date ) - 60 * 60 * 24 * $offset;
-		$should = date( 'Y-m-d H:i:s', $time );
-		$query = new \WP_Query( [
+		$time   = strtotime( $date ) - 60 * 60 * 24 * $offset;
+		$should = gmdate( 'Y-m-d H:i:s', $time );
+		$query  = new \WP_Query( [
 			'post_type'      => 'shop_order',
 			'post_status'    => 'wc-' . self::STATUS,
 			'posts_per_page' => -1,

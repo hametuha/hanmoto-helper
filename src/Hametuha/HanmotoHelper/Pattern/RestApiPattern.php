@@ -28,7 +28,7 @@ abstract class RestApiPattern extends Singleton {
 	 * @return string[]
 	 */
 	protected function methods() {
-		return ['GET'];
+		return [ 'GET' ];
 	}
 
 	/**

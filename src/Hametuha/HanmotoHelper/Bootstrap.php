@@ -55,7 +55,7 @@ class Bootstrap extends Singleton {
 			}
 			$url = plugin_dir_url( hanmoto_root_dir() . '/dist' ) . $asset['path'];
 			switch ( $asset['ext'] ) {
-				case 'css';
+				case 'css':
 					wp_register_style( $asset['handle'], $url, $asset['deps'], $asset['version'], $asset['media'] );
 					break 1;
 				case 'js':

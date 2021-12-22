@@ -1,49 +1,47 @@
-.isbnb{
-  &-collection{
-    margin: 1em 0;
-  }
-  $image-width: 120px;
-  &-item{
-    margin-bottom: 1em;
-    &:after{
-      content: "";
-      display: block;
-      clear: both;
-    }
-    &:last-child{
-      margin-bottom: 0;
-    }
-    &-image{
-      width: $image-width;
-      float: left;
-      img{
-        max-width: 100%;
-        width: auto;
-        height: auto;
-      }
-    }
-    &-content{
-      margin-left: $image-width + 20;
-    }
-    &-title{
-      font-size: 1.2em;
-      font-weight: bold;
-    }
-    &-meta{
-      margin: 10px 0;
-      font-size: 0.85em;
-      &-list{
-        margin: 0;
-      }
-      th{
-        font-weight: bold;
-      }
-      td{
-      }
-    }
-    &-desc{
-      clear: both;
-      margin-top: 20px;
-    }
-  }
+.isbnb {
+	&-collection {
+		margin: 1em 0;
+	}
+	$image-width: 120px;
+	&-item {
+		margin-bottom: 1em;
+		&::after {
+			content: "";
+			display: block;
+			clear: both;
+		}
+		&:last-child {
+			margin-bottom: 0;
+		}
+		&-image {
+			width: $image-width;
+			float: left;
+			img {
+				max-width: 100%;
+				width: auto;
+				height: auto;
+			}
+		}
+		&-content {
+			margin-left: $image-width + 20;
+		}
+		&-title {
+			font-size: 1.2em;
+			font-weight: 700;
+		}
+		&-meta {
+			margin: 10px 0;
+			font-size: 0.85em;
+			&-list {
+				margin: 0;
+			}
+			th {
+				font-weight: 700;
+			}
+		}
+		&-desc {
+			clear: both;
+			margin-top: 20px;
+		}
+	}
 }

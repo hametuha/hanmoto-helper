@@ -28,7 +28,7 @@ $( document ).ready( function() {
 			wp.apiFetch( {
 				method,
 				path: '/hanmoto/v1/registration/shop',
-			} ).then( ( res ) => {
+			} ).then( () => {
 				// Do nothing.
 			} ).catch( ( res ) => {
 				alert( res.message );
