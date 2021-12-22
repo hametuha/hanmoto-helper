@@ -35,6 +35,7 @@ function hanmoto_actions( $book ) {
 	$links = [];
 	// Hanmoto.
 	$links[] = [
+		'id'        => 'hanmoto',
 		'label'     => __( '版元ドットコム', 'hanmoto' ),
 		'url'       => sprintf( 'https://www.hanmoto.com/bd/isbn/%s', $book['summary']['isbn'] ),
 		'sponsored' => false,
@@ -42,6 +43,7 @@ function hanmoto_actions( $book ) {
 	// Others.
 	$associate = \Hametuha\HanmotoHelper\Controller\Settings::get_instance()->get_setting( 'associate_id' ) ?: 'hametuha-22';
 	$links[] = [
+		'id'        => 'amazon',
 		'label'     => __( 'Amazon', 'hanmoto' ),
 		'url'       => sprintf( 'https://www.amazon.co.jp/dp/%s?tag=%s&linkCode=ogi&th=1&psc=1&language=ja_JP', hanmoto_isbn10( $book['summary']['isbn'] ), $associate ),
 		'sponsored' => true,
@@ -49,6 +51,7 @@ function hanmoto_actions( $book ) {
 	// Original store.
 	if ( ! empty( $book['hanmoto']['storelink'] ) ) {
 		$links[] = [
+			'id'        => 'direct',
 			'label'     => __( '直販', 'hanmoto' ),
 			'url'       => $book['hanmoto']['storelink'],
 			'sponsored' => false,

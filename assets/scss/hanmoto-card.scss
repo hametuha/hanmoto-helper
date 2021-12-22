@@ -117,7 +117,7 @@
 			}
 
 			@each $brand, $color in (
-				amazon: #e47911,
+				amazon: #ffa41c,
 				hanmoto: #c00,
 			) {
 				&[href*="#{$brand}."] {

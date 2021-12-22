@@ -5,6 +5,7 @@ namespace Hametuha\HanmotoHelper\Utility;
 
 use cli\Table;
 use Hametuha\HanmotoHelper\Controller\PostType;
+use Hametuha\HanmotoHelper\Services\WooCommerceOrder;
 use PHP_CodeSniffer\Standards\Squiz\Sniffs\CSS\OpacitySniff;
 
 /**
@@ -80,5 +81,40 @@ class Commands extends \WP_CLI_Command {
 		}
 		list( $created, $updated, $failed ) = $result;
 		\WP_CLI::success( sprintf( 'Created %d, Updated %d, Failed %d' , $created, $updated, $failed ) );
+	}
+
+	/**
+	 * Display order list.
+	 *
+	 * @param array $args command option.
+	 * @synopsis <days> [<date>]
+	 */
+	public function orders( $args ) {
+		if ( ! class_exists( 'WooCommerce' ) ) {
+			\WP_CLI::error( 'WooCommerce is not active.' );
+		}
+		$args[] = 'now';
+		list( $days, $date ) = $args;
+		$orders = WooCommerceOrder::get_instance()->get_order_to_capture( $days, $date );
+		if ( empty( $orders ) ) {
+			\WP_CLI::success( 'No orders matched.' );
+			exit;
+		}
+		$table = new \cli\Table();
+		$table->setHeaders( [ 'ID', 'Name', 'Price', 'Captured' ] );
+		foreach ( $orders as $order ) {
+			$name    = $order->get_formatted_billing_full_name();
+			$company = $order->get_billing_company();
+			if ( $company ) {
+				$name .= sprintf( ' (%s)', $company );
+			}
+			$table->addRow( [
+				$order->get_id(),
+				$name,
+				$order->get_total(),
+				WooCommerceOrder::get_instance()->will_captured( $order, 'Y-m-d H:i:s' ),
+			] );
+		}
+		$table->display();
 	}
 }
