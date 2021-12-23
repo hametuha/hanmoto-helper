@@ -232,14 +232,7 @@ class WooCommerceOrder extends Singleton {
 		if ( ! $coupon ) {
 			return;
 		}
-		if ( ! current_user_can( 'book_shop' ) ) {
-			printf(
-				'<span class="description">%s &raquo; <a href="%s">%s</a></span>',
-				esc_html__( '書店取引をご希望の方はログインして「マイアカウント ＞ 住所 ＞ 請求先情報」から登録してください。', 'hanmoto' ),
-				esc_url( wc_get_page_permalink( 'myaccount' ) ),
-				esc_html__( 'マイアカウント', 'hanmoto' )
-			);
-		} else {
+		if ( current_user_can( 'book_shop' ) ) {
 			printf(
 				'<button class="button" id="book-shop-coupon" data-coupon="%s">%s</span>',
 				esc_attr( $coupon->get_code() ),

@@ -5,7 +5,7 @@ namespace Hametuha\HanmotoHelper\Controller;
 
 use Hametuha\HanmotoHelper\Pattern\Singleton;
 use Hametuha\HanmotoHelper\Services\WooCommerceOrder;
-use Hametuha\HanmotoHelper\Services\WoocommerceSetting;
+use Hametuha\HanmotoHelper\Services\WooCommerceSetting;
 use Hametuha\HanmotoHelper\Services\WooCommerceTemplate;
 use Hametuha\HanmotoHelper\Utility\OpenDbApi;
 

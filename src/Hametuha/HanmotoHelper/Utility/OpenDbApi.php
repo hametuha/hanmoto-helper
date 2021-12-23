@@ -92,10 +92,9 @@ trait OpenDbApi {
 	 * @param string $method GET or POST.
 	 * @param array $params Query parameter.
 	 *
-	 * @return object|array|WP_Error
+	 * @return object|array|\WP_Error
 	 */
 	protected function openbd_request( $endpoint, $method = 'GET', $params = [] ) {
-		$endpoint =
 		$method   = strtoupper( $method );
 		$params   = (array) $params;
 		switch ( $method ) {
@@ -103,7 +102,7 @@ trait OpenDbApi {
 				$result = wp_remote_get( add_query_arg( $params, $endpoint ) );
 				break;
 			case 'POST':
-				$result                   = wp_remote_post( $endpoint, );
+				$result                   = wp_remote_post( $endpoint );
 				$curl_opt[ CURLOPT_POST ] = true;
 				$params_escaped           = [];
 				foreach ( $params as $key => $value ) {
@@ -130,7 +129,7 @@ trait OpenDbApi {
 		curl_close( $ch );
 		$response = json_decode( $result );
 		if ( ! $response ) {
-			return new WP_Error( 500, __( 'Failed to parse response. something might be wrong.', 'isbn-beautify' ) );
+			return new \WP_Error( 500, __( 'Failed to parse response. something might be wrong.', 'isbn-beautify' ) );
 		}
 
 		return $response;

@@ -22,11 +22,16 @@ class WooCommerceTemplate extends Singleton {
 	 * @inheritDoc
 	 */
 	protected function init() {
+		// Single product.
 		add_action( 'woocommerce_single_product_summary', [ $this, 'after_title' ], 6 );
 		add_action( 'woocommerce_product_meta_start', [ $this, 'product_meta' ] );
-		add_action( 'woocommerce_after_add_to_cart_form', [ $this, 'external_buttons' ] );
+		add_action( 'woocommerce_after_add_to_cart_form', [ $this, 'external_buttons' ], 1 );
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		add_filter( 'woocommerce_product_tabs', [ $this, 'tabs' ] );
+		// Cart.
+		add_action( 'woocommerce_before_cart_table', [ $this, 'before_cart' ] );
+		add_action( 'woocommerce_after_cart_item_name', [ $this, 'item_in_cart' ], 10, 2 );
+
 	}
 
 	/**
@@ -281,4 +286,48 @@ class WooCommerceTemplate extends Singleton {
 		<?php
 	}
 
+	/**
+	 * Display notice on cart.
+	 *
+	 * @return void
+	 */
+	public function before_cart() {
+		if ( current_user_can( 'book_shop' ) ) {
+			printf(
+				'<p class="description">%s</p>',
+				esc_html__( '「書店注文価格を適用」をクリックすると割引価格が適用されます。', 'hanmoto' )
+			);
+		} else {
+			printf(
+				'<p><span class="description">%s &raquo; <a href="%s">%s</a></span></p>',
+				esc_html__( '書店取引をご希望の方はログインして「マイアカウント ＞ 住所 ＞ 請求先情報」から登録してください。', 'hanmoto' ),
+				esc_url( wc_get_page_permalink( 'myaccount' ) ),
+				esc_html__( 'マイアカウント', 'hanmoto' )
+			);
+		}
+	}
+
+	/**
+	 * If item is orderable, display.
+	 *
+	 * @param array  $item $product.
+	 * @param string $item_key Item key.
+	 * @return void
+	 */
+	public function item_in_cart( $item, $item_key ) {
+		if ( ! $this->helper->product_can_order( $item['product_id'] ) ) {
+			// This is not orderable.
+			return;
+		}
+		$coupon = $this->order->get_shop_coupon();
+		if ( ! $coupon ) {
+			return;
+		}
+		$product = wc_get_product( $item['product_id'] );
+		$rate  = min( 100, 100 - $coupon->get_amount() );
+		$price = (int) ( $product->get_price() / 100 * $rate );
+		?>
+		<span class="hanmoto-cart-detail"><strong>書店注文<?php echo esc_html( $rate ) ?>%</strong>（<?php echo number_format( $price ) ?>円）</span>
+		<?php
+	}
 }
