@@ -95,8 +95,8 @@ trait OpenDbApi {
 	 * @return object|array|\WP_Error
 	 */
 	protected function openbd_request( $endpoint, $method = 'GET', $params = [] ) {
-		$method   = strtoupper( $method );
-		$params   = (array) $params;
+		$method = strtoupper( $method );
+		$params = (array) $params;
 		switch ( $method ) {
 			case 'GET':
 				$result = wp_remote_get( add_query_arg( $params, $endpoint ) );

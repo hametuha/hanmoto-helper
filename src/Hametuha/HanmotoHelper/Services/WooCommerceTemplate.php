@@ -324,10 +324,10 @@ class WooCommerceTemplate extends Singleton {
 			return;
 		}
 		$product = wc_get_product( $item['product_id'] );
-		$rate  = min( 100, 100 - $coupon->get_amount() );
-		$price = (int) ( $product->get_price() / 100 * $rate );
+		$rate    = min( 100, 100 - $coupon->get_amount() );
+		$price   = (int) ( $product->get_price() / 100 * $rate );
 		?>
-		<span class="hanmoto-cart-detail"><strong>書店注文<?php echo esc_html( $rate ) ?>%</strong>（<?php echo number_format( $price ) ?>円）</span>
+		<span class="hanmoto-cart-detail"><strong>書店注文<?php echo esc_html( $rate ); ?>%</strong>（<?php echo number_format( $price ); ?>円）</span>
 		<?php
 	}
 }
