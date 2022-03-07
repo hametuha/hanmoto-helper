@@ -51,7 +51,7 @@ function hanmoto_actions( $book ) {
 	// Rakuten.
 	$rakuten_link = hanmoto_rakuten_url( $book['summary']['isbn'] );
 	if ( ! is_wp_error( $rakuten_link ) ) {
-		$links[]   = [
+		$links[] = [
 			'id'        => 'rakuten',
 			'label'     => __( '楽天ブックス', 'hanmoto' ),
 			'url'       => $rakuten_link,
