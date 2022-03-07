@@ -315,6 +315,9 @@ class WooCommerceTemplate extends Singleton {
 	 * @return void
 	 */
 	public function item_in_cart( $item, $item_key ) {
+		if ( ! current_user_can( 'book_shop' ) ) {
+			return;
+		}
 		if ( ! $this->helper->product_can_order( $item['product_id'] ) ) {
 			// This is not orderable.
 			return;

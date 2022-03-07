@@ -152,6 +152,19 @@ class Settings extends Singleton {
 				'type'        => 'text',
 				'placeholder' => 'hametuha-22',
 			],
+			[
+				'id'          => 'rakuten_app_id',
+				'label'       => __( 'Rakuten App ID', 'hanmoto' ),
+				'type'        => 'text',
+				'placeholder' => '1051183079836014250',
+				'help'        => __( 'If set, generate link to Rakuten Books.', 'hanmoto' ),
+			],
+			[
+				'id'          => 'rakuten_affiliate_id',
+				'label'       => __( 'Rakuten Affiliate ID', 'hanmoto' ),
+				'type'        => 'text',
+				'placeholder' => '0e9cde67.8fb388cd.0e9cde68.6632f7db',
+			],
 		];
 	}
 

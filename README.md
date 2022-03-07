@@ -31,6 +31,14 @@ npm install && npm run gulp build
 
 ## Changelog
 
+### 2.1.1
+
+* Rakuten books supported.
+
+### 2.0.0
+
+* WooCommerce supported.
+
 ### 1.0.0
 
 * First release.

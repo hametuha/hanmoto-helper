@@ -15,6 +15,10 @@
 
 .hanmoto-button {
 
+	& + & {
+		margin-left: 0.875em;
+	}
+
 	&-amazon {
 		color: #000 !important;
 		border-color: #ff8f00 !important;
@@ -26,6 +30,16 @@
 		}
 	}
 
+	&-rakuten {
+		color: #bf0000 !important;
+		border: 1px solid #bf0000 !important;
+		background-color: #fff !important;
+
+		&:hover {
+			color: #fff !important;
+			background-color: #bf0000 !important;
+		}
+	}
 }
 
 .hanmoto-book-shop {
