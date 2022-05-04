@@ -22,9 +22,9 @@ class TemplateTags extends Singleton {
 	 * @return array
 	 */
 	public static function get_list( $lifetime = 1800, $country_code = '4', $allow_979 = true ) {
-		$ids      = self::setting()->get_publisher_ids();
-		$key      = 'hanmoto_list_' . md5( implode( ',', [ implode( ',', $ids ), $country_code, $allow_979 ? '1' : '0' ] ) );
-		$cash     = get_transient( $key );
+		$ids  = self::setting()->get_publisher_ids();
+		$key  = 'hanmoto_list_' . md5( implode( ',', [ implode( ',', $ids ), $country_code, $allow_979 ? '1' : '0' ] ) );
+		$cash = get_transient( $key );
 		if ( false !== $cash ) {
 			return $cash;
 		}
@@ -57,7 +57,7 @@ class TemplateTags extends Singleton {
 	 * @return false|string
 	 */
 	public static function render_list( $limit = 12, $template = '' ) {
-		$books  = self::get_list();
+		$books = self::get_list();
 		if ( empty( $books ) ) {
 			return '';
 		}
