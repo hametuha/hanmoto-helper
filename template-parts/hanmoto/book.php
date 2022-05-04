@@ -12,9 +12,9 @@ $book = $args['book'];
 <div class="hanmoto-book hanmoto-book-card">
 
 	<?php if ( ! empty( $book['summary']['cover'] ) ) : ?>
-	<div class="hanmoto-book-cover">
-		<img class="hanmoto-book-image" src="<?php echo esc_url( $book['summary']['cover'] ); ?>" alt="<?php echo esc_attr( $book['summary']['title'] ); ?>" />
-	</div>
+	<figure class="hanmoto-book-cover">
+		<img class="hanmoto-book-image" width="200" height="296" src="<?php echo esc_url( $book['summary']['cover'] ); ?>" alt="<?php echo esc_attr( $book['summary']['title'] ); ?>" loading="lazy" />
+	</figure>
 	<?php else : ?>
 		<?php do_action( 'hanmoto_no_image', $book ); ?>
 	<?php endif; ?>
@@ -22,11 +22,11 @@ $book = $args['book'];
 		<p class="hanmoto-book-title"><?php echo esc_html( $book['summary']['title'] ); ?></p>
 		<p class="hanmoto-book-author"><?php echo esc_html( $book['summary']['author'] ); ?></p>
 		<dl class="hanmoto-book-properties">
-			<dt><?php esc_html_e( '出版者', 'hanmoto' ); ?></dt>
-			<dd><?php echo esc_html( $book['summary']['publisher'] ); ?></dd>
+			<dt class="hanmoto-book-property-publisher"><?php esc_html_e( '出版者', 'hanmoto' ); ?></dt>
+			<dd class="hanmoto-book-property-publisher"><?php echo esc_html( $book['summary']['publisher'] ); ?></dd>
 			<dt>ISBN</dt>
-			<dd><?php echo esc_html( $book['summary']['isbn'] ); ?></dd>
-			<dt><?php esc_html_e( 'ページ数', 'hanmoto' ); ?></dt>
+			<dd class="hanmoto-book-property-isbn"><?php echo esc_html( $book['summary']['isbn'] ); ?></dd>
+			<dt class="hanmoto-book-property-isbn"><?php esc_html_e( 'ページ数', 'hanmoto' ); ?></dt>
 			<dd>
 			<?php
 				$page = $book['onix']['DescriptiveDetail']['Extent'][0]['ExtentValue'];

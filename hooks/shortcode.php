@@ -34,3 +34,20 @@ add_action( 'register_shortcode_ui', function () {
 		],
 	] );
 } );
+
+/**
+ * List of book shortcode
+ *
+ * @param array  $atts    Attributes.
+ * @param string $content Contents.
+ * @return string
+ */
+add_shortcode( 'books', function( $atts = [], $content = '' ) {
+	$atts = shortcode_atts( [
+		'limit' => 12,
+	], $atts, 'books' );
+	return sprintf(
+		'<div class="wp-block-hanmoto-list hanmoto-list-block">%s</div>',
+		\Hametuha\HanmotoHelper\Controller\TemplateTags::render_list( $atts['limit'] )
+	);
+} );
