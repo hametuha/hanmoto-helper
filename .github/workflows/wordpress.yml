@@ -79,7 +79,7 @@ jobs:
       - name: Setup PHP
         uses: nanasess/setup-php@master
         with:
-          php-version: 7.0
+          php-version: 7.2
 
       - name: Install Node
         uses: actions/setup-node@v1
