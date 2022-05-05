@@ -124,7 +124,7 @@ class WooCommerceTemplate extends Singleton {
 				esc_url( $link['url'] ),
 				esc_attr( implode( ' ', $rel ) ),
 				// translators: %s is shop name.
-				esc_html( sprintf( __( '%sで買う', 'hanmoto' ), $link['label'] ) )
+				esc_html( $link['title'] )
 			);
 		}
 		$output .= '</div>';

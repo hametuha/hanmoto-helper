@@ -25,6 +25,7 @@ function hanmoto_publish_date( $book, $format = '', $empty = '-' ) {
 	return mysql2date( $format, $date );
 }
 
+
 /**
  * Get hanmoto actions.
  *
@@ -33,37 +34,53 @@ function hanmoto_publish_date( $book, $format = '', $empty = '-' ) {
  */
 function hanmoto_actions( $book ) {
 	$links = [];
+	$published = $book['summary']['pubdate'] <= date_i18n( 'Ymd' );
+	$label = function( $brand, $is_published ) {
+		return sprintf( $is_published ?__( '%sで買う', 'hanmoto' ) : __( '%sで予約', 'hanmoto' ) , $brand );
+	};
 	// Hanmoto.
+	$title   = __( '版元ドットコム', 'hanmoto' );
 	$links[] = [
 		'id'        => 'hanmoto',
-		'label'     => __( '版元ドットコム', 'hanmoto' ),
+		'label'     => $title,
+		'title'     => $label( $title, $published ),
+		'published' => $published,
 		'url'       => sprintf( 'https://www.hanmoto.com/bd/isbn/%s', $book['summary']['isbn'] ),
 		'sponsored' => false,
 	];
 	// Amazon.
 	$associate = \Hametuha\HanmotoHelper\Controller\Settings::get_instance()->get_setting( 'associate_id' ) ?: 'hametuha-22';
+	$title     = __( 'Amazon', 'hanmoto' );
 	$links[]   = [
 		'id'        => 'amazon',
-		'label'     => __( 'Amazon', 'hanmoto' ),
+		'label'     => $title,
+		'title'     => $label( $title, $published ),
+		'published' => $published,
 		'url'       => sprintf( 'https://www.amazon.co.jp/dp/%s?tag=%s&linkCode=ogi&th=1&psc=1&language=ja_JP', hanmoto_isbn10( $book['summary']['isbn'] ), $associate ),
 		'sponsored' => true,
 	];
 	// Rakuten.
 	$rakuten_link = hanmoto_rakuten_url( $book['summary']['isbn'] );
 	if ( ! is_wp_error( $rakuten_link ) ) {
+		$title = __( '楽天ブックス', 'hanmoto' );
 		$links[] = [
 			'id'        => 'rakuten',
-			'label'     => __( '楽天ブックス', 'hanmoto' ),
+			'label'     => $title,
+			'title'     => $label( $title, $published ),
 			'url'       => $rakuten_link,
+			'published' => $published,
 			'sponsored' => true,
 		];
 	}
 	// Original store.
 	if ( ! empty( $book['hanmoto']['storelink'] ) ) {
+		$title = __( '直販', 'hanmoto' );
 		$links[] = [
 			'id'        => 'direct',
-			'label'     => __( '直販', 'hanmoto' ),
+			'label'     => $title,
 			'url'       => $book['hanmoto']['storelink'],
+			'title'     => $label( $title, $published ),
+			'published' => $published,
 			'sponsored' => false,
 		];
 	}
