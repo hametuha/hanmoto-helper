@@ -33,10 +33,11 @@ function hanmoto_publish_date( $book, $format = '', $empty = '-' ) {
  * @return array
  */
 function hanmoto_actions( $book ) {
-	$links = [];
+	$links     = [];
 	$published = $book['summary']['pubdate'] <= date_i18n( 'Ymd' );
-	$label = function( $brand, $is_published ) {
-		return sprintf( $is_published ?__( '%sで買う', 'hanmoto' ) : __( '%sで予約', 'hanmoto' ) , $brand );
+	$label     = function( $brand, $is_published ) {
+		// translators: %s is a brand name.
+		return sprintf( $is_published ? __( '%sで買う', 'hanmoto' ) : __( '%sで予約', 'hanmoto' ), $brand );
 	};
 	// Hanmoto.
 	$title   = __( '版元ドットコム', 'hanmoto' );
@@ -62,7 +63,7 @@ function hanmoto_actions( $book ) {
 	// Rakuten.
 	$rakuten_link = hanmoto_rakuten_url( $book['summary']['isbn'] );
 	if ( ! is_wp_error( $rakuten_link ) ) {
-		$title = __( '楽天ブックス', 'hanmoto' );
+		$title   = __( '楽天ブックス', 'hanmoto' );
 		$links[] = [
 			'id'        => 'rakuten',
 			'label'     => $title,
@@ -74,7 +75,7 @@ function hanmoto_actions( $book ) {
 	}
 	// Original store.
 	if ( ! empty( $book['hanmoto']['storelink'] ) ) {
-		$title = __( '直販', 'hanmoto' );
+		$title   = __( '直販', 'hanmoto' );
 		$links[] = [
 			'id'        => 'direct',
 			'label'     => $title,
