@@ -42,16 +42,43 @@ trait OpenDbApi {
 	/**
 	 * Get openBD list.
 	 *
+	 * @param string[] $prefixes Prefix for this item.
 	 * @return string[]|\WP_Error
 	 */
-	public function openbd_list() {
+	public function openbd_list( $prefixes = [] ) {
 		$endpoint = $this->openbd_url( 'coverage' );
 		$response = wp_remote_get( $endpoint );
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
-		$result = json_decode( $response['body'], true );
-		return is_array( $result ) ? $result : new \WP_Error( 'invalid_result', __( 'Invalid response.', 'hanmoto' ) );
+		$json = $response['body'];
+		unset( $response );
+		$json = str_replace( ',', "\n", $json );
+		// Save json to file and read it in the file stream.
+		$tmp = tempnam( sys_get_temp_dir(), 'hanmoto-json' );
+		file_put_contents( $tmp, $json );
+		unset( $json );
+		// Parse file.
+		$spl  = new \SplFileObject( $tmp, 'r' );
+		$isbn = [];
+		while ( ! $spl->eof() ) {
+			$line = $spl->fgets();
+			$i    = preg_replace( '#\D#u', '', $line );
+			if ( empty( $prefixes ) ) {
+				$isbn[] = $i;
+			} else {
+				foreach ( $prefixes as $pref ) {
+					if ( 0 === strpos( $i, $pref ) ) {
+						$isbn[] = $i;
+						break 1;
+					}
+				}
+			}
+		}
+		unset( $spl );
+		// Remove temp file.
+		unlink( $tmp );
+		return $isbn;
 	}
 
 	/**
@@ -63,7 +90,6 @@ trait OpenDbApi {
 	 * @return string[]
 	 */
 	public function openbd_filter( $id, $country_code = 4, $allow_979 = false ) {
-		$list  = $this->openbd_list();
 		$codes = [ 978 ];
 		$ids   = (array) $id;
 		if ( $allow_979 ) {
@@ -75,14 +101,7 @@ trait OpenDbApi {
 				$prefix[] = $code . $country_code . $id;
 			}
 		}
-		return array_values( array_filter( $list, function( $isbn ) use ( $prefix ) {
-			foreach ( $prefix as $p ) {
-				if ( 0 === strpos( $isbn, $p ) ) {
-					return true;
-				}
-			}
-			return false;
-		} ) );
+		return $this->openbd_list( $prefix );
 	}
 
 	/**
@@ -90,7 +109,7 @@ trait OpenDbApi {
 	 *
 	 * @param string $endpoint Endpoint name.
 	 * @param string $method GET or POST.
-	 * @param array $params Query parameter.
+	 * @param array  $params Query parameter.
 	 *
 	 * @return object|array|\WP_Error
 	 */
