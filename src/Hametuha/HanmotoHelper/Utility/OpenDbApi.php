@@ -76,6 +76,8 @@ trait OpenDbApi {
 			}
 		}
 		unset( $spl );
+		// Remove temp file.
+		unlink( $tmp );
 		return $isbn;
 	}
 
