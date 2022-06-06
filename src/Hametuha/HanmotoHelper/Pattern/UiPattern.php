@@ -94,7 +94,8 @@ abstract class UiPattern extends \WP_List_Table {
 		</div>
 		<?php
 			$table = new static();
-			$table->prepare_items();;
+			$table->prepare_items();
+
 			$table->display();
 		?>
 		<?php if ( static::$can_add ) : ?>
@@ -102,7 +103,8 @@ abstract class UiPattern extends \WP_List_Table {
 		<div id="hanmoto-add-new">
 			<?php static::editor(); ?>
 		</div>
-		<?php endif;
+			<?php
+		endif;
 	}
 
 	/**

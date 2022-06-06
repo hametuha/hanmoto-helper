@@ -19,7 +19,7 @@ class ModelItem extends Model {
 	 */
 	protected function create_sql() {
 		$charset_collate = $this->db->get_charset_collate();
-		$sql = <<<SQL
+		$sql             = <<<SQL
 CREATE TABLE `{$this->table}` (
   id mediumint(9) NOT NULL PRIMARY KEY,
   title VARCHAR(256) NOT NULL,
@@ -42,7 +42,7 @@ SQL;
 	 * @return string|\WP_Error
 	 */
 	public function register( $id, $title, $parent = 0 ) {
-		$now = current_time( 'mysql', true );
+		$now            = current_time( 'mysql', true );
 		$parent_post_id = 0;
 		if ( $parent ) {
 			$parent_post = get_post( $parent );
@@ -71,7 +71,7 @@ SQL;
 	 * @return \stdClass[]
 	 */
 	public function get_items( $args = [] ) {
-		$args = wp_parse_args( $args, [
+		$args           = wp_parse_args( $args, [
 			'paged'          => 1,
 			'posts_per_page' => 20,
 			's'              => '',
@@ -89,7 +89,7 @@ SQL;
 			ORDER BY %s %s
 			LIMIT %d, %d
 SQL;
-		$query = $this->db->prepare( $query, $orderby, $order, ( $offset * $posts_per_page ), $posts_per_page );
+		$query          = $this->db->prepare( $query, $orderby, $order, ( $offset * $posts_per_page ), $posts_per_page );
 		if ( $args['s'] ) {
 			$query = str_replace( ':::', '%', $query );
 		}

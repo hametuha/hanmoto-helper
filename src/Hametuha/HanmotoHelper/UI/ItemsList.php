@@ -39,7 +39,7 @@ class ItemsList extends UiPattern {
 		parent::__construct( [
 			'singular' => 'item',
 			'plural'   => 'items',
-			'ajax'     => false
+			'ajax'     => false,
 		] );
 	}
 

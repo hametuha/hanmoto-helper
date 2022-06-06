@@ -18,7 +18,7 @@ class ModelDelivery extends Singleton {
 	protected function init() {
 		add_action( 'init', [ $this, 'register_post_types' ] );
 		add_action( 'admin_head', [ $this, 'enqueue_assets' ] );
-		add_filter('bulk_actions-edit-inventory', function($bulk_actions) {
+		add_filter('bulk_actions-edit-inventory', function( $bulk_actions ) {
 			$bulk_actions['make-delivery-of-goods'] = __( '納品書を作成', 'hanmoto' );
 			return $bulk_actions;
 		});
@@ -70,8 +70,8 @@ class ModelDelivery extends Singleton {
 	public function register_apis() {
 		register_rest_route( 'hanmoto/v1', 'delivery-of-goods', [
 			[
-				'methods' => 'POST',
-				'args'    => [
+				'methods'             => 'POST',
+				'args'                => [
 					'ids' => [
 						'type'              => 'string',
 						'required'          => true,
@@ -81,14 +81,14 @@ class ModelDelivery extends Singleton {
 								return false;
 							}
 							$query = $this->get_inventories( $ids );
-							return $query->found_posts === count( $ids );
+							return count( $ids ) === $query->found_posts;
 						},
-					]
+					],
 				],
 				'permission_callback' => function( $request ) {
 					return current_user_can( 'edit_others_posts' );
 				},
-				'callback' => function( $request ) {
+				'callback'            => function( $request ) {
 					$query   = $this->get_inventories( $request->get_param( 'ids' ) );
 					$post_id = wp_insert_post( [
 						'post_type'   => 'delivery-of-goods',
@@ -149,28 +149,28 @@ class ModelDelivery extends Singleton {
 			?>
 			<p>
 				<label>
-					<?php esc_html_e( '発行日', 'hanmoto' ) ?><br />
+					<?php esc_html_e( '発行日', 'hanmoto' ); ?><br />
 					<input type="date" name="issued_at" value="<?php echo esc_attr( get_post_meta( $post->ID, '_issued_at', true ) ); ?>"
 						placeholder="<?php echo esc_attr( $post->post_date ); ?>"/>
 				</label>
 			</p>
 			<p>
 				<label>
-					<?php esc_html_e( '発行者', 'hanmoto' ) ?><br />
+					<?php esc_html_e( '発行者', 'hanmoto' ); ?><br />
 					<input class="regular-text" type="text" name="issued_by" value="<?php echo esc_attr( get_post_meta( $post->ID, '_issued_by', true ) ); ?>"
-						placeholder="<?php echo esc_attr( get_option( 'hanmoto_issued_by' ) ) ?>"/>
+						placeholder="<?php echo esc_attr( get_option( 'hanmoto_issued_by' ) ); ?>"/>
 				</label>
 			</p>
 			<p>
 				<label>
-					<?php esc_html_e( '担当者', 'hanmoto' ) ?><br />
+					<?php esc_html_e( '担当者', 'hanmoto' ); ?><br />
 					<input class="regular-text" type="text" name="issue_owner" value="<?php echo esc_attr( get_post_meta( $post->ID, '_issue_owner', true ) ); ?>"
-						placeholder="<?php echo esc_attr( get_option( 'hanmoto_issue_owner' ) ) ?>"/>
+						placeholder="<?php echo esc_attr( get_option( 'hanmoto_issue_owner' ) ); ?>"/>
 				</label>
 			</p>
 			<?php
 			$inventories = get_post_meta( $post->ID, '_inventory' );
-			$query = $this->get_inventories( $inventories );
+			$query       = $this->get_inventories( $inventories );
 			if ( ! $query->have_posts() ) {
 				printf(
 					'<div class="notice-error"><p>%s</p></div>',
@@ -185,7 +185,7 @@ class ModelDelivery extends Singleton {
 					<strong>
 						<?php echo esc_html( get_the_title( $inventory ) ); ?>
 					</strong>
-					<span><?php echo mysql2date( __( 'Y年m月d日', 'hanmoto' ), $post->post_date ) ?></span>
+					<span><?php echo mysql2date( __( 'Y年m月d日', 'hanmoto' ), $post->post_date ); ?></span>
 					<br />
 					<?php
 					$total = ModelInventory::get_instance()->get_total( $inventory );

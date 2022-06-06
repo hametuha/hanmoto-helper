@@ -204,21 +204,21 @@ class ModelInventory extends Singleton {
 				<tr>
 					<td>
 						<input type="number" id="habmoto-unit_price" name="unit_price"
-							value="<?php echo esc_attr( get_post_meta( $post->ID, '_unit_price', true ) ) ?>" />
+							value="<?php echo esc_attr( get_post_meta( $post->ID, '_unit_price', true ) ); ?>" />
 					</td>
 					<td>
 						<input type="number" id="habmoto-amount" name="amount"
-							value="<?php echo esc_attr( get_post_meta( $post->ID, '_amount', true ) ) ?>" />
+							value="<?php echo esc_attr( get_post_meta( $post->ID, '_amount', true ) ); ?>" />
 					</td>
 					<td>
 
 						<input type="number" id="habmoto-margin" name="margin"
-							value="<?php echo esc_attr( get_post_meta( $post->ID, '_margin', true ) ) ?>" />
+							value="<?php echo esc_attr( get_post_meta( $post->ID, '_margin', true ) ); ?>" />
 					</td>
 					<td>
 						<input type="number" id="habmoto-vat" name="vat"
-							value="<?php echo esc_attr( get_post_meta( $post->ID, '_vat', true ) ) ?>"
-							placeholder="<?php esc_attr_e( '10%', 'hanmoto' ) ?>" />
+							value="<?php echo esc_attr( get_post_meta( $post->ID, '_vat', true ) ); ?>"
+							placeholder="<?php esc_attr_e( '10%', 'hanmoto' ); ?>" />
 					</td>
 				</tr>
 				</tbody>
@@ -226,7 +226,7 @@ class ModelInventory extends Singleton {
 			<p>
 				<label>
 					<?php esc_html_e( '請求日', 'hanmoto' ); ?><br />
-					<input type="date" name="capture_at" value="<?php echo esc_attr( get_post_meta( $post->ID, '_capture_at', true ) ) ?>" />
+					<input type="date" name="capture_at" value="<?php echo esc_attr( get_post_meta( $post->ID, '_capture_at', true ) ); ?>" />
 				</label>
 			</p>
 			<p>
@@ -271,11 +271,11 @@ class ModelInventory extends Singleton {
 	 * @return float
 	 */
 	public function get_total( $post = null ) {
-		$post = get_post( $post );
+		$post       = get_post( $post );
 		$unit_price = (float) get_post_meta( $post->ID, '_unit_price', true );
 		$margin     = (float) get_post_meta( $post->ID, '_margin', true );
 		$amount     = (int) get_post_meta( $post->ID, '_amount', true );
-		$sub_total = $unit_price * ( $margin / 100 ) * $amount * -1;
+		$sub_total  = $unit_price * ( $margin / 100 ) * $amount * -1;
 		return $sub_total;
 	}
 
@@ -287,9 +287,9 @@ class ModelInventory extends Singleton {
 	 * @return float
 	 */
 	public function get_tax_total( $post = null ) {
-		$post = get_post( $post );
+		$post  = get_post( $post );
 		$price = $this->get_total( $post );
-		$tax = get_post_meta( $post->ID, '_vat', true );
+		$tax   = get_post_meta( $post->ID, '_vat', true );
 		if ( ! is_numeric( $tax ) ) {
 			$tax = 10;
 		}
@@ -334,8 +334,8 @@ class ModelInventory extends Singleton {
 						$new_columns['sub_total'] = __( '総額', 'hanmoto' );
 						break;
 					case 'date':
-						$new_columns[ $key ] = $label;
-						$new_columns[ 'capture_at' ] = __( '請求日', 'hanmoto' );
+						$new_columns[ $key ]       = $label;
+						$new_columns['capture_at'] = __( '請求日', 'hanmoto' );
 						break;
 					default:
 						$new_columns[ $key ] = $label;
@@ -360,11 +360,11 @@ class ModelInventory extends Singleton {
 					break;
 				case 'sub_total':
 					$sub_total = $this->get_total( $post_id );
-					printf( '<span style="display:block; text-align: right;">%s</span>', number_format( $sub_total) );
+					printf( '<span style="display:block; text-align: right;">%s</span>', number_format( $sub_total ) );
 					break;
 				case 'capture_at':
 					$capture_at = get_post_meta( $post_id, '_capture_at', true );
-					echo $capture_at ? mysql2date( __( 'Y年m月d日', 'hanmoto' ), $capture_at )  : '<span style="color:lightgrey">---</spans>';
+					echo $capture_at ? mysql2date( __( 'Y年m月d日', 'hanmoto' ), $capture_at ) : '<span style="color:lightgrey">---</spans>';
 					break;
 			}
 		}, 10, 2 );

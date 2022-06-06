@@ -61,7 +61,8 @@ abstract class Model extends Singleton {
 			printf(
 				'<div class="updated"><p>%s</p></div>',
 				sprintf(
-					esc_html__( 'Database %s is updated.', 'hanmoto' ),
+					// translators: %s is
+					esc_html__( 'データベース %s が更新されました。', 'hanmoto' ),
 					esc_html( $this->table )
 				)
 			);
@@ -129,7 +130,7 @@ abstract class Model extends Singleton {
 				}
 				$class_name = explode( '\\', get_called_class() );
 				$class_name = $class_name[ count( $class_name ) - 1 ];
-				return $this->db->prefix . 'hanmoto_' .  strtolower( preg_replace( '/^_/u', '', preg_replace_callback( '/[A-Z]/u', function( $matches ) {
+				return $this->db->prefix . 'hanmoto_' . strtolower( preg_replace( '/^_/u', '', preg_replace_callback( '/[A-Z]/u', function( $matches ) {
 					return '_' . $matches[0];
 				}, $class_name ) ) );
 			case 'version_key':

@@ -4,12 +4,12 @@ if ( ! current_user_can( 'edit_others_posts' ) ) {
 }
 the_post();
 $inventory_ids = get_post_meta( get_the_ID(), '_inventory' );
-$inventories = \Hametuha\HanmotoHelper\Models\ModelDelivery::get_instance()->get_inventories( $inventory_ids );
+$inventories   = \Hametuha\HanmotoHelper\Models\ModelDelivery::get_instance()->get_inventories( $inventory_ids );
 if ( empty( $inventories ) ) {
 	wp_die( __( '該当する在庫情報がありません。', 'hanmoto' ) );
 }
 // Prefix.
-$prefix = sprintf( 'H%08d-', get_the_ID() );
+$prefix       = sprintf( 'H%08d-', get_the_ID() );
 $supplier_ids = [];
 $type_ids     = [];
 foreach ( $inventories->posts as $inventory ) {
@@ -19,7 +19,7 @@ foreach ( $inventories->posts as $inventory ) {
 			$supplier_ids[] = $term->term_id;
 		}
 	}
-	$types     = get_the_terms( $inventory, 'transaction_type' );
+	$types = get_the_terms( $inventory, 'transaction_type' );
 	foreach ( $types as $term ) {
 		if ( ! in_array( $term->term_id, $type_ids, true ) ) {
 			$type_ids[] = $term->term_id;
@@ -27,7 +27,7 @@ foreach ( $inventories->posts as $inventory ) {
 	}
 }
 ?><!DOCTYPE html>
-<html <?php language_attributes();?>>
+<html <?php language_attributes(); ?>>
 <head>
 	<meta charset="UTF-8">
 	<title><?php the_title(); ?></title>
@@ -160,10 +160,10 @@ foreach ( $supplier_ids as $supplier_id ) {
 		$supplier         = get_term_by( 'id', $supplier_id, 'supplier' );
 		$transaction_type = get_term_by( 'id', $type_id, 'transaction_type' );
 		$capture_at       = '';
-		$rows = [];
-		$total_amount      = 0;
-		$total_unit_price  = 0;
-		$total_subtotal    = 0;
+		$rows             = [];
+		$total_amount     = 0;
+		$total_unit_price = 0;
+		$total_subtotal   = 0;
 		foreach ( $inventories->posts as $inventory ) {
 			if ( ! has_term( $supplier->term_id, $supplier->taxonomy, $inventory ) ) {
 				continue 1;
@@ -172,16 +172,16 @@ foreach ( $supplier_ids as $supplier_id ) {
 				continue 1;
 			}
 			// This is the inventory.
-			$id       = get_post_meta( $inventory->post_parent, 'hanmoto_isbn', true ) ?: '#' . $inventory->ID;
-			$title    = get_the_title( $inventory->post_parent );
-			$price    = get_post_meta( $inventory->ID, '_unit_price', true );
-			$margin   = get_post_meta( $inventory->ID, '_margin', true );
-			$amount   = get_post_meta( $inventory->ID, '_amount', true ) * -1;
-			$subtotal = round( $price * $amount / 100 * $margin );
-			$total_amount += $amount;
+			$id                = get_post_meta( $inventory->post_parent, 'hanmoto_isbn', true ) ?: '#' . $inventory->ID;
+			$title             = get_the_title( $inventory->post_parent );
+			$price             = get_post_meta( $inventory->ID, '_unit_price', true );
+			$margin            = get_post_meta( $inventory->ID, '_margin', true );
+			$amount            = get_post_meta( $inventory->ID, '_amount', true ) * -1;
+			$subtotal          = round( $price * $amount / 100 * $margin );
+			$total_amount     += $amount;
 			$total_unit_price += $amount * $price;
-			$total_subtotal += $subtotal;
-			$capture  = get_post_meta( $inventory->ID, '_capture_at', true );
+			$total_subtotal   += $subtotal;
+			$capture           = get_post_meta( $inventory->ID, '_capture_at', true );
 			if ( $capture_at < $capture ) {
 				$capture_at = $capture;
 			}
@@ -196,21 +196,27 @@ foreach ( $supplier_ids as $supplier_id ) {
 			'納品書（Ａ）',
 			'納品書版元控（Ｂ）',
 			'請求明細（Ｃ）',
-			'請求明細版元控（Ｄ）'
-		] as $index => $print_label ) : ?>
-			<section class="<?php echo ( ( $index + 1 ) % 2 === 0 ) ? 'even' : 'odd' ?>">
-				<h1><?php echo esc_html( $print_label ) ?></h1>
+			'請求明細版元控（Ｄ）',
+		] as $index => $print_label ) :
+			?>
+			<section class="<?php echo ( ( $index + 1 ) % 2 === 0 ) ? 'even' : 'odd'; ?>">
+				<h1><?php echo esc_html( $print_label ); ?></h1>
 				<header>
 					<div class="to">
 						<p>
-							<strong><?php printf( esc_html__( '%s 御中', 'hanmoto' ), esc_html( $supplier->name ) ); ?></strong>
+							<strong>
+								<?php
+								// translators: %s is a supplier.
+								printf( esc_html__( '%s 御中', 'hanmoto' ), esc_html( $supplier->name ) );
+								?>
+							</strong>
 							<br />
 							<br />
 							<?php echo nl2br( esc_html( get_term_meta( $supplier->term_id, 'address', true ) ) ); ?>
 						</p>
 						<?php if ( in_array( $index, [ 1, 3 ], true ) ) : ?>
 							<div class="stamp">
-								<?php esc_html_e( '印', 'hanmoto' ) ;?>
+								<?php esc_html_e( '印', 'hanmoto' ); ?>
 							</div>
 						<?php endif; ?>
 					</div>
@@ -229,11 +235,11 @@ foreach ( $supplier_ids as $supplier_id ) {
 								<td><?php echo esc_html( $transaction_type->name ); ?></td>
 							</tr>
 							<tr>
-								<th><?php esc_html_e( '発行日', 'hanmoto' ) ?></th>
+								<th><?php esc_html_e( '発行日', 'hanmoto' ); ?></th>
 								<td><?php echo $issue_date; ?></td>
 							</tr>
 							<tr>
-								<th><?php esc_html_e( '請求〆日', 'hanmoto' ) ?></th>
+								<th><?php esc_html_e( '請求〆日', 'hanmoto' ); ?></th>
 								<td><?php echo mysql2date( __( 'Y年m月d日', 'hanmoto' ), $capture_at ); ?></td>
 							</tr>
 							<tr>
@@ -259,9 +265,9 @@ foreach ( $supplier_ids as $supplier_id ) {
 					<tr>
 						<th>&nbsp;</th>
 						<th>&nbsp;</th>
-						<th><?php esc_html_e( '部数合計', 'hanmoto' ) ?></th>
-						<th colspan="2"><?php esc_html_e( '本体価格合計', 'hanmoto' ) ?></th>
-						<th><?php esc_html_e( '正味金額合計', 'hanmoto' ) ?></th>
+						<th><?php esc_html_e( '部数合計', 'hanmoto' ); ?></th>
+						<th colspan="2"><?php esc_html_e( '本体価格合計', 'hanmoto' ); ?></th>
+						<th><?php esc_html_e( '正味金額合計', 'hanmoto' ); ?></th>
 					</tr>
 					<tr class="mono">
 						<td>&nbsp;</td>
@@ -282,7 +288,7 @@ foreach ( $supplier_ids as $supplier_id ) {
 					</tbody>
 				</table>
 			</section>
-		<?php
+			<?php
 		endforeach;
 		$counter++;
 	}
