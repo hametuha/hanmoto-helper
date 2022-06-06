@@ -23,10 +23,7 @@ gulp.task( 'sass', function () {
 			sourceComments: false,
 			sourcemap: true,
 			includePaths: [
-				'./assets/sass',
-				'./vendor',
-				'./node_modules/bootstrap-sass/assets/stylesheets',
-				'./vendor/hametuha'
+				'./assets/scss',
 			]
 		} ) )
 		.pipe( $.autoprefixer() )

@@ -148,22 +148,44 @@ class Settings extends Singleton {
 			],
 			[
 				'id'          => 'associate_id',
-				'label'       => __( 'Amazon Associate ID', 'hanmoto' ),
+				'label'       => __( 'Amazon アソシエイト ID', 'hanmoto' ),
 				'type'        => 'text',
 				'placeholder' => 'hametuha-22',
 			],
 			[
 				'id'          => 'rakuten_app_id',
-				'label'       => __( 'Rakuten App ID', 'hanmoto' ),
+				'label'       => __( '楽天アプリID', 'hanmoto' ),
 				'type'        => 'text',
 				'placeholder' => '1051183079836014250',
 				'help'        => __( 'If set, generate link to Rakuten Books.', 'hanmoto' ),
 			],
 			[
 				'id'          => 'rakuten_affiliate_id',
-				'label'       => __( 'Rakuten Affiliate ID', 'hanmoto' ),
+				'label'       => __( '楽天アフィリエイト ID', 'hanmoto' ),
 				'type'        => 'text',
 				'placeholder' => '0e9cde67.8fb388cd.0e9cde68.6632f7db',
+			],
+			[
+				'id'      => 'use_order_manager',
+				'label'   => __( '注文管理', 'hanmoto' ),
+				'type'    => 'radio',
+				'help'    => __( 'If enabled, order manager will be available.', 'hanmoto' ),
+				'choices' => [
+					''  => __( 'Do not manage orders.', 'hanmoto' ),
+					'1' => __( 'Use order manager', 'hanmoto' ),
+				],
+			],
+			[
+				'id'          => 'issued_by',
+				'label'       => __( '納品者', 'hanmoto' ),
+				'type'        => 'text',
+				'placeholder' => '',
+			],
+			[
+				'id'          => 'issue_owner',
+				'label'       => __( '納品担当者', 'hanmoto' ),
+				'type'        => 'text',
+				'placeholder' => '',
 			],
 		];
 	}

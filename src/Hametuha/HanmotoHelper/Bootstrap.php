@@ -4,6 +4,7 @@ namespace Hametuha\HanmotoHelper;
 
 
 use Hametuha\HanmotoHelper\Controller\Blocks;
+use Hametuha\HanmotoHelper\Controller\OrderManager;
 use Hametuha\HanmotoHelper\Controller\PostType;
 use Hametuha\HanmotoHelper\Controller\RestBookInfo;
 use Hametuha\HanmotoHelper\Controller\Settings;
@@ -34,6 +35,7 @@ class Bootstrap extends Singleton {
 		// Register it.
 		if ( class_exists( 'WooCommerce' ) ) {
 			WooCommerceHelper::get_instance();
+			OrderManager::get_instance();
 		}
 	}
 
