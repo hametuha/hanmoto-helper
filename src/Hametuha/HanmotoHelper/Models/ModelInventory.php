@@ -19,6 +19,17 @@ class ModelInventory extends Singleton {
 		// Register meta boxes.
 		add_action( 'save_post_inventory', [ $this, 'save_inventory_boxes' ], 10, 2 );
 		add_action( 'add_meta_boxes', [ $this, 'add_inventory_boxes' ] );
+		// Add action.
+		add_filter( 'query_vars', function( $vars ) {
+			$vars[] = 'inventory_parent';
+			return $vars;
+		} );
+		add_action( 'pre_get_posts', function( $wp_query ) {
+			$parent = $wp_query->get( 'inventory_parent' );
+			if ( $parent ) {
+				$wp_query->set( 'post_parent', $parent );
+			}
+		} );
 		// Customize admin columns.
 		$this->admin_columns();
 		// Customize order.
@@ -116,7 +127,6 @@ class ModelInventory extends Singleton {
 		] );
 
 		// Orders.
-
 	}
 
 	/**
@@ -228,6 +238,32 @@ class ModelInventory extends Singleton {
 					<?php esc_html_e( '請求日', 'hanmoto' ); ?><br />
 					<input type="date" name="capture_at" value="<?php echo esc_attr( get_post_meta( $post->ID, '_capture_at', true ) ); ?>" />
 				</label>
+				<span style="display: inline-block; margin-left: 10px;">
+				<?php
+				$dates = [
+					0  => __( '当月末', 'hanmoto' ),
+					1  => __( '翌月末', 'hanmoto' ),
+					6  => __( '6ヶ月後月末', 'hanmoto' ),
+					12 => __( '1年後月末', 'hanmoto' ),
+				];
+				$now = $post->post_date;
+				foreach ( $dates as $month => $label) :
+					try {
+						$date = new \DateTime( $now );
+					} catch ( \Exception $e ) {
+						continue 1;
+					}
+					if ( $month ) {
+						$date->modify( sprintf( '+%d month', $month ) );
+					}
+					$date = $date->format( 'Y-m-t' );
+					?>
+					<span>
+						<?php echo esc_html( $label ); ?>
+						<code><?php echo esc_html( $date ); ?></code>
+					</span>
+				<?php endforeach; ?>
+				</span>
 			</p>
 			<p>
 				<label style="display: block">
@@ -325,10 +361,36 @@ class ModelInventory extends Singleton {
 	 * @return void
 	 */
 	public function admin_columns() {
+		// add styles.
+		add_action( 'admin_head', function() {
+			$screen = get_current_screen();
+			if ( 'edit-inventory' !== $screen->id ) {
+				return;
+			}
+			?>
+			<style>
+				.wp-list-table th.column-inventory,
+				.wp-list-table th.column-taxonomy-transaction_type,
+				.wp-list-table th.column-sub_total {
+					width: 80px;
+				}
+				.wp-list-table th.column-taxonomy-supplier {
+					width: 120px;
+				}
+				.wp-list-table th.column-capture_at {
+					width: 14%;
+				}
+			</style>
+			<?php
+		} );
+		// Add columns.
 		add_filter( 'manage_inventory_posts_columns', function( $columns ) {
 			$new_columns = [];
 			foreach ( $columns as $key => $label ) {
 				switch ( $key ) {
+					case 'title':
+						$new_columns['item_title'] = __( '商品', 'hanmoto' );
+						break;
 					case 'author':
 						$new_columns['inventory'] = __( '在庫変動', 'hanmoto' );
 						$new_columns['sub_total'] = __( '総額', 'hanmoto' );
@@ -344,16 +406,17 @@ class ModelInventory extends Singleton {
 			}
 			return $new_columns;
 		} );
-		// Add parent post.
-		add_filter( 'display_post_states', function( $states, \WP_Post $post ) {
-			if ( ( 'inventory' === $post->post_type ) && $post->post_parent ) {
-				$states[] = get_the_title( $post->post_parent );
-			}
-			return $states;
-		}, 10, 2 );
 		// Render columns.
 		add_action( 'manage_inventory_posts_custom_column', function( $column, $post_id ) {
 			switch ( $column ) {
+				case 'item_title':
+					$parent = wp_get_post_parent_id( $post_id );
+					printf(
+						'<a href="%s">%s</span>',
+						esc_url( admin_url( 'edit.php?post_type=inventory&inventory_parent=' . $parent ) ),
+						esc_html( $parent ? get_the_title( $parent ) : __( '登録のない商品', 'hanmoto' ) )
+					);
+					break;
 				case 'inventory':
 					$move = get_post_meta( $post_id, '_amount', true );
 					printf( '<span style="display:block; text-align: right;">%s</span>', number_format( $move ) );

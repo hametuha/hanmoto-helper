@@ -154,7 +154,7 @@ foreach ( $inventories->posts as $inventory ) {
 $counter    = 1;
 $issue_date = mysql2date( __( 'Y年m月d日', 'hanmoto' ), ( get_post_meta( get_the_ID(), '_issued_at', true ) ?: get_post()->post_date ) );
 $vendor     = get_post_meta( get_the_ID(), '_issued_by', true ) ?: get_option( 'hanmoto_issued_by', get_bloginfo( 'name' ) );
-$owner      = get_post_meta( get_the_ID(), '_issue_owner', true ) ?: '---';
+$owner      = get_post_meta( get_the_ID(), '_issue_owner', true ) ?: get_option( 'hanmoto_issue_owner', '---' );
 foreach ( $supplier_ids as $supplier_id ) {
 	foreach ( $type_ids as $type_id ) {
 		$supplier         = get_term_by( 'id', $supplier_id, 'supplier' );
