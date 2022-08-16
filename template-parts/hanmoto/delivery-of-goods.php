@@ -212,7 +212,17 @@ foreach ( $supplier_ids as $supplier_id ) {
 							</strong>
 							<br />
 							<br />
-							<?php echo nl2br( esc_html( get_term_meta( $supplier->term_id, 'address', true ) ) ); ?>
+							<?php
+							echo nl2br( esc_html( get_term_meta( $supplier->term_id, 'address', true ) ) );
+							$in_charge = get_term_meta( $supplier->term_id, 'in_charge', true );
+							if ( $in_charge ) {
+								echo '<br />';
+								printf(
+									esc_html__( '%s 様', 'hanmoto' ),
+									esc_html( $in_charge )
+								);
+							}
+							?>
 						</p>
 						<?php if ( in_array( $index, [ 1, 3 ], true ) ) : ?>
 							<div class="stamp">

@@ -27,7 +27,7 @@ class Settings extends Singleton {
 	 * Register menu.
 	 */
 	public function admin_menu() {
-		$title = __( 'ISBN Setting', 'hanmoto' );
+		$title = __( '版元機能設定', 'hanmoto' );
 		add_options_page( $title, $title, 'manage_options', 'hanmoto-helper', [ $this, 'admin_render' ] );
 	}
 
@@ -56,52 +56,57 @@ class Settings extends Singleton {
 		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 			return;
 		}
-		// Register setting.
-		add_settings_section( 'hanmoto-helper-default', __( 'Publisher Info', 'hanmoto' ), function() {
-
-		}, 'hanmoto-helper' );
-		foreach ( $this->get_settings() as $setting ) {
-			$option_id = 'hanmoto_' . $setting['id'];
-			add_settings_field( $option_id, $setting['label'], function() use ( $option_id, $setting ) {
-				$value      = $this->get_setting( $setting['id'], true );
-				$predefined = $this->get_predefined( $setting['id'] );
-				switch ( $setting['type'] ) {
-					case 'text':
-						printf(
-							'<input name="%s" type="text" value="%s" placeholder="%s" class="regular-text" />',
-							esc_attr( $option_id ),
-							esc_attr( $value ),
-							esc_attr( $setting['placeholder'] )
-						);
-						break;
-					case 'textarea':
-						printf(
-							'<textarea name="%s" placeholder="%s" class="widefat" style="box-sizing: border-box" rows="3">%s</textarea>',
-							esc_attr( $option_id ),
-							esc_attr( $setting['placeholder'] ),
-							esc_textarea( $value )
-						);
-						break;
-					case 'radio':
-						foreach ( $setting['choices'] as $choice_value => $choice_label ) {
+		foreach ( $this->get_settings() as $section_id => $section ) {
+			// Register section
+			$section_id = 'hanmoto-helper-' . $section_id;
+			add_settings_section( $section_id, $section['label'], function() use ( $section ) {
+				if ( ! empty( $section['desc'] ) ) {
+					printf( '<p class="description">%s</p>', esc_html( $section['desc'] ) );
+				}
+			}, 'hanmoto-helper' );
+			foreach ( $section['options']  as $setting ) {
+				$option_id = 'hanmoto_' . $setting['id'];
+				add_settings_field( $option_id, $setting['label'], function() use ( $option_id, $setting ) {
+					$value      = $this->get_setting( $setting['id'], true );
+					$predefined = $this->get_predefined( $setting['id'] );
+					switch ( $setting['type'] ) {
+						case 'text':
 							printf(
-								'<p><label><input type="radio" name="%s" value="%s" %s/> %s</label></p>',
+								'<input name="%s" type="text" value="%s" placeholder="%s" class="regular-text" />',
 								esc_attr( $option_id ),
-								esc_attr( $choice_value ),
-								checked( $choice_value, $value, false ),
-								esc_html( $choice_label )
+								esc_attr( $value ),
+								esc_attr( $setting['placeholder'] )
 							);
-						}
-						break;
-				}
-				if ( ! empty( $setting['help'] ) ) {
-					printf(
-						'<p class="description">%s</p>',
-						esc_html( $setting['help'] )
-					);
-				}
-			}, 'hanmoto-helper', 'hanmoto-helper-default' );
-			register_setting( 'hanmoto-helper', $option_id );
+							break;
+						case 'textarea':
+							printf(
+								'<textarea name="%s" placeholder="%s" class="widefat" style="box-sizing: border-box" rows="3">%s</textarea>',
+								esc_attr( $option_id ),
+								esc_attr( $setting['placeholder'] ),
+								esc_textarea( $value )
+							);
+							break;
+						case 'radio':
+							foreach ( $setting['choices'] as $choice_value => $choice_label ) {
+								printf(
+									'<p><label><input type="radio" name="%s" value="%s" %s/> %s</label></p>',
+									esc_attr( $option_id ),
+									esc_attr( $choice_value ),
+									checked( $choice_value, $value, false ),
+									esc_html( $choice_label )
+								);
+							}
+							break;
+					}
+					if ( ! empty( $setting['help'] ) ) {
+						printf(
+							'<p class="description">%s</p>',
+							esc_html( $setting['help'] )
+						);
+					}
+				}, 'hanmoto-helper', $section_id );
+				register_setting( 'hanmoto-helper', $option_id );
+			}
 		}
 	}
 
@@ -112,80 +117,92 @@ class Settings extends Singleton {
 	 */
 	protected function get_settings() {
 		return [
-			[
-				'id'          => 'publisher_id',
-				'label'       => __( 'Publisher ID', 'hanmoto' ),
-				'type'        => 'textarea',
-				'placeholder' => 'e.g. 12345678',
-				'help'        => __( 'Enter your publisher ID in each line.', 'hanmoto' ),
-			],
-			[
-				'id'      => 'create_post_type',
-				'label'   => __( 'Custom Post Type', 'hanmoto' ),
-				'type'    => 'radio',
-				'help'    => __( 'If enabled, private custom post type "books" will be created.', 'hanmoto' ),
-				'choices' => [
-					''  => __( 'No', 'hanmoto' ),
-					'1' => __( 'Yes, create custom post type.', 'hanmoto' ),
+			'publisher' => [
+				'label'   => __( '版元情報', 'hanmoto' ),
+				'desc'    => '',
+				'options' => [
+					[
+						'id'          => 'publisher_id',
+						'label'       => __( '出版社記号', 'hanmoto' ),
+						'type'        => 'textarea',
+						'placeholder' => 'e.g. 12345678',
+						'help'        => __( '出版社記号を各行に1つ入れてください。', 'hanmoto' ),
+					],
+					[
+						'id'      => 'create_post_type',
+						'label'   => __( 'カスタム投稿タイプ', 'hanmoto' ),
+						'type'    => 'radio',
+						'help'    => __( '有効にすると非公開の投稿タイプ "books" が作成されます。', 'hanmoto' ),
+						'choices' => [
+							''  => __( '無効', 'hanmoto' ),
+							'1' => __( '有効にしてカスタム投稿タイプを作成', 'hanmoto' ),
+						],
+					],
+					[
+						'id'      => 'sync_post_type',
+						'label'   => __( '投稿タイプを同期する', 'hanmoto' ),
+						'type'    => 'radio',
+						'help'    => __( '有効にすると、書誌情報が定期的に保存されます。', 'hanmoto' ),
+						'choices' => [
+							''  => __( '同期しない', 'hanmoto' ),
+							'1' => __( '自動で同期する', 'hanmoto' ),
+						],
+					],
+					[
+						'id'          => 'post_type',
+						'label'       => __( '同期する投稿タイプ', 'hanmoto' ),
+						'type'        => 'text',
+						'placeholder' => 'books',
+						'help'        => __( '初期値は books です。既存の投稿タイプを入力すると、書誌情報がその投稿タイプに同期されます。', 'hanmoto' ),
+					],
+					[
+						'id'          => 'associate_id',
+						'label'       => __( 'Amazon アソシエイト ID', 'hanmoto' ),
+						'type'        => 'text',
+						'placeholder' => 'hametuha-22',
+					],
+					[
+						'id'          => 'rakuten_app_id',
+						'label'       => __( '楽天アプリID', 'hanmoto' ),
+						'type'        => 'text',
+						'placeholder' => '1051183079836014250',
+						'help'        => __( 'If set, generate link to Rakuten Books.', 'hanmoto' ),
+					],
+					[
+						'id'          => 'rakuten_affiliate_id',
+						'label'       => __( '楽天アフィリエイト ID', 'hanmoto' ),
+						'type'        => 'text',
+						'placeholder' => '0e9cde67.8fb388cd.0e9cde68.6632f7db',
+					],
 				],
 			],
-			[
-				'id'      => 'sync_post_type',
-				'label'   => __( 'Sync Post Type', 'hanmoto' ),
-				'type'    => 'radio',
-				'help'    => __( 'If enabled, book information will be saved periodically.', 'hanmoto' ),
-				'choices' => [
-					''  => __( 'Do not sync', 'hanmoto' ),
-					'1' => __( 'Sync Automatically', 'hanmoto' ),
-				],
-			],
-			[
-				'id'          => 'post_type',
-				'label'       => __( 'Post Type to Sync', 'hanmoto' ),
-				'type'        => 'text',
-				'placeholder' => 'books',
-				'help'        => __( 'Default is books. Enter existent post type if you need your CPT to have book data.', 'hanmoto' ),
-			],
-			[
-				'id'          => 'associate_id',
-				'label'       => __( 'Amazon アソシエイト ID', 'hanmoto' ),
-				'type'        => 'text',
-				'placeholder' => 'hametuha-22',
-			],
-			[
-				'id'          => 'rakuten_app_id',
-				'label'       => __( '楽天アプリID', 'hanmoto' ),
-				'type'        => 'text',
-				'placeholder' => '1051183079836014250',
-				'help'        => __( 'If set, generate link to Rakuten Books.', 'hanmoto' ),
-			],
-			[
-				'id'          => 'rakuten_affiliate_id',
-				'label'       => __( '楽天アフィリエイト ID', 'hanmoto' ),
-				'type'        => 'text',
-				'placeholder' => '0e9cde67.8fb388cd.0e9cde68.6632f7db',
-			],
-			[
-				'id'      => 'use_order_manager',
+			'order' => [
 				'label'   => __( '注文管理', 'hanmoto' ),
-				'type'    => 'radio',
-				'help'    => __( 'If enabled, order manager will be available.', 'hanmoto' ),
-				'choices' => [
-					''  => __( 'Do not manage orders.', 'hanmoto' ),
-					'1' => __( 'Use order manager', 'hanmoto' ),
+				'desc' => __( '注文管理機能に関する設定です。', 'hanmoto' ),
+				'options' => [
+					[
+						'id'      => 'use_order_manager',
+						'label'   => __( '注文管理', 'hanmoto' ),
+						'type'    => 'radio',
+						'help'    => __( '有効にすると、注文管理機能が有効になります。', 'hanmoto' ),
+						'choices' => [
+							''  => __( '注文を管理しない', 'hanmoto' ),
+							'1' => __( '注文管理機能を使う', 'hanmoto' ),
+						],
+					],
+					[
+						'id'          => 'issued_by',
+						'label'       => __( '納品者', 'hanmoto' ),
+						'type'        => 'text',
+						'placeholder' => '',
+					],
+					[
+						'id'          => 'issue_owner',
+						'label'       => __( '納品担当者', 'hanmoto' ),
+						'type'        => 'text',
+						'placeholder' => '',
+					],
 				],
-			],
-			[
-				'id'          => 'issued_by',
-				'label'       => __( '納品者', 'hanmoto' ),
-				'type'        => 'text',
-				'placeholder' => '',
-			],
-			[
-				'id'          => 'issue_owner',
-				'label'       => __( '納品担当者', 'hanmoto' ),
-				'type'        => 'text',
-				'placeholder' => '',
 			],
 		];
 	}
