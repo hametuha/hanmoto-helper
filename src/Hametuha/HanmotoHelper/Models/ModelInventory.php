@@ -5,13 +5,15 @@ namespace Hametuha\HanmotoHelper\Models;
 
 use Hametuha\HanmotoHelper\Pattern\Singleton;
 use Hametuha\HanmotoHelper\Utility\BookSelector;
+use Hametuha\HanmotoHelper\Utility\Validator;
 
 /**
  * Create Inventory model.
  */
 class ModelInventory extends Singleton {
 
-	use BookSelector;
+	use BookSelector,
+		Validator;
 
 	/**
 	 * {@inheritdoc }
@@ -264,5 +266,102 @@ class ModelInventory extends Singleton {
 	 */
 	public function supplier_detail() {
 
+	}
+
+	/**
+	 * Get stock on specified date.
+	 *
+	 * @param string $date Get stock.
+	 * @return int
+	 */
+	public function get_stock( $post_id, $date ) {
+		global $wpdb;
+		$query = <<<SQL
+			SELECT SUM( CAST( pm.meta_value AS SIGNED ) )
+			FROM {$wpdb->posts} AS p
+			INNER JOIN {$wpdb->postmeta} AS pm
+			ON p.ID = pm.post_id AND pm.meta_key = '_amount'
+			WHERE p.post_type = 'inventory'
+			  AND p.post_status IN ( 'publish', 'future' )
+			  AND p.post_parent = %d
+			  AND DATE(p.post_date) < %s
+SQL;
+		return (int) $wpdb->get_var( $wpdb->prepare( $query, $post_id, $date ) );
+	}
+
+	/**
+	 * Get inventory change event.
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $start   Default 30 days ago.
+	 * @param string $end     Default today.
+	 *
+	 * @return array|\WP_Error
+	 */
+	public function get_inventory_changes( $post_id = 0, $start = '', $end = '' ) {
+		$args = [
+			'post_type'      => 'inventory',
+			'post_status'    => [ 'publish', 'future' ],
+			'posts_per_page' => -1,
+			'orderby'        => [ 'date' => 'ASC' ],
+			'meta_query'     => [
+				[
+					'key' => '_amount',
+					'compare'  => 'EXISTS',
+				],
+			],
+		];
+		if ( $post_id ) {
+			$args['post_parent'] = $post_id;
+		}
+		$date_query = [];
+		if ( $this->is_date( $start ) ) {
+			list( $start_year, $start_month, $start_day ) = array_map( 'intval', explode( '-', $start ) );
+			$date_query['after'] = [
+				'year'  => $start_year,
+				'month' => $start_month,
+				'day'   => $start_day,
+			];
+		}
+		if ( $this->is_date( $end ) ) {
+			list( $end_year, $end_month, $end_day )       = array_map( 'intval', explode( '-', $end ) );
+			$date_query['before'] = [
+				'year'  => $end_year,
+				'month' => $end_month,
+				'day'   => $end_day,
+			];
+		}
+		if ( ! empty( $date_query ) ) {
+			$date_query['inclusive'] = true;
+			$args['date_query'] = [ $date_query ];
+		}
+		$query = new \WP_Query( $args );
+		if ( ! $query->have_posts() ) {
+			return [];
+		}
+		$changes = [];
+		foreach ( $query->posts as $post ) {
+			$transaction = __( '不明', 'hanmoto' );
+			$supplier    = __( '不明', 'hanmoto' );
+			$terms = get_the_terms( $post, 'transaction_type' );
+			if ( $terms && ! is_wp_error( $terms ) ) {
+				$transaction = $terms[0]->name;
+			}
+			$suppliers = get_the_terms( $post, 'supplier' );
+			if ( $suppliers && ! is_wp_error( $suppliers ) ) {
+				$supplier = $suppliers[0]->name;
+			}
+			$changes[] = [
+				'id'       => $post->ID,
+				'title'    => get_the_title( $post->post_parent ),
+				'isbn'     => get_post_meta( $post->post_parent, 'hanmoto_isbn', true ) ?: sprintf( 'H%012d', $post->post_parent ),
+				'amount'   => (int) get_post_meta( $post->ID, '_amount', true ),
+				'type'     => $transaction,
+				'supplier' => $supplier,
+				'date'     => mysql2date( 'Y-m-d', $post->post_date ),
+				'datetime' => $post->post_date,
+			];
+		}
+		return $changes;
 	}
 }

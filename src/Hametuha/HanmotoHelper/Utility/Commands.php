@@ -5,6 +5,7 @@ namespace Hametuha\HanmotoHelper\Utility;
 
 use cli\Table;
 use Hametuha\HanmotoHelper\Controller\PostType;
+use Hametuha\HanmotoHelper\Models\ModelInventory;
 use Hametuha\HanmotoHelper\Services\WooCommerceOrder;
 use PHP_CodeSniffer\Standards\Squiz\Sniffs\CSS\OpacitySniff;
 
@@ -17,7 +18,8 @@ use PHP_CodeSniffer\Standards\Squiz\Sniffs\CSS\OpacitySniff;
 class Commands extends \WP_CLI_Command {
 
 	use OpenDbApi,
-		SettingsAccessor;
+		SettingsAccessor,
+		Validator;
 
 	/**
 	 * Get detailed information of books.
@@ -114,6 +116,42 @@ class Commands extends \WP_CLI_Command {
 				$order->get_total(),
 				WooCommerceOrder::get_instance()->will_captured( $order, 'Y-m-d H:i:s' ),
 			] );
+		}
+		$table->display();
+	}
+
+	/**
+	 * Get stock at specified date.
+	 *
+	 * @synopsis <post_id> <date>
+	 * @param array $args Command options.
+	 * @return void
+	 */
+	public function stock( $args ) {
+		list( $post_id, $date ) = $args;
+		if ( ! $this->is_date( $date ) ) {
+			\WP_CLI::error( __( '日付形式が不正です。', 'hanmoto' ) . ' ' . $date );
+		}
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			\WP_CLI::error( __( '投稿を発見できませんでした。', 'hanmoto' ) . ' ' . $date );
+		}
+		\WP_CLI::line( sprintf( __( '#%d %s の在庫を確認しています。', 'hanmoto' ), $post_id, get_the_title( $post ) ) );
+		$stock = ModelInventory::get_instance()->get_stock( $post_id, $date );
+		\WP_CLI::line( sprintf( __( '%s以前での在庫は%dです。', 'hanmoto' ), mysql2date( get_option( 'date_format' ), $date ), $stock ) );
+		$changes = ModelInventory::get_instance()->get_inventory_changes( $post_id, $date );
+		if ( is_wp_error( $changes ) ) {
+			\WP_CLI::error( $changes->get_error_message() );
+		}
+
+		if ( empty( $changes ) ) {
+			\WP_CLI::error( __( '該当期間のデータはありません。', 'hanmoto' ) );
+		}
+		$table = new Table();
+		$table->setHeaders( [ 'id', 'Date', 'Title', 'Type', 'Supplier', 'Amount', 'Subtotal' ] );
+		foreach ( $changes as $change ) {
+			$stock += $change['amount'];
+			$table->addRow( [ $change['id'], $change['date'], $change['title'], $change['type'], $change['supplier'], $change['amount'], $stock ] );
 		}
 		$table->display();
 	}

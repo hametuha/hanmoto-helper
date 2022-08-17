@@ -75,7 +75,7 @@ abstract class RestApiPattern extends Singleton {
 	abstract public function callback( $request );
 
 	/**
-	 * Permiassion callback.
+	 * Permission callback.
 	 *
 	 * @param \WP_REST_Request $request Request object.
 	 * @return bool|\WP_Error

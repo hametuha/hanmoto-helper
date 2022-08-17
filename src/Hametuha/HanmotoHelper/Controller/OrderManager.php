@@ -9,6 +9,7 @@ use Hametuha\HanmotoHelper\Models\ModelItem;
 use Hametuha\HanmotoHelper\Models\ModelOrder;
 use Hametuha\HanmotoHelper\Models\ModelSupplier;
 use Hametuha\HanmotoHelper\Pattern\Singleton;
+use Hametuha\HanmotoHelper\Rest\RestInventoryStats;
 use Hametuha\HanmotoHelper\UI\CsvImporter;
 use Hametuha\HanmotoHelper\UI\ItemsList;
 use Hametuha\HanmotoHelper\UI\StatisticHandler;
@@ -35,6 +36,7 @@ class OrderManager extends Singleton {
 		ModelOrder::get_instance();
 		// Importer
 		CsvImporter::get_instance();
-		StatisticHandler::get_instance();
+		// REST API
+		RestInventoryStats::get_instance();
 	}
 }
