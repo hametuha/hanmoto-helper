@@ -133,6 +133,7 @@ trait BookSelector {
 			foreach ( $columns as $key => $label ) {
 				switch ( $key ) {
 					case 'title':
+						$new_columns['inventory_group'] = __( '取引', 'hanmoto' );
 						$new_columns['item_title'] = __( '商品', 'hanmoto' );
 						break;
 					case 'author':
@@ -165,6 +166,14 @@ trait BookSelector {
 		// Render columns.
 		add_action( 'manage_' . $post_type . '_posts_custom_column', function( $column, $post_id ) use ( $post_type ) {
 			switch ( $column ) {
+				case 'inventory_group':
+					$group = get_post_meta( $post_id, '_group', true );
+					if ( $group ) {
+						printf( '<a href="%s">%s</a>', get_edit_post_link( $group ), get_the_title( $group ) );
+					} else {
+						printf( '<span style="color: lightgray;">%s</span>', esc_html__( '未設定', 'hanmoto' ) );
+					}
+					break;
 				case 'item_title':
 					$parent = wp_get_post_parent_id( $post_id );
 					printf(

@@ -32,7 +32,7 @@ class ModelSupplier extends Singleton {
 	 * @return void
 	 */
 	public function register_taxonomies() {
-		register_taxonomy( 'supplier', [ 'inventory', ModelOrder::post_type() ], [
+		register_taxonomy( 'supplier', [ 'inventory-event', 'inventory', ModelOrder::post_type() ], [
 			'public'            => false,
 			'show_ui'           => true,
 			'show_in_nav_menus' => false,

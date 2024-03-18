@@ -38,6 +38,8 @@ class ModelInventory extends Singleton {
 		} );
 		// Customize admin columns.
 		$this->admin_columns( 'inventory' );
+		// REST API
+		add_action( 'rest_api_init', [ $this, 'register_apis' ] );
 	}
 
 	/**
@@ -54,13 +56,12 @@ class ModelInventory extends Singleton {
 			'show_ui'           => true,
 			'show_in_nav_menu'  => false,
 			'show_in_admin_bar' => false,
-			'menu_icon'         => 'dashicons-database',
-			'menu_position'     => 80,
+			'show_in_menu'      => 'edit.php?post_type=inventory-event',
 			'supports'          => [ 'author', 'excerpt' ],
 		] );
 
 		// Transaction type.
-		register_taxonomy( 'transaction_type', [ 'inventory' ], [
+		register_taxonomy( 'transaction_type', [ 'inventory', 'inventory-event' ], [
 			'public'            => false,
 			'show_ui'           => true,
 			'show_in_nav_menus' => false,
@@ -68,6 +69,7 @@ class ModelInventory extends Singleton {
 			'label'             => __( '取引種別', 'hanmoto' ),
 			'hierarchical'      => true,
 			'show_admin_column' => true,
+			'show_in_rest'      => true,
 			'meta_box_cb'       => function ( $post ) {
 				// tax_input[transaction_type][]
 				$terms = get_terms( [
@@ -95,6 +97,74 @@ class ModelInventory extends Singleton {
 		] );
 	}
 
+	public function register_apis() {
+		register_rest_route( 'hanmoto/v1', 'inventory', [
+			[
+				'methods' => 'POST',
+				'args' => [
+
+				],
+			],
+		] );
+	}
+
+	/**
+	 * Get inventory.
+	 *
+	 * @param int|null|\WP_Post $post_id ID of inventory.
+	 *
+	 * @return array|\WP_Error
+	 */
+	public function to_rest_response( $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return new \WP_Error( 'not_found', __( '在庫変動が見つかりませんでした。', 'hanmoto' ), [ 'status' => 404 ] );
+		}
+		$parent = get_post( $post->post_parent );
+		if ( ! $parent ) {
+			return new \WP_Error( 'not_found', __( '商品が見つかりませんでした。', 'hanmoto' ), [ 'status' => 404 ] );
+		}
+		$response = [
+			'id'      => $post->ID,
+			'name'    => get_the_title( $post ),
+			'product' => get_the_title( $post->post_parent ),
+		];
+		foreach ( array_merge( $this->keys(), [ 'group' ] ) as $key ) {
+			$value = get_post_meta( $post->ID, '_' . $key, true );
+			if ( in_array( $key, [ 'vat', 'margin', 'amount', 'unit_price' ], true ) ) {
+				$value = intval( $value );
+			}
+			$response[ $key ] = $value;
+			if ( in_array( $key, [ 'group' ], true ) ) {
+				$response[ $key . '_label' ] = get_the_title( $value );
+			}
+		}
+		foreach ( [ 'supplier', 'transaction_type' ] as $taxonomy ) {
+			$terms = get_the_terms( $post, $taxonomy );
+			if ( $terms && ! is_wp_error( $terms ) ) {
+				$response[ $taxonomy ] = $terms[0]->term_id;
+				$response[ $taxonomy . '_label' ] = $terms[0]->name;
+			}
+		}
+		$response['edit_link'] = get_edit_post_link( $post->ID, 'display' );
+		return $response;
+	}
+
+	/**
+	 * Get meta keys.
+	 *
+	 * @return string[]
+	 */
+	private function keys() {
+		return [
+			'unit_price',
+			'amount',
+			'margin',
+			'vat',
+			'capture_at',
+		];
+	}
+
 	/**
 	 * Save post data.
 	 *
@@ -108,15 +178,10 @@ class ModelInventory extends Singleton {
 			return;
 		}
 		// Save all meta.
-		foreach ( [
-			'unit_price',
-			'amount',
-			'margin',
-			'vat',
-			'capture_at',
-		] as $key ) {
+		foreach ( $this->keys() as $key ) {
 			update_post_meta( $post_id, '_' . $key, filter_input( INPUT_POST, $key ) );
 		}
+		update_post_meta( $post_id, '_group', (int) filter_input( INPUT_POST, 'group' ) );
 	}
 
 	/**
@@ -253,6 +318,29 @@ class ModelInventory extends Singleton {
 					<?php esc_html_e( '商品', 'hanmoto' ); ?>
 					<br />
 					<?php $this->book_select_pull_down( $post->post_parent ); ?>
+				</label>
+			</p>
+			<p>
+				<?php
+				$current_group = (int) get_post_meta( $post->ID, '_group', true );
+				$groups        = new \WP_Query( [
+					'post_type'      => 'inventory-event',
+					'post_status'    => 'any',
+					'posts_per_page' => -1,
+					'orderby'        => [ 'date' => 'DESC' ],
+				] );
+				?>
+				<label style="display: block">
+					<label for="group"><?php esc_html_e( '取引グループ', 'hanmoto' ); ?></label>
+					<br />
+					<select id="group" name="group">
+						<option value="0" <?php selected( $current_group, 0 ); ?>><?php esc_html_e( '設定なし', 'hanmoto' ); ?></option>
+						<?php foreach ( $groups->posts as $group ) : ?>
+							<option value="<?php echo esc_attr( $group->ID ); ?>" <?php selected( $current_group, $group->ID ); ?>>
+								<?php echo esc_html( get_the_title( $group ) ); ?>（<?php echo date_i18n( get_option( 'date_time', $post->post_date ) ); ?>）
+							</option>
+						<?php endforeach; ?>
+					</select>
 				</label>
 			</p>
 			<?php

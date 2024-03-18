@@ -4,6 +4,7 @@ namespace Hametuha\HanmotoHelper\Controller;
 
 
 use Hametuha\HanmotoHelper\Models\ModelDelivery;
+use Hametuha\HanmotoHelper\Models\ModelEvent;
 use Hametuha\HanmotoHelper\Models\ModelInventory;
 use Hametuha\HanmotoHelper\Models\ModelItem;
 use Hametuha\HanmotoHelper\Models\ModelOrder;
@@ -30,6 +31,7 @@ class OrderManager extends Singleton {
 			return;
 		}
 		// Inventory.
+		ModelEvent::get_instance();
 		ModelInventory::get_instance();
 		ModelDelivery::get_instance();
 		ModelSupplier::get_instance();
