@@ -127,9 +127,10 @@ class ModelDelivery extends Singleton {
 			return null;
 		}
 		return new \WP_Query( [
-			'post_type' => 'inventory',
-			'post__in'  => $ids,
-			'orderby'   => [ 'date' => 'ASC' ],
+			'post_type'   => 'inventory',
+			'post__in'    => $ids,
+			'post_status' => [ 'publish', 'future' ],
+			'orderby'     => [ 'date' => 'ASC' ],
 		] );
 	}
 
