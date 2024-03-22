@@ -20,7 +20,6 @@ const { __, sprintf } = wp.i18n;
 
 let initialFetched = false;
 
-
 const HanmotoIsbnBox = withState( {
 	loading: false,
 	bookData: null,
@@ -41,7 +40,7 @@ const HanmotoIsbnBox = withState( {
 			} ).then( ( res ) => {
 				setState( {
 					loading: false,
-					bookData: res.length ? res[0] : null,
+					bookData: res.length ? res[ 0 ] : null,
 				} );
 			} ).catch( () => {
 				setState( { loading: false } );
@@ -95,7 +94,7 @@ const HanmotoIsbnBox = withState( {
 						<small className="hanmoto-card-author">{ bookData.summary.author }</small>
 					</p>
 					<p className="hanmoto-card-links">
-						<a href={ `https://www.hanmoto.com/bd/isbn/${bookData.summary.isbn}` }
+						<a href={ `https://www.hanmoto.com/bd/isbn/${ bookData.summary.isbn }` }
 							className="hanmoto-card-link hanmoto-com" rel="noopener noreferrer" target="_blank">
 							{ __( 'View in Hanmoto.com', 'hanmoto' ) }
 						</a>

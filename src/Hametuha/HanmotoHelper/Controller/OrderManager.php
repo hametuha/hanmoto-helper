@@ -4,10 +4,16 @@ namespace Hametuha\HanmotoHelper\Controller;
 
 
 use Hametuha\HanmotoHelper\Models\ModelDelivery;
+use Hametuha\HanmotoHelper\Models\ModelEvent;
 use Hametuha\HanmotoHelper\Models\ModelInventory;
 use Hametuha\HanmotoHelper\Models\ModelItem;
+use Hametuha\HanmotoHelper\Models\ModelOrder;
+use Hametuha\HanmotoHelper\Models\ModelSupplier;
 use Hametuha\HanmotoHelper\Pattern\Singleton;
+use Hametuha\HanmotoHelper\Rest\RestInventoryStats;
+use Hametuha\HanmotoHelper\UI\CsvImporter;
 use Hametuha\HanmotoHelper\UI\ItemsList;
+use Hametuha\HanmotoHelper\UI\StatisticHandler;
 
 /**
  * Order manager.
@@ -25,7 +31,14 @@ class OrderManager extends Singleton {
 			return;
 		}
 		// Inventory.
+		ModelEvent::get_instance();
 		ModelInventory::get_instance();
 		ModelDelivery::get_instance();
+		ModelSupplier::get_instance();
+		ModelOrder::get_instance();
+		// Importer
+		CsvImporter::get_instance();
+		// REST API
+		RestInventoryStats::get_instance();
 	}
 }

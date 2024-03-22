@@ -9,9 +9,7 @@
 const $ = jQuery;
 
 $( document ).ready( function() {
-
 	$( '#hanmoto-fill-product' ).click( function( e ) {
 		e.preventDefault();
 	} );
-
 } );

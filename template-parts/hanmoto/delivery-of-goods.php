@@ -61,7 +61,7 @@ foreach ( $inventories->posts as $inventory ) {
 			padding: 10mm 0;
 		}
 		section.even {
-			border-top: 1mm dashed #000;
+			border-top: 0.5mm dashed #000;
 		}
 		h1 {
 			text-align: center;
@@ -147,6 +147,15 @@ foreach ( $inventories->posts as $inventory ) {
 		.mono {
 			font-family: monospace;
 		}
+		footer {
+			margin-top: 1cm;
+			display: flex;
+			justify-content: end;
+		}
+		footer address {
+			font-style: normal;
+			font-size: 9pt;
+		}
 	</style>
 </head>
 <body>
@@ -154,7 +163,7 @@ foreach ( $inventories->posts as $inventory ) {
 $counter    = 1;
 $issue_date = mysql2date( __( 'Y年m月d日', 'hanmoto' ), ( get_post_meta( get_the_ID(), '_issued_at', true ) ?: get_post()->post_date ) );
 $vendor     = get_post_meta( get_the_ID(), '_issued_by', true ) ?: get_option( 'hanmoto_issued_by', get_bloginfo( 'name' ) );
-$owner      = get_post_meta( get_the_ID(), '_issue_owner', true ) ?: '---';
+$owner      = get_post_meta( get_the_ID(), '_issue_owner', true ) ?: get_option( 'hanmoto_issue_owner', '---' );
 foreach ( $supplier_ids as $supplier_id ) {
 	foreach ( $type_ids as $type_id ) {
 		$supplier         = get_term_by( 'id', $supplier_id, 'supplier' );
@@ -212,7 +221,18 @@ foreach ( $supplier_ids as $supplier_id ) {
 							</strong>
 							<br />
 							<br />
-							<?php echo nl2br( esc_html( get_term_meta( $supplier->term_id, 'address', true ) ) ); ?>
+							<?php
+							echo nl2br( esc_html( get_term_meta( $supplier->term_id, 'address', true ) ) );
+							$in_charge = get_term_meta( $supplier->term_id, 'in_charge', true );
+							if ( $in_charge ) {
+								echo '<br />';
+								printf(
+									// translators: %s is a person in charge.
+									esc_html__( '%s 様', 'hanmoto' ),
+									esc_html( $in_charge )
+								);
+							}
+							?>
 						</p>
 						<?php if ( in_array( $index, [ 1, 3 ], true ) ) : ?>
 							<div class="stamp">
@@ -247,6 +267,15 @@ foreach ( $supplier_ids as $supplier_id ) {
 								<td><?php echo esc_html( $owner ); ?></td>
 							</tr>
 						</table>
+					</div>
+					<div class="address">
+						<address>
+							株式会社破滅派<br />
+							〒104-0061<br />
+							東京都中央区銀座1-3-3<br />
+							G1ビル7F 1211<br />
+							登録番号: T1010401087592
+						</address>
 					</div>
 				</header>
 
