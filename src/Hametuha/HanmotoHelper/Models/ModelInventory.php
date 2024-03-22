@@ -55,7 +55,7 @@ class ModelInventory extends Singleton {
 			'margin',
 			'vat',
 			'capture_at',
-			'applied_at'
+			'applied_at',
 		];
 	}
 
@@ -122,11 +122,11 @@ class ModelInventory extends Singleton {
 	public function register_apis() {
 		register_rest_route( 'hanmoto/v1', 'inventory/(?P<inventory_id>\d+)/?$', [
 			[
-				'methods' => 'POST',
-				'args' => [
+				'methods'             => 'POST',
+				'args'                => [
 					'inventory_id' => [
-						'required' => true,
-						'type'     => 'integer',
+						'required'          => true,
+						'type'              => 'integer',
 						'validate_callback' => function( $var ) {
 							return is_numeric( $var ) && ( 'inventory' === get_post_type( $var ) );
 						},
@@ -135,11 +135,12 @@ class ModelInventory extends Singleton {
 				'permission_callback' => function( $request ) {
 					return current_user_can( 'edit_post', $request->get_param( 'inventory_id' ) );
 				},
-				'callback' => function( \WP_REST_Request $request ) {
-					$inventory = get_post( $request->get_param( 'inventory_id') );
+				'callback'            => function( \WP_REST_Request $request ) {
+					$inventory = get_post( $request->get_param( 'inventory_id' ) );
 					// Is already applied?
 					$updated = get_post_meta( $inventory->ID, '_applied_at', true );
 					if ( $updated ) {
+						// translators: %s is updated time.
 						return new \WP_Error( 'already_applied', sprintf( __( '既に在庫反映されています: %s', 'hanmoto' ), $updated ), [ 'status' => 400 ] );
 					}
 					// Get product.
@@ -153,16 +154,16 @@ class ModelInventory extends Singleton {
 					}
 					// 在庫情報を取得
 					$difference =
-					$old_stock = $product->get_stock_quantity();
-					$new_stock = $old_stock + (int) get_post_meta( $inventory->ID, '_amount', true );
-					$result = wc_update_product_stock( $product->get_id(), $new_stock );
+					$old_stock  = $product->get_stock_quantity();
+					$new_stock  = $old_stock + (int) get_post_meta( $inventory->ID, '_amount', true );
+					$result     = wc_update_product_stock( $product->get_id(), $new_stock );
 					if ( ! $result ) {
 						return new \WP_Error( 'stock_manage_failed', __( '商品の在庫設定に失敗しました。', 'hanmoto' ), [ 'status' => 400 ] );
 					}
 					update_post_meta( $inventory->ID, '_applied_at', current_time( 'mysql' ) );
 					return new \WP_REST_Response( [
-						'before' => $old_stock,
-						'after'  => $new_stock,
+						'before'  => $old_stock,
+						'after'   => $new_stock,
 						'updated' => date_i18n( get_option( 'date_format' ) ),
 					] );
 				},
@@ -204,7 +205,7 @@ class ModelInventory extends Singleton {
 		foreach ( [ 'supplier', 'transaction_type' ] as $taxonomy ) {
 			$terms = get_the_terms( $post, $taxonomy );
 			if ( $terms && ! is_wp_error( $terms ) ) {
-				$response[ $taxonomy ] = $terms[0]->term_id;
+				$response[ $taxonomy ]            = $terms[0]->term_id;
 				$response[ $taxonomy . '_label' ] = $terms[0]->name;
 			}
 		}
@@ -342,8 +343,8 @@ class ModelInventory extends Singleton {
 					6  => __( '6ヶ月後月末', 'hanmoto' ),
 					12 => __( '1年後月末', 'hanmoto' ),
 				];
-				$now = $post->post_date;
-				foreach ( $dates as $month => $label) :
+				$now   = $post->post_date;
+				foreach ( $dates as $month => $label ) :
 					try {
 						$date = new \DateTime( $now );
 					} catch ( \Exception $e ) {
@@ -431,6 +432,7 @@ class ModelInventory extends Singleton {
 			  AND p.post_parent = %d
 			  AND DATE(p.post_date) < %s
 SQL;
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		return (int) $wpdb->get_var( $wpdb->prepare( $query, $post_id, $date ) );
 	}
 
@@ -451,8 +453,8 @@ SQL;
 			'orderby'        => [ 'date' => 'ASC' ],
 			'meta_query'     => [
 				[
-					'key' => '_amount',
-					'compare'  => 'EXISTS',
+					'key'     => '_amount',
+					'compare' => 'EXISTS',
 				],
 			],
 		];
@@ -462,15 +464,15 @@ SQL;
 		$date_query = [];
 		if ( $this->is_date( $start ) ) {
 			list( $start_year, $start_month, $start_day ) = array_map( 'intval', explode( '-', $start ) );
-			$date_query['after'] = [
+			$date_query['after']                          = [
 				'year'  => $start_year,
 				'month' => $start_month,
 				'day'   => $start_day,
 			];
 		}
 		if ( $this->is_date( $end ) ) {
-			list( $end_year, $end_month, $end_day )       = array_map( 'intval', explode( '-', $end ) );
-			$date_query['before'] = [
+			list( $end_year, $end_month, $end_day ) = array_map( 'intval', explode( '-', $end ) );
+			$date_query['before']                   = [
 				'year'  => $end_year,
 				'month' => $end_month,
 				'day'   => $end_day,
@@ -478,7 +480,7 @@ SQL;
 		}
 		if ( ! empty( $date_query ) ) {
 			$date_query['inclusive'] = true;
-			$args['date_query'] = [ $date_query ];
+			$args['date_query']      = [ $date_query ];
 		}
 		$query = new \WP_Query( $args );
 		if ( ! $query->have_posts() ) {
@@ -488,7 +490,7 @@ SQL;
 		foreach ( $query->posts as $post ) {
 			$transaction = __( '不明', 'hanmoto' );
 			$supplier    = __( '不明', 'hanmoto' );
-			$terms = get_the_terms( $post, 'transaction_type' );
+			$terms       = get_the_terms( $post, 'transaction_type' );
 			if ( $terms && ! is_wp_error( $terms ) ) {
 				$transaction = $terms[0]->name;
 			}

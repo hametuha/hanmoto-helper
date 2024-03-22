@@ -136,9 +136,11 @@ class Commands extends \WP_CLI_Command {
 		if ( ! $post ) {
 			\WP_CLI::error( __( '投稿を発見できませんでした。', 'hanmoto' ) . ' ' . $date );
 		}
-		\WP_CLI::line( sprintf( __( '#%d %s の在庫を確認しています。', 'hanmoto' ), $post_id, get_the_title( $post ) ) );
+		// translators: %1$d is id, %2$s is title.
+		\WP_CLI::line( sprintf( __( '#%1$d %2$s の在庫を確認しています。', 'hanmoto' ), $post_id, get_the_title( $post ) ) );
 		$stock = ModelInventory::get_instance()->get_stock( $post_id, $date );
-		\WP_CLI::line( sprintf( __( '%s以前での在庫は%dです。', 'hanmoto' ), mysql2date( get_option( 'date_format' ), $date ), $stock ) );
+		// translators: %1$s is date, %2$d is stock.
+		\WP_CLI::line( sprintf( __( '%1$s以前での在庫は%2$dです。', 'hanmoto' ), mysql2date( get_option( 'date_format' ), $date ), $stock ) );
 		$changes = ModelInventory::get_instance()->get_inventory_changes( $post_id, $date );
 		if ( is_wp_error( $changes ) ) {
 			\WP_CLI::error( $changes->get_error_message() );

@@ -35,13 +35,13 @@ class RestInventoryStats extends RestApiPattern {
 					return (bool) get_post( $var );
 				},
 			],
-			'start' => [
+			'start'   => [
 				'required'          => false,
 				'type'              => 'string',
 				'validate_callback' => [ $this, 'is_date_or_empty' ],
 				'default'           => '',
 			],
-			'end' => [
+			'end'     => [
 				'required'          => false,
 				'type'              => 'string',
 				'default'           => '',
@@ -65,7 +65,7 @@ class RestInventoryStats extends RestApiPattern {
 		}
 		$subtotal = $total;
 		foreach ( $changes as &$change ) {
-			$subtotal += $change['amount'];
+			$subtotal          += $change['amount'];
 			$change['subtotal'] = $subtotal;
 		}
 

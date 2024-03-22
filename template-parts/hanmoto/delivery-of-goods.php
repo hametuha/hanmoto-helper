@@ -227,6 +227,7 @@ foreach ( $supplier_ids as $supplier_id ) {
 							if ( $in_charge ) {
 								echo '<br />';
 								printf(
+									// translators: %s is a person in charge.
 									esc_html__( '%s 様', 'hanmoto' ),
 									esc_html( $in_charge )
 								);

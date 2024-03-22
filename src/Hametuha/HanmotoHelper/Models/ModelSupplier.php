@@ -86,7 +86,7 @@ class ModelSupplier extends Singleton {
 			?>
 			<tr>
 				<th>
-					<label for="hanmoto-<?php echo esc_attr( $key ) ?>">
+					<label for="hanmoto-<?php echo esc_attr( $key ); ?>">
 						<?php echo esc_html( $label ); ?>
 					</label>
 				</th>

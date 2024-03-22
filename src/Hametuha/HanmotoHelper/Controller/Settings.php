@@ -176,9 +176,9 @@ class Settings extends Singleton {
 					],
 				],
 			],
-			'order' => [
+			'order'     => [
 				'label'   => __( '注文管理', 'hanmoto' ),
-				'desc' => __( '注文管理機能に関する設定です。', 'hanmoto' ),
+				'desc'    => __( '注文管理機能に関する設定です。', 'hanmoto' ),
 				'options' => [
 					[
 						'id'      => 'use_order_manager',

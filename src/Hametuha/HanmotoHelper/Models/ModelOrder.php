@@ -41,14 +41,14 @@ class ModelOrder extends Singleton {
 	public function register_posts() {
 		// Register post type.
 		register_post_type( self::post_type(), [
-			'label'  => __( '書店注文', 'hanmoto' ),
-			'public' => false,
-			'show_ui' => true,
-			'show_in_nav_menu' => false,
+			'label'             => __( '書店注文', 'hanmoto' ),
+			'public'            => false,
+			'show_ui'           => true,
+			'show_in_nav_menu'  => false,
 			'show_in_admin_bar' => false,
-			'menu_icon' => 'dashicons-calculator',
-			'menu_position' => 81,
-			'supports' => [ 'author', 'excerpt' ],
+			'menu_icon'         => 'dashicons-calculator',
+			'menu_position'     => 81,
+			'supports'          => [ 'author', 'excerpt' ],
 		] );
 		// Register order source.
 		register_taxonomy( 'source', [ self::post_type() ], [

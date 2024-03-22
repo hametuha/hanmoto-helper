@@ -93,13 +93,13 @@ class CsvImporter extends Singleton {
 					<legend><?php esc_html_e( 'CSVをアップロード', 'hanmoto' ); ?></legend>
 					<p>
 						<label>
-							<?php esc_html_e( 'CSVファイル', 'hanmoto' ) ?><br />
+							<?php esc_html_e( 'CSVファイル', 'hanmoto' ); ?><br />
 							<input type="file" name="csv" accept="text/csv" />
 						</label>
 					</p>
 					<p>
 						<label>
-							<?php esc_html_e( 'タイプ', 'hanmoto' ) ?><br />
+							<?php esc_html_e( 'タイプ', 'hanmoto' ); ?><br />
 							<select name="type">
 								<?php
 								foreach ( $this->get_types() as $value => $label ) {
@@ -135,16 +135,16 @@ class CsvImporter extends Singleton {
 			if ( ! isset( $_FILES['csv'] ) || UPLOAD_ERR_OK !== $_FILES['csv']['error'] ) {
 				throw new \Exception( __( 'ファイルのアップロードにエラーがありました。', 'hanmoto' ) );
 			}
-			$tmp_path = $_FILES['csv']['tmp_name'];
+			$tmp_path    = $_FILES['csv']['tmp_name'];
 			$file_object = new \SplFileObject( $tmp_path, 'r' );
 			$file_object->setFlags( \SplFileObject::READ_CSV );
-			$counter = 0;
+			$counter  = 0;
 			$imported = 0;
 			$failure  = 0;
 			switch ( $type ) {
 				case 'general':
 					// Order sheet.
-
+					// phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
 					while ( $line = $file_object->fgetcsv() ) {
 						$counter++;
 						if ( 2 > $counter || empty( $line ) ) {
@@ -190,7 +190,8 @@ class CsvImporter extends Singleton {
 						wp_set_object_terms( $order_id, [ $source ], 'source' );
 						$imported++;
 					}
-					wp_redirect( admin_url( sprintf( 'tools.php?page=%s&msg=%s', $this->slug, rawurlencode( sprintf( __( '%d件インポート　%d件失敗', 'hanmoto' ), $imported, $failure ) ) ) ) );
+					// translators: %1$d is imported, %2$d is failure.
+					wp_redirect( admin_url( sprintf( 'tools.php?page=%s&msg=%s', $this->slug, rawurlencode( sprintf( __( '%1$d件インポート　%2$d件失敗', 'hanmoto' ), $imported, $failure ) ) ) ) );
 					break;
 				case 'direct':
 					// Direct input files.

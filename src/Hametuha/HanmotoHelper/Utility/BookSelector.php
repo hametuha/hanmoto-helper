@@ -34,7 +34,7 @@ trait BookSelector {
 			$product_ids[ $product->ID ] = get_the_title( $product );
 		}
 		?>
-		<select name="<?php echo esc_attr( $name ) ?>" id="<?php echo esc_attr( $id ) ?>">
+		<select name="<?php echo esc_attr( $name ); ?>" id="<?php echo esc_attr( $id ); ?>">
 			<?php
 			foreach ( $product_ids as $id => $label ) {
 				printf(
@@ -68,6 +68,7 @@ trait BookSelector {
 			if ( ! $terms || is_wp_error( $terms ) ) {
 				printf(
 					'<div class="notice-error"><p>%s</p></div>',
+					// translators: %s is product name.
 					sprintf( esc_html__( '%sが登録されていません。', 'hanmoto' ), esc_html( $label ) )
 				);
 				return;
@@ -135,7 +136,7 @@ trait BookSelector {
 				switch ( $key ) {
 					case 'title':
 						$new_columns['inventory_group'] = __( '取引', 'hanmoto' );
-						$new_columns['item_title'] = __( '商品', 'hanmoto' );
+						$new_columns['item_title']      = __( '商品', 'hanmoto' );
 						break;
 					case 'author':
 						switch ( $post_type ) {
@@ -268,10 +269,10 @@ trait BookSelector {
 	 * @return \WP_Term|null|\WP_Error
 	 */
 	public function get_bookshop( $name, $wholesaler, $line_code, $shop_code, $create = false ) {
-		$wholesaler = trim( $wholesaler );
-		$name       = trim( $name );
-		$line_code  = str_replace( '-', '', trim( $line_code ) );
-		$shop_code  = trim( $shop_code );
+		$wholesaler   = trim( $wholesaler );
+		$name         = trim( $name );
+		$line_code    = str_replace( '-', '', trim( $line_code ) );
+		$shop_code    = trim( $shop_code );
 		$meta_queries = [
 			[
 				'key'   => 'wholesaler',
@@ -286,13 +287,13 @@ trait BookSelector {
 				'value' => $shop_code,
 			],
 		];
-		$term_query = new \WP_Term_Query( [
+		$term_query   = new \WP_Term_Query( [
 			'taxonomy'   => 'supplier',
 			'number'     => 1,
 			'hide_empty' => false,
 			'meta_query' => $meta_queries,
 		] );
-		$terms = $term_query->get_terms();
+		$terms        = $term_query->get_terms();
 		if ( $terms ) {
 			return $terms[0];
 		}
@@ -303,7 +304,7 @@ trait BookSelector {
 		$parent = get_term_by( 'slug', 'bookshop', 'supplier' );
 		if ( is_wp_error( $parent ) ) {
 			return $parent;
-		} elseif ( ! $parent) {
+		} elseif ( ! $parent ) {
 			return new \WP_Error( 'bookshop_error', __( 'タクソノミー「書店」が登録されていません。', 'hanmoto' ) );
 		}
 		$bookshop = wp_insert_term( $name, 'supplier', [
