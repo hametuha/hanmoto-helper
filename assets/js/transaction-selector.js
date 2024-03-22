@@ -6,9 +6,8 @@
  */
 
 const { useState, useEffect } = wp.element;
-const { __, sprintf } = wp.i18n;
+const { __ } = wp.i18n;
 const { SelectControl } = wp.components;
-const { apiFetch } = wp;
 
 const TransactionSelector = ( props ) => {
 	const termId = parseInt( props.termId );

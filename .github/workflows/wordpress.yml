@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         operating-system: [ ubuntu-18.04 ]  # OS. ubuntu-18.04 is also available.
-        php: [ '7.2', '7.4', '8.0' ] # PHP versions to check.
+        php: [ '7.4', '8.0' ] # PHP versions to check.
         wp: [ 'latest', '5.4' ]      # WordPress version to check.
     services:
       mysql:
@@ -79,7 +79,7 @@ jobs:
       - name: Setup PHP
         uses: nanasess/setup-php@master
         with:
-          php-version: 7.2
+          php-version: 7.4
 
       - name: Install Node
         uses: actions/setup-node@v1

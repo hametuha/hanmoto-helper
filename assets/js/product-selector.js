@@ -8,7 +8,6 @@
 const { useState, useEffect } = wp.element;
 const { __, sprintf } = wp.i18n;
 const { SelectControl } = wp.components;
-const { apiFetch } = wp;
 
 const ProductSelector = ( props ) => {
 	const currentId = parseInt( props.postId );

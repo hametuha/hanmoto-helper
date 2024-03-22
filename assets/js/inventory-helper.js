@@ -12,10 +12,6 @@ const { __ } = wp.i18n;
 
 const div = document.getElementById( 'hanmoto-inventories' );
 
-const InventoryApply = ( { postId } ) => {
-	const [] = useState( [] );
-};
-
 const InventoryForm = ( props ) => {
 	const [ inventory, setInventory ] = useState( {
 		id: 0,
@@ -28,27 +24,34 @@ const InventoryForm = ( props ) => {
 	} );
 	return (
 		<div className="inventory-form">
-			<ProductSelector post-id={ inventory.id } onChange={ ( id ) => setInventory( { ...inventory, id: parseInt( id ) } ) } />
+			<ProductSelector post-id={ inventory.id }
+				onChange={ ( id ) => setInventory( { ...inventory, id: parseInt( id ) } ) } />
 			<Flex align="start">
 				<FlexItem>
-					<TextControl type="number" label={ __( '単価', 'hanmoto' ) } value={ inventory.price } onChange={ ( price ) => setInventory( { ...inventory, price: parseInt( price ) } )} />
+					<TextControl type="number" label={ __( '単価', 'hanmoto' ) } value={ inventory.price }
+						onChange={ ( price ) => setInventory( { ...inventory, price: parseInt( price ) } ) } />
 				</FlexItem>
 				<FlexItem>
-					<TextControl type="number" label={ __( '数量', 'hanmoto' ) } value={ inventory.amount } onChange={ ( amount ) => setInventory( { ...inventory, amount: parseInt( amount ) } )} />
+					<TextControl type="number" label={ __( '数量', 'hanmoto' ) } value={ inventory.amount }
+						onChange={ ( amount ) => setInventory( { ...inventory, amount: parseInt( amount ) } ) } />
 				</FlexItem>
 				<FlexItem>
-					<TextControl type="number" label={ __( '料率', 'hanmoto' ) } value={ inventory.margin } onChange={ ( margin ) => setInventory( { ...inventory, margin: parseInt( margin ) } )}
+					<TextControl type="number" label={ __( '料率', 'hanmoto' ) } value={ inventory.margin }
+						onChange={ ( margin ) => setInventory( { ...inventory, margin: parseInt( margin ) } ) }
 						placeholder={ __( 'e.g. 63%', 'hanmoto' ) } help={ __( '単位は%です。', 'hanmoto' ) } />
 				</FlexItem>
 				<FlexItem>
-					<TextControl type="number" label={ __( '消費税', 'hanmoto' ) } value={ inventory.tax } onChange={ ( tax ) => setInventory( { ...inventory, tax: parseInt( tax ) } )}
+					<TextControl type="number" label={ __( '消費税', 'hanmoto' ) } value={ inventory.tax }
+						onChange={ ( tax ) => setInventory( { ...inventory, tax: parseInt( tax ) } ) }
 						placeholder={ __( 'e.g. 10%', 'hanmoto' ) } help={ __( '単位は%です。', 'hanmoto' ) } />
 				</FlexItem>
 				<FlexItem>
-					<TransactionSelector term-id={ inventory.transaction_type } onChange={ ( id ) => setInventory( { ...inventory, transaction_type: parseInt( id ) } ) } />
+					<TransactionSelector term-id={ inventory.transaction_type }
+						onChange={ ( id ) => setInventory( { ...inventory, transaction_type: parseInt( id ) } ) } />
 				</FlexItem>
 				<FlexItem>
-					<SelectControl label={ __( '清算日', 'hanmoto' ) } value={ inventory.paid_at } onChange={ ( paid_at ) => setInventory( { ...inventory, paid_at: parseInt( paid_at ) } )}
+					<SelectControl label={ __( '清算日', 'hanmoto' ) } value={ inventory.paid_at }
+						onChange={ ( paid_at ) => setInventory( { ...inventory, paid_at: parseInt( paid_at ) } ) }
 						options={ [
 							{
 								value: 0,
@@ -89,9 +92,9 @@ const InventoryContainer = ( { post } ) => {
 		} ).catch( ( error ) => {
 			alert( error.message );
 		} );
-	}, [] );
+	}, [ post ] );
 	const getPrice = ( inventory ) => {
-		return Math.floor( inventory.unit_price * inventory.amount * -1 * inventory.margin / 100 *  ( 100 + inventory.vat ) / 100 );
+		return Math.floor( inventory.unit_price * inventory.amount * -1 * inventory.margin / 100 * ( 100 + inventory.vat ) / 100 );
 	};
 	let total = 0;
 	inventories.forEach( ( inventory ) => {
@@ -111,7 +114,7 @@ const InventoryContainer = ( { post } ) => {
 									<small>{ inventory.unit_price }円
 										× { inventory.amount }冊（料率{ inventory.margin }%）</small>
 									＝<span style={ { color: ( subtotal > 0 ? 'green' : 'red' ) } }>&yen; { subtotal }</span>
-									<span>（{ inventory.transaction_type_label } @ {inventory.capture_at}）</span>
+									<span>（{ inventory.transaction_type_label } @ { inventory.capture_at }）</span>
 									<InventoryAndStock inventory={ inventory } onChange={ ( inventoryToUpdate ) => {
 										wp.apiFetch( {
 											path: '/hanmoto/v1/inventory/' + inventoryToUpdate.id + '/',
@@ -119,9 +122,7 @@ const InventoryContainer = ( { post } ) => {
 										} ).then( ( data ) => {
 											const index = inventories.findIndex( ( i ) => i.id === inventoryToUpdate.id );
 											inventories[ index ].applied_at = data.updated;
-											console.log( inventories[ index ] );
 											setInventories( inventories );
-											console.log( data );
 										} ).catch( ( error ) => {
 											alert( error.message );
 										} );

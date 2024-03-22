@@ -14,11 +14,12 @@ const InventoryAndStock = ( props ) => {
 	const [ loading, setLoading ] = useState( false, [] );
 	if ( inventory.applied_at ) {
 		return (
+			// translators: %s is the date when the inventory was applied.
 			<span style={ { color: 'lightgrey' } }>{ sprintf( __( '%sに在庫反映済み', 'hametuha' ), inventory.applied_at ) }</span>
 		);
 	}
 	return (
-		<Button isSecondary disabled={ loading } isSmall onClick={ ( e ) => {
+		<Button isSecondary disabled={ loading } isSmall onClick={ () => {
 			setLoading( true );
 			onChange( inventory );
 		} }>{ __( '在庫に反映', 'hanmoto' ) }</Button>
