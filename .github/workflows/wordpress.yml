@@ -12,10 +12,9 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        operating-system: [ ubuntu-18.04 ]  # OS. ubuntu-18.04 is also available.
         php: [ '7.4', '8.0' ] # PHP versions to check.
         wp: [ 'latest', '5.4' ]      # WordPress version to check.
     services:
