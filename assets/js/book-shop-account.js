@@ -11,7 +11,6 @@
 const $ = jQuery;
 
 $( document ).ready( function() {
-
 	$( '#hanmoto-is-book-shop' ).click( function( e ) {
 		let method;
 		let message;

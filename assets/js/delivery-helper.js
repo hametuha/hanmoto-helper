@@ -16,7 +16,7 @@ $( '#doaction,#doaction2' ).click( function( e ) {
 	e.preventDefault();
 	const ids = [];
 	$( 'input[name="post[]"]:checked' ).each( function( index, input ) {
-		ids.push( parseInt( $(input).val() ) );
+		ids.push( parseInt( $( input ).val() ) );
 	} );
 	if ( ids.length ) {
 		apiFetch( {

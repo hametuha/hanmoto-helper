@@ -12,11 +12,10 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        operating-system: [ ubuntu-18.04 ]  # OS. ubuntu-18.04 is also available.
-        php: [ '7.2', '7.4', '8.0' ] # PHP versions to check.
+        php: [ '7.4', '8.0' ] # PHP versions to check.
         wp: [ 'latest', '5.4' ]      # WordPress version to check.
     services:
       mysql:
@@ -52,14 +51,14 @@ jobs:
 
   assets:
     name: Assets Test
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
 
       - name: Install Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: '12'
+          node-version: '16'
 
       - name: Install NPM Packages
         run: npm install
@@ -71,7 +70,7 @@ jobs:
     name: Deploy WordPress.org
     needs: [ test, assets ]
     if: contains(github.ref, 'tags/')
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -79,12 +78,12 @@ jobs:
       - name: Setup PHP
         uses: nanasess/setup-php@master
         with:
-          php-version: 7.2
+          php-version: 7.4
 
       - name: Install Node
         uses: actions/setup-node@v1
         with:
-          node-version: '12'
+          node-version: '16'
 
       - name: Build Plugin
         run: bash bin/build.sh ${{ github.ref }}
