@@ -33,12 +33,14 @@ jobs:
         uses: nanasess/setup-php@master
         with:
           php-version: ${{ matrix.php }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Validate composer.json and composer.lock
         run: composer validate
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest
+        run: composer install --prefer-dist
 
       - name: Start MySQL
         run: sudo systemctl start mysql
@@ -79,9 +81,11 @@ jobs:
         uses: nanasess/setup-php@master
         with:
           php-version: 7.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
 

@@ -7,7 +7,7 @@
 		"stop": "wp-env stop",
 		"cli": "wp-env run cli wp",
 		"cli:test": "wp-env run tests-cli wp",
-		"package": "npm run build && npm run gulp dump",
+		"package": "npm run gulp",
 		"watch": "npm-watch",
 		"gulp": "gulp",
 		"gulp:task": "gulp --tasks",
