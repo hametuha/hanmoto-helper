@@ -56,7 +56,7 @@ class WooCommerceHelper extends Singleton {
 	 */
 	public function get_product_rate( $product = null ) {
 		$product = wc_get_product( $product );
-		$meta    = get_post_meta( $product->id, self::META_KEY_RESALE_RATE, true );
+		$meta    = get_post_meta( $product->get_id(), self::META_KEY_RESALE_RATE, true );
 		$rate    = $this->get_global_rate();
 		if ( $meta && is_numeric( $meta ) ) {
 			$rate = (float) $meta;
@@ -72,7 +72,7 @@ class WooCommerceHelper extends Singleton {
 	 */
 	public function product_can_order( $product = null ) {
 		$product = wc_get_product( $product );
-		return 'yes' === get_post_meta( $product->id, 'hanmoto_book_shop_can_order', true );
+		return 'yes' === get_post_meta( $product->get_id(), 'hanmoto_book_shop_can_order', true );
 	}
 
 	/**
@@ -118,13 +118,13 @@ class WooCommerceHelper extends Singleton {
 				case 'hanmoto_sync_with_openbd':
 				case 'hanmoto_book_shop_can_order':
 					if ( 'yes' === $value ) {
-						update_post_meta( $product->id, $key, $value );
+						update_post_meta( $product->get_id(), $key, $value );
 					} else {
-						delete_post_meta( $product->id, $key );
+						delete_post_meta( $product->get_id(), $key );
 					}
 					break;
 				default:
-					update_post_meta( $product->id, $key, $value );
+					update_post_meta( $product->get_id(), $key, $value );
 					break;
 			}
 		}
@@ -236,7 +236,7 @@ class WooCommerceHelper extends Singleton {
 	 */
 	public function get_product_book( $product = null ) {
 		$product = wc_get_product( $product );
-		$isbn    = get_post_meta( $product->id, PostType::META_KEY_ISBN, true );
+		$isbn    = get_post_meta( $product->get_id(), PostType::META_KEY_ISBN, true );
 		if ( ! $isbn ) {
 			return null;
 		}

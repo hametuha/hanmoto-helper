@@ -20,7 +20,6 @@ class ModelEvent extends Singleton {
 		add_action( 'add_meta_boxes', [ $this, 'add_meta_box' ] );
 		// Add product selector.
 		add_action( 'rest_api_init', [ $this, 'rest_api' ], 1 );
-
 	}
 
 	/**

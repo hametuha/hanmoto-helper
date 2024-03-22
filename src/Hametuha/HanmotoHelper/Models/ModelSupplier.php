@@ -139,9 +139,4 @@ class ModelSupplier extends Singleton {
 		$terms = $query->get_terms();
 		return empty( $terms ) ? null : $terms[0];
 	}
-
-
-	public function save_shop( $title, $wholesaler, $line_code, $shop_code, $args = [] ) {
-
-	}
 }

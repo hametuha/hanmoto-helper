@@ -61,7 +61,7 @@ foreach ( $inventories->posts as $inventory ) {
 			padding: 10mm 0;
 		}
 		section.even {
-			border-top: 1mm dashed #000;
+			border-top: 0.5mm dashed #000;
 		}
 		h1 {
 			text-align: center;
@@ -146,6 +146,15 @@ foreach ( $inventories->posts as $inventory ) {
 		}
 		.mono {
 			font-family: monospace;
+		}
+		footer {
+			margin-top: 1cm;
+			display: flex;
+			justify-content: end;
+		}
+		footer address {
+			font-style: normal;
+			font-size: 9pt;
 		}
 	</style>
 </head>
@@ -257,6 +266,15 @@ foreach ( $supplier_ids as $supplier_id ) {
 								<td><?php echo esc_html( $owner ); ?></td>
 							</tr>
 						</table>
+					</div>
+					<div class="address">
+						<address>
+							株式会社破滅派<br />
+							〒104-0061<br />
+							東京都中央区銀座1-3-3<br />
+							G1ビル7F 1211<br />
+							登録番号: T1010401087592
+						</address>
 					</div>
 				</header>
 

@@ -40,7 +40,7 @@ class ModelDelivery extends Singleton {
 			'public'            => current_user_can( 'edit_others_posts' ),
 			'show_in_nav_menu'  => false,
 			'show_in_admin_bar' => false,
-			'show_in_menu'      => 'edit.php?post_type=inventory',
+			'show_in_menu'      => 'edit.php?post_type=inventory-event',
 			'capability_type'   => 'post',
 			'map_meta_cap'      => true,
 			'capabilities'      => [

@@ -2,12 +2,12 @@
  * Inventory helper
  *
  * @handle hanmoto-inventory-helper
- * @deps wp-i18n, wp-element, wp-api-fetch, wp-components, wp-api-fetch, hanmoto-product-selector, hanmoto-transaction-type-selector
+ * @deps wp-i18n, wp-element, wp-api-fetch, wp-components, wp-api-fetch, hanmoto-product-selector, hanmoto-transaction-type-selector, hanmoto-inventory-stock
  */
 
 const { render, createRoot, useState, useEffect } = wp.element;
 const { Button, TextControl, SelectControl, Flex, FlexItem } = wp.components;
-const { ProductSelector, TransactionSelector } = hanmoto;
+const { ProductSelector, TransactionSelector, InventoryAndStock } = hanmoto;
 const { __ } = wp.i18n;
 
 const div = document.getElementById( 'hanmoto-inventories' );
@@ -111,8 +111,21 @@ const InventoryContainer = ( { post } ) => {
 									<small>{ inventory.unit_price }円
 										× { inventory.amount }冊（料率{ inventory.margin }%）</small>
 									＝<span style={ { color: ( subtotal > 0 ? 'green' : 'red' ) } }>&yen; { subtotal }</span>
-									<span>（{ inventory.transaction_type_label }）</span>
-									<span>{ inventory.captured_at }</span>
+									<span>（{ inventory.transaction_type_label } @ {inventory.capture_at}）</span>
+									<InventoryAndStock inventory={ inventory } onChange={ ( inventoryToUpdate ) => {
+										wp.apiFetch( {
+											path: '/hanmoto/v1/inventory/' + inventoryToUpdate.id + '/',
+											method: 'POST',
+										} ).then( ( data ) => {
+											const index = inventories.findIndex( ( i ) => i.id === inventoryToUpdate.id );
+											inventories[ index ].applied_at = data.updated;
+											console.log( inventories[ index ] );
+											setInventories( inventories );
+											console.log( data );
+										} ).catch( ( error ) => {
+											alert( error.message );
+										} );
+									} } />
 								</li>
 							);
 						} ) }

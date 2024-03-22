@@ -51,25 +51,28 @@
 		"webpack": "^5.89",
 		"webpack-stream": "^7.0"
 	},
-	"watch" : {
-		"build:js" : {
-			"extensions" : "js,scss,json",
-			"patterns" : [
+	"watch": {
+		"build:js": {
+			"extensions": "js,scss,json",
+			"patterns": [
 				"assets/js"
 			]
 		},
-		"build:css" : {
-			"extensions" : "scss",
-			"patterns" : [
+		"build:css": {
+			"extensions": "scss",
+			"patterns": [
 				"assets/scss"
 			]
 		},
-		"dump" : {
-			"extensions" : "js,css",
-			"patterns" : [
+		"dump": {
+			"extensions": "js,css",
+			"patterns": [
 				"dist/js",
 				"dist/css"
 			]
 		}
+	},
+	"volta": {
+		"node": "16.20.2"
 	}
 }

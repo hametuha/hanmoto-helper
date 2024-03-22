@@ -42,6 +42,23 @@ class ModelInventory extends Singleton {
 		add_action( 'rest_api_init', [ $this, 'register_apis' ] );
 	}
 
+
+	/**
+	 * Get meta keys.
+	 *
+	 * @return string[]
+	 */
+	private function keys() {
+		return [
+			'unit_price',
+			'amount',
+			'margin',
+			'vat',
+			'capture_at',
+			'applied_at'
+		];
+	}
+
 	/**
 	 * Register post type
 	 *
@@ -70,7 +87,7 @@ class ModelInventory extends Singleton {
 			'hierarchical'      => true,
 			'show_admin_column' => true,
 			'show_in_rest'      => true,
-			'meta_box_cb'       => function ( $post ) {
+			'meta_box_cb'       => function( \WP_Post $post ) {
 				// tax_input[transaction_type][]
 				$terms = get_terms( [
 					'taxonomy'   => 'transaction_type',
@@ -97,13 +114,58 @@ class ModelInventory extends Singleton {
 		] );
 	}
 
+	/**
+	 * Add api to apply WooCommerce product stock.
+	 *
+	 * @return void
+	 */
 	public function register_apis() {
-		register_rest_route( 'hanmoto/v1', 'inventory', [
+		register_rest_route( 'hanmoto/v1', 'inventory/(?P<inventory_id>\d+)/?$', [
 			[
 				'methods' => 'POST',
 				'args' => [
-
+					'inventory_id' => [
+						'required' => true,
+						'type'     => 'integer',
+						'validate_callback' => function( $var ) {
+							return is_numeric( $var ) && ( 'inventory' === get_post_type( $var ) );
+						},
+					],
 				],
+				'permission_callback' => function( $request ) {
+					return current_user_can( 'edit_post', $request->get_param( 'inventory_id' ) );
+				},
+				'callback' => function( \WP_REST_Request $request ) {
+					$inventory = get_post( $request->get_param( 'inventory_id') );
+					// Is already applied?
+					$updated = get_post_meta( $inventory->ID, '_applied_at', true );
+					if ( $updated ) {
+						return new \WP_Error( 'already_applied', sprintf( __( '既に在庫反映されています: %s', 'hanmoto' ), $updated ), [ 'status' => 400 ] );
+					}
+					// Get product.
+					$product = wc_get_product( $inventory->post_parent );
+					if ( ! $product ) {
+						return new \WP_Error( 'not_found', __( '商品が見つかりませんでした。', 'hanmoto' ), [ 'status' => 404 ] );
+					}
+					// Set stock.
+					if ( ! $product->managing_stock() ) {
+						return new \WP_Error( 'stock_is_not_managed', __( 'この商品は在庫管理対象外です。', 'hanmoto' ), [ 'status' => 400 ] );
+					}
+					// 在庫情報を取得
+					$difference =
+					$old_stock = $product->get_stock_quantity();
+					$new_stock = $old_stock + (int) get_post_meta( $inventory->ID, '_amount', true );
+					$result = wc_update_product_stock( $product->get_id(), $new_stock );
+					if ( ! $result ) {
+						return new \WP_Error( 'stock_manage_failed', __( '商品の在庫設定に失敗しました。', 'hanmoto' ), [ 'status' => 400 ] );
+					}
+					update_post_meta( $inventory->ID, '_applied_at', current_time( 'mysql' ) );
+					return new \WP_REST_Response( [
+						'before' => $old_stock,
+						'after'  => $new_stock,
+						'updated' => date_i18n( get_option( 'date_format' ) ),
+					] );
+				},
 			],
 		] );
 	}
@@ -147,22 +209,8 @@ class ModelInventory extends Singleton {
 			}
 		}
 		$response['edit_link'] = get_edit_post_link( $post->ID, 'display' );
-		return $response;
-	}
 
-	/**
-	 * Get meta keys.
-	 *
-	 * @return string[]
-	 */
-	private function keys() {
-		return [
-			'unit_price',
-			'amount',
-			'margin',
-			'vat',
-			'capture_at',
-		];
+		return $response;
 	}
 
 	/**
@@ -319,9 +367,18 @@ class ModelInventory extends Singleton {
 					<br />
 					<?php $this->book_select_pull_down( $post->post_parent ); ?>
 				</label>
+				<label style="marign-left: 10px;">
+					<?php
+					$applied_at = get_post_meta( $post->ID, '_applied_at', true );
+					if ( $applied_at ) :
+						?>
+						<span style="color: lightgrey;"><?php echo date_i18n( get_option( 'date_format' ), $applied_at ); ?></span>
+					<?php endif; ?>
+				</label>
 			</p>
 			<p>
 				<?php
+				wp_enqueue_script( 'hanmoto-taxonomy-selector' );
 				$current_group = (int) get_post_meta( $post->ID, '_group', true );
 				$groups        = new \WP_Query( [
 					'post_type'      => 'inventory-event',
@@ -333,7 +390,7 @@ class ModelInventory extends Singleton {
 				<label style="display: block">
 					<label for="group"><?php esc_html_e( '取引グループ', 'hanmoto' ); ?></label>
 					<br />
-					<select id="group" name="group">
+					<select id="group" name="group" class="hanmoto-select2">
 						<option value="0" <?php selected( $current_group, 0 ); ?>><?php esc_html_e( '設定なし', 'hanmoto' ); ?></option>
 						<?php foreach ( $groups->posts as $group ) : ?>
 							<option value="<?php echo esc_attr( $group->ID ); ?>" <?php selected( $current_group, $group->ID ); ?>>

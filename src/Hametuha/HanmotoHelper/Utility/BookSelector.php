@@ -58,6 +58,7 @@ trait BookSelector {
 	 */
 	public function hierarchical_radio( $taxonomy, $label ) {
 		return function ( $post ) use ( $taxonomy, $label ) {
+			wp_enqueue_script( 'hanmoto-taxonomy-selector' );
 			// tax_input[source][]
 			$terms = get_terms( [
 				'taxonomy'   => $taxonomy,
@@ -71,10 +72,10 @@ trait BookSelector {
 				);
 				return;
 			}
-			foreach ( $terms as $term ) {
-				?>
-				<div>
-					<h4><?php echo esc_html( $term->name ); ?></h4>
+			?>
+			<select class="hanmoto-select2" name="tax_input[<?php echo esc_attr( $taxonomy ); ?>][]">
+				<?php foreach ( $terms as $term ) : ?>
+				<optgroup label="<?php echo esc_attr( $term->name ); ?>">
 					<?php
 					$children = get_terms( [
 						'taxonomy'   => $term->taxonomy,
@@ -84,8 +85,7 @@ trait BookSelector {
 					if ( ! empty( $children ) && ! is_wp_error( $children ) ) {
 						foreach ( $children as $child ) {
 							printf(
-								'<div><label><input type="radio" name="tax_input[%s][]" value="%d" %s/> %s</label></div>',
-								esc_attr( $child->taxonomy ),
+								'<option value="%d" %s>%s</option>',
 								esc_attr( $child->term_id ),
 								checked( has_term( $child, $child->taxonomy, $post ), true, false ),
 								esc_html( $child->name )
@@ -93,9 +93,10 @@ trait BookSelector {
 						}
 					}
 					?>
-				</div>
-				<?php
-			}
+				</optgroup>
+				<?php endforeach; ?>
+			</select>
+			<?php
 		};
 	}
 
