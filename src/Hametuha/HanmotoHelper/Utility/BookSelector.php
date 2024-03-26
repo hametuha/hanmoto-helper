@@ -88,7 +88,7 @@ trait BookSelector {
 							printf(
 								'<option value="%d" %s>%s</option>',
 								esc_attr( $child->term_id ),
-								checked( has_term( $child, $child->taxonomy, $post ), true, false ),
+								selected( has_term( $child, $child->taxonomy, $post ), true, false ),
 								esc_html( $child->name )
 							);
 						}
@@ -131,6 +131,7 @@ trait BookSelector {
 		} );
 		// Add columns.
 		add_filter( 'manage_' . $post_type . '_posts_columns', function( $columns ) use ( $post_type ) {
+			wp_enqueue_script( 'hanmoto-inventory-bulk-action' );
 			$new_columns = [];
 			foreach ( $columns as $key => $label ) {
 				switch ( $key ) {

@@ -19,6 +19,7 @@ class ModelDelivery extends Singleton {
 		add_action( 'init', [ $this, 'register_post_types' ] );
 		add_action( 'admin_head', [ $this, 'enqueue_assets' ] );
 		add_filter('bulk_actions-edit-inventory', function( $bulk_actions ) {
+			$bulk_actions['assign-event'] = __( '取引イベントを登録', 'hanmoto' );
 			$bulk_actions['make-delivery-of-goods'] = __( '納品書を作成', 'hanmoto' );
 			return $bulk_actions;
 		});

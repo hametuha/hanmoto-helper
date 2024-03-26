@@ -24,7 +24,7 @@ const TransactionSelector = ( props ) => {
 			} ];
 			data.forEach( ( transactionType ) => {
 				options.push( {
-					value: transactionType.term_id,
+					value: transactionType.id,
 					label: transactionType.name,
 				} );
 			} );

@@ -47,7 +47,7 @@ const InventoryForm = ( props ) => {
 				</FlexItem>
 				<FlexItem>
 					<TransactionSelector term-id={ inventory.transaction_type }
-						onChange={ ( id ) => setInventory( { ...inventory, transaction_type: parseInt( id ) } ) } />
+						onChange={ ( id ) => console.log( id ) && setInventory( { ...inventory, transaction_type: parseInt( id ) } ) } />
 				</FlexItem>
 				<FlexItem>
 					<SelectControl label={ __( '清算日', 'hanmoto' ) } value={ inventory.paid_at }
@@ -120,9 +120,14 @@ const InventoryContainer = ( { post } ) => {
 											path: '/hanmoto/v1/inventory/' + inventoryToUpdate.id + '/',
 											method: 'POST',
 										} ).then( ( data ) => {
-											const index = inventories.findIndex( ( i ) => i.id === inventoryToUpdate.id );
-											inventories[ index ].applied_at = data.updated;
-											setInventories( inventories );
+											const newInventories = [];
+											for ( const i of inventories ) {
+												if ( i.id === inventoryToUpdate.id ) {
+													i.applied_at = data.updated;
+												}
+												newInventories.push( i );
+											}
+											setInventories( newInventories );
 										} ).catch( ( error ) => {
 											alert( error.message );
 										} );
@@ -143,8 +148,7 @@ const InventoryContainer = ( { post } ) => {
 					method: 'POST',
 					data: inventory,
 				} ).then( ( data ) => {
-					inventories.push( data );
-					setInventories( inventories );
+					setInventories( [ ...inventories, data ] );
 				} ).catch( ( error ) => {
 					alert( error.message );
 				} );

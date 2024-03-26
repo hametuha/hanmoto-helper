@@ -58,10 +58,10 @@ class Bootstrap extends Singleton {
 			$url = plugin_dir_url( hanmoto_root_dir() . '/dist' ) . $asset['path'];
 			switch ( $asset['ext'] ) {
 				case 'css':
-					wp_register_style( $asset['handle'], $url, $asset['deps'], $asset['version'], $asset['media'] );
+					wp_register_style( $asset['handle'], $url, $asset['deps'], $asset['hash'], $asset['media'] );
 					break 1;
 				case 'js':
-					wp_register_script( $asset['handle'], $url, $asset['deps'], $asset['version'], $asset['footer'] );
+					wp_register_script( $asset['handle'], $url, $asset['deps'], $asset['hash'], $asset['footer'] );
 					if ( in_array( 'wp-i18n', $asset['deps'], true ) ) {
 						wp_set_script_translations( $asset['handle'], 'hanmoto' );
 					}

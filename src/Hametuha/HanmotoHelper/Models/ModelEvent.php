@@ -90,15 +90,16 @@ class ModelEvent extends Singleton {
 				return ( get_post( $id ) && 'inventory-event' === get_post_type( $id ) );
 			},
 		];
+		$permission_callback = function() {
+			return current_user_can( 'edit_posts' );
+		};
 		register_rest_route( 'hanmoto/v1', 'inventories/(?P<post_id>\d+)', [
 			[
 				'methods'             => 'GET',
 				'args'                => [
 					'post_id' => $arg_post_id,
 				],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_posts' );
-				},
+				'permission_callback' => $permission_callback,
 				'callback'            => function( \WP_REST_Request $request ) {
 					$query = new \WP_Query( [
 						'post_type'      => 'inventory',
@@ -179,13 +180,11 @@ class ModelEvent extends Singleton {
 							// Should exist in taxonomy.
 							$term = get_term( $term_id, 'transaction_type' );
 
-							return is_wp_error( $term ) ? $term : true;
+							return ( ! $term || is_wp_error( $term ) ) ? $term : true;
 						},
 					],
 				],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_posts' );
-				},
+				'permission_callback' => $permission_callback,
 				'callback'            => function ( \WP_REST_Request $reqeust ) {
 					$parent  = get_post( $reqeust->get_param( 'post_id' ) );
 					$post_id = wp_insert_post( [
@@ -231,6 +230,41 @@ class ModelEvent extends Singleton {
 					return is_wp_error( $response ) ? $response : new \WP_REST_Response( $response );
 				},
 			],
+			[
+				'methods'             => 'PUT',
+				'args'                => [
+					'post_id'          => $arg_post_id,
+					'ids'              => [
+						'type'                => 'string',
+						'description'         => __( '在庫変動IDのカンマ区切り形式', 'hanmoto' ),
+						'required'            => true,
+						'validation_callback' => function ( $ids ) {
+							if ( ! preg_match( '/^[0-9,]+$/u', $ids ) ) {
+								return false;
+							}
+							$ids = explode( ',', $ids );
+							$valid = array_filter( $ids, function( $id ) {
+								return get_post( $id ) && 'inventory' === get_post_type( $id );
+							} );
+							return count( $ids ) && count( $valid );
+						},
+					],
+				],
+				'permission_callback' => $permission_callback,
+				'callback'            => function ( \WP_REST_Request $request ) {
+					// Check if all events are valid.
+					$ids   = explode( ',', $request->get_param( 'ids' ) );
+					$event = $request->get_param( 'post_id' );
+					$total = 0;
+					foreach ( $ids as $id ) {
+						$total += update_post_meta( $id, '_group', $event ) ? 1 : 0;
+					}
+					return new \WP_REST_Response( [
+						'updated' => $total,
+						'should'  => count( $ids ),
+					] );
+				},
+			]
 		] );
 	}
 
