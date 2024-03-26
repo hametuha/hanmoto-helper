@@ -27,12 +27,12 @@ $( document ).ready( function() {
 		if ( ! /^\d+$/.test( event ) ) {
 			return true;
 		}
-		console.log( event );
 		wp.apiFetch( {
 			path: 'hanmoto/v1/inventories/' + event + '/?ids=' + request.join( ',' ),
 			method: 'PUT',
 		} ).then( function( response ) {
-			alert( sprintf( __( '%d/%d件を登録しました。', 'hanmoto' ), response.updated, response.should ) );
+			// translators: %1$d is success, %2$d is total.
+			alert( sprintf( __( '%1$d/%2$d件を登録しました。', 'hanmoto' ), response.updated, response.should ) );
 			window.refresh();
 		} ).cache( function( response ) {
 			alert( response.message );

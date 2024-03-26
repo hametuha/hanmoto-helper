@@ -47,7 +47,7 @@ const InventoryForm = ( props ) => {
 				</FlexItem>
 				<FlexItem>
 					<TransactionSelector term-id={ inventory.transaction_type }
-						onChange={ ( id ) => console.log( id ) && setInventory( { ...inventory, transaction_type: parseInt( id ) } ) } />
+						onChange={ ( id ) => setInventory( { ...inventory, transaction_type: parseInt( id ) } ) } />
 				</FlexItem>
 				<FlexItem>
 					<SelectControl label={ __( '清算日', 'hanmoto' ) } value={ inventory.paid_at }

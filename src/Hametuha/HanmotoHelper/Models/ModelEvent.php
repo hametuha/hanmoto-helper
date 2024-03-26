@@ -82,7 +82,7 @@ class ModelEvent extends Singleton {
 			],
 		] );
 		// Inventory list
-		$arg_post_id = [
+		$arg_post_id         = [
 			'type'                => 'int',
 			'description'         => __( '取引イベント', 'hanmoto' ),
 			'required'            => true,
@@ -233,8 +233,8 @@ class ModelEvent extends Singleton {
 			[
 				'methods'             => 'PUT',
 				'args'                => [
-					'post_id'          => $arg_post_id,
-					'ids'              => [
+					'post_id' => $arg_post_id,
+					'ids'     => [
 						'type'                => 'string',
 						'description'         => __( '在庫変動IDのカンマ区切り形式', 'hanmoto' ),
 						'required'            => true,
@@ -242,7 +242,7 @@ class ModelEvent extends Singleton {
 							if ( ! preg_match( '/^[0-9,]+$/u', $ids ) ) {
 								return false;
 							}
-							$ids = explode( ',', $ids );
+							$ids   = explode( ',', $ids );
 							$valid = array_filter( $ids, function( $id ) {
 								return get_post( $id ) && 'inventory' === get_post_type( $id );
 							} );
@@ -264,7 +264,7 @@ class ModelEvent extends Singleton {
 						'should'  => count( $ids ),
 					] );
 				},
-			]
+			],
 		] );
 	}
 
