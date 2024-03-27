@@ -3,6 +3,7 @@
 namespace Hametuha\HanmotoHelper\Models;
 
 use Hametuha\HanmotoHelper\Pattern\Singleton;
+use Hametuha\HanmotoHelper\Utility\BookSelector;
 
 /**
  * 取引イベントを登録するモデル
@@ -10,6 +11,13 @@ use Hametuha\HanmotoHelper\Pattern\Singleton;
  * @package hanmoto
  */
 class ModelEvent extends Singleton {
+
+	use BookSelector;
+
+	/**
+	 * Post type.
+	 */
+	const POST_TYPE = 'inventory-event';
 
 	/**
 	 * {@inheritdoc}
@@ -20,6 +28,7 @@ class ModelEvent extends Singleton {
 		add_action( 'add_meta_boxes', [ $this, 'add_meta_box' ] );
 		// Add product selector.
 		add_action( 'rest_api_init', [ $this, 'rest_api' ], 1 );
+		$this->admin_columns( self::POST_TYPE );
 	}
 
 	/**
@@ -28,7 +37,7 @@ class ModelEvent extends Singleton {
 	 * @return void
 	 */
 	public function register_post_types() {
-		register_post_type( 'inventory-event', [
+		register_post_type( self::POST_TYPE, [
 			'label'             => __( '取引イベント', 'hanmoto' ),
 			'has_archive'       => false,
 			'public'            => false,
@@ -274,10 +283,55 @@ class ModelEvent extends Singleton {
 	 * @return void
 	 */
 	public function add_meta_box( $post_type ) {
-		if ( 'inventory-event' !== $post_type ) {
+		if ( self::POST_TYPE !== $post_type ) {
 			return;
 		}
 		add_meta_box( 'inventories', __( '在庫変動', 'hanmoto' ), [ $this, 'render_meta_box' ], $post_type, 'advanced' );
+	}
+
+	/**
+	 * Get total amount and price of inventory event.
+	 *
+	 * @param int|\WP_Post $inventory_event Inventory event.
+	 * @return array{total_plus_amount: int, total_minus_amount:int, total_price: int, count:int}
+	 */
+	public static function calc_total_amount( $inventory_event ) {
+		$post   = get_post( $inventory_event );
+		$result = [
+			'total_plus_amount'  => 0,
+			'total_minus_amount' => 0,
+			'total_price'        => 0,
+			'count'              => 0,
+		];
+		if ( ! $post || 'inventory-event' !== $post->post_type ) {
+			return $result;
+		}
+		$query = new \WP_Query( [
+			'post_type'      => 'inventory',
+			'posts_per_page' => -1,
+			'post_status'    => 'any',
+			'no_found_rows'  => true,
+			'meta_query'     => [
+				[
+					'key'   => '_group',
+					'value' => $post->ID,
+				],
+			],
+		] );
+		foreach ( $query->posts as $inventory ) {
+			++$result['count'];
+			$amount = (int) get_post_meta( $inventory->ID, '_amount', true );
+			if ( $amount < 0 ) {
+				$result['total_minus_amount'] += $amount;
+			} else {
+				$result['total_plus_amount'] += $amount;
+			}
+			$sub_total              = (int) get_post_meta( $inventory->ID, '_unit_price', true ) * $amount * -1;
+			$sub_total             *= (int) get_post_meta( $inventory->ID, '_margin', true ) / 100;
+			$sub_total             *= ( 100 + (int) get_post_meta( $inventory->ID, '_vat', true ) ) / 100;
+			$result['total_price'] += $sub_total;
+		}
+		return $result;
 	}
 
 	/**

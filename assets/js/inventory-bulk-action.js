@@ -33,7 +33,7 @@ $( document ).ready( function() {
 		} ).then( function( response ) {
 			// translators: %1$d is success, %2$d is total.
 			alert( sprintf( __( '%1$d/%2$d件を登録しました。', 'hanmoto' ), response.updated, response.should ) );
-			window.refresh();
+			window.location.reload();
 		} ).cache( function( response ) {
 			alert( response.message );
 		} );

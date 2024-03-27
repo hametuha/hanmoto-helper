@@ -236,13 +236,12 @@ class WooCommerceTemplate extends Singleton {
 				<dt><?php echo esc_html( $prop['label'] ); ?></dt>
 				<dd>
 					<?php echo $prop['value']; ?>
-					<?php if ( $prop['desc'] ) : ?>
+					<?php if ( ! empty( $prop['desc'] ) ) : ?>
 						<span class="description"><?php echo $prop['desc']; ?></span>
 					<?php endif; ?>
 				</dd>
 				<?php endforeach; ?>
 			</dl>
-
 
 			<hr />
 
