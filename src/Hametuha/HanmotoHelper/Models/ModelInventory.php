@@ -524,7 +524,7 @@ SQL;
 	public function save_product_password( $post_id, $post ) {
 		if ( isset( $_POST['inventory-password'] ) ) {
 			$password = filter_input( INPUT_POST, 'inventory-password' );
-			if ( empty( $password ) ){
+			if ( empty( $password ) ) {
 				delete_post_meta( $post_id, '_inventory_password' );
 			} else {
 				update_post_meta( $post_id, '_inventory_password', $password );
@@ -563,7 +563,7 @@ SQL;
 				</p>
 			<?php else : ?>
 				<p class="description"><?php esc_html_e( 'パスワードを設定すると外部の人が在庫確認をできるようになります。', 'hanmoto' ); ?></p>
-			<?php
+				<?php
 			endif;
 		}, $post_type, 'side', 'default' );
 	}

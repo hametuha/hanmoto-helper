@@ -9,9 +9,9 @@
 .hanmoto-stats {
 
 	&-main {
-		min-height: calc( 100vh - 80px );
-		min-height: calc( 100svh - 80px );
-
+		min-height: calc(100vh - 80px);
+		// stylelint-disable-next-line unit-no-unknown
+		min-height: calc(100svh - 80px);
 
 
 		canvas {
@@ -54,7 +54,7 @@
 	}
 
 	&-title {
-		font-size: 18px ;
+		font-size: 18px;
 		margin: 0;
 	}
 

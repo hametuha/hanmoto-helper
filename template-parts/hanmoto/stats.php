@@ -28,7 +28,7 @@ wp_enqueue_style( 'hanmoto-stats' );
 		<canvas id="hanmoto-stats-chart"></canvas>
 	</main>
 	<footer class="hanmoto-stats-footer">
-		<p>&copy; <?php echo esc_html( date( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?></p>
+		<p>&copy; <?php echo esc_html( time( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?></p>
 	</footer>
 </div><!-- //.hanmoto-stats-template -->
 <?php wp_footer(); ?>

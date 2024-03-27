@@ -296,7 +296,7 @@ class ModelEvent extends Singleton {
 	 * @return array{total_plus_amount: int, total_minus_amount:int, total_price: int, count:int}
 	 */
 	public static function calc_total_amount( $inventory_event ) {
-		$post = get_post( $inventory_event );
+		$post   = get_post( $inventory_event );
 		$result = [
 			'total_plus_amount'  => 0,
 			'total_minus_amount' => 0,
@@ -326,9 +326,9 @@ class ModelEvent extends Singleton {
 			} else {
 				$result['total_plus_amount'] += $amount;
 			}
-			$sub_total = (int) get_post_meta( $inventory->ID, '_unit_price', true )* $amount * -1;
-			$sub_total *= (int)get_post_meta( $inventory->ID, '_margin', true ) / 100;
-			$sub_total *= ( 100 + (int)get_post_meta( $inventory->ID, '_vat', true ) ) / 100;
+			$sub_total              = (int) get_post_meta( $inventory->ID, '_unit_price', true ) * $amount * -1;
+			$sub_total             *= (int) get_post_meta( $inventory->ID, '_margin', true ) / 100;
+			$sub_total             *= ( 100 + (int) get_post_meta( $inventory->ID, '_vat', true ) ) / 100;
 			$result['total_price'] += $sub_total;
 		}
 		return $result;

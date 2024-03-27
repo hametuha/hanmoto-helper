@@ -143,7 +143,7 @@ trait BookSelector {
 						if ( ModelEvent::POST_TYPE === $post_type ) {
 							$new_columns[ $key ] = $label;
 						} else {
-							$new_columns['item_title']      = __( '商品', 'hanmoto' );
+							$new_columns['item_title'] = __( '商品', 'hanmoto' );
 						}
 						break;
 					case 'author':
@@ -152,9 +152,9 @@ trait BookSelector {
 								$new_columns['inventory'] = __( '部数', 'hanmoto' );
 								break 2;
 							case ModelEvent::POST_TYPE:
-								$new_columns['total_count'] = __( '取引件数', 'hanmoto' );
+								$new_columns['total_count']     = __( '取引件数', 'hanmoto' );
 								$new_columns['total_inventory'] = __( '取引部数', 'hanmoto' );
-								$new_columns['total_amount'] = __( '取引総額', 'hanmoto' );
+								$new_columns['total_amount']    = __( '取引総額', 'hanmoto' );
 								break 2;
 							default:
 								$new_columns['inventory'] = __( '在庫変動', 'hanmoto' );
@@ -214,7 +214,7 @@ trait BookSelector {
 					break;
 				case 'total_amount':
 					$amount = ModelEvent::calc_total_amount( $post_id );
-					printf( '<strong style="color: %2$s">&yen;%1$s</strong>', number_format(absint( $amount['total_price'] ) ), ( 0 < $amount['total_price'] ? 'green' : 'red' ) );
+					printf( '<strong style="color: %2$s">&yen;%1$s</strong>', number_format( absint( $amount['total_price'] ) ), ( 0 < $amount['total_price'] ? 'green' : 'red' ) );
 					break;
 				case 'sub_total':
 					$sub_total = $this->get_total( $post_id );

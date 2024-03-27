@@ -43,7 +43,7 @@ class RestInventoryStats extends RestApiPattern {
 	 */
 	public function get_arguments( $method ) {
 		return [
-			'post_id' => [
+			'post_id'  => [
 				'required'          => true,
 				'type'              => 'int',
 				'validate_callback' => function( $var ) {
@@ -51,19 +51,19 @@ class RestInventoryStats extends RestApiPattern {
 				},
 			],
 			'password' => [
-				'required' => true,
-				'type'     => 'string',
+				'required'          => true,
+				'type'              => 'string',
 				'validate_callback' => function( $var, \WP_REST_Request $request ) {
 					return ModelInventory::is_password_valid_for( $request->get_param( 'post_id' ), $var );
 				},
 			],
-			'start'   => [
+			'start'    => [
 				'required'          => false,
 				'type'              => 'string',
 				'validate_callback' => [ $this, 'is_date_or_empty' ],
 				'default'           => '',
 			],
-			'end'     => [
+			'end'      => [
 				'required'          => false,
 				'type'              => 'string',
 				'default'           => '',
@@ -109,7 +109,7 @@ class RestInventoryStats extends RestApiPattern {
 	 * @return void
 	 */
 	public function pre_get_posts( $query ) {
-		if ( is_admin() || ! $query->is_main_query() || ! $query->get( 'hanmoto-stats' )  ) {
+		if ( is_admin() || ! $query->is_main_query() || ! $query->get( 'hanmoto-stats' ) ) {
 			return;
 		}
 		// Check if password is valid.

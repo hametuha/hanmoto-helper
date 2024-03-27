@@ -6,7 +6,8 @@
 	},
 	"globals": {
 		"wp": false,
-		"hanmoto": false
+		"hanmoto": false,
+		"Chart": false
 	},
 	"extends": [
 		"plugin:@wordpress/eslint-plugin/recommended-with-formatting"

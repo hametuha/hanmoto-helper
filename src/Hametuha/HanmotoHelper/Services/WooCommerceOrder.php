@@ -54,7 +54,7 @@ class WooCommerceOrder extends Singleton {
 		add_action( 'woocommerce_thankyou_order_received_text', [ $this, 'thank_you_notice' ], 10, 2 );
 		add_action( 'woocommerce_email_order_details', [ $this, 'processing_email' ], 10, 4 );
 		// todo: この処理がなんだったかを再確認
-//		add_action( 'woocommerce_email_before_order_table', [ $this, 'order_notification' ], 10, 4 );
+		//      add_action( 'woocommerce_email_before_order_table', [ $this, 'order_notification' ], 10, 4 );
 		add_filter( 'woocommerce_email_classes', [ $this, 'email_classes' ] );
 		// Status update via cron.
 		add_action( 'init', [ $this, 'register_cron' ] );

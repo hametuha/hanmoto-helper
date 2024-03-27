@@ -10,8 +10,6 @@
 const { __ } = wp.i18n;
 const endpoint = `/hanmoto/v1/stats/inventory/${ HanmotoStats.post }/?password=${ HanmotoStats.password }`;
 
-
-
 // Canvas
 wp.apiFetch( {
 	path: endpoint,
@@ -32,7 +30,7 @@ wp.apiFetch( {
 						y: item.subtotal,
 					};
 				} ),
-			}
+			},
 		],
 	};
 	new Chart( ctx, {
@@ -42,17 +40,17 @@ wp.apiFetch( {
 			scales: {
 				x: {
 					type: 'time',
-					min: res[0].date,
+					min: res[ 0 ].date,
 					time: {
 						unit: 'day',
-					}
-				}
-			}
-		}
+					},
+				},
+			},
+		},
 	} );
 } ).catch( ( res ) => {
 	alert( res.message );
 } ).finally( () => {
 	// Remove loading.
-	document.getElementsByClassName( 'hanmoto-stats-main' )[0].classList.remove( 'loading' );
+	document.getElementsByClassName( 'hanmoto-stats-main' )[ 0 ].classList.remove( 'loading' );
 } );
