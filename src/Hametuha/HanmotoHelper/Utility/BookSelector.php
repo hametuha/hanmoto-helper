@@ -3,6 +3,7 @@
 namespace Hametuha\HanmotoHelper\Utility;
 
 use Hametuha\HanmotoHelper\Controller\PostType;
+use Hametuha\HanmotoHelper\Models\ModelEvent;
 use Hametuha\HanmotoHelper\Models\ModelOrder;
 
 /**
@@ -136,13 +137,24 @@ trait BookSelector {
 			foreach ( $columns as $key => $label ) {
 				switch ( $key ) {
 					case 'title':
-						$new_columns['inventory_group'] = __( '取引', 'hanmoto' );
-						$new_columns['item_title']      = __( '商品', 'hanmoto' );
+						if ( 'inventory' === $post_type ) {
+							$new_columns['inventory_group'] = __( '取引', 'hanmoto' );
+						}
+						if ( ModelEvent::POST_TYPE === $post_type ) {
+							$new_columns[ $key ] = $label;
+						} else {
+							$new_columns['item_title']      = __( '商品', 'hanmoto' );
+						}
 						break;
 					case 'author':
 						switch ( $post_type ) {
 							case ModelOrder::post_type():
-								$new_columns['inventory'] = __( '冊数', 'hanmoto' );
+								$new_columns['inventory'] = __( '部数', 'hanmoto' );
+								break 2;
+							case ModelEvent::POST_TYPE:
+								$new_columns['total_count'] = __( '取引件数', 'hanmoto' );
+								$new_columns['total_inventory'] = __( '取引部数', 'hanmoto' );
+								$new_columns['total_amount'] = __( '取引総額', 'hanmoto' );
 								break 2;
 							default:
 								$new_columns['inventory'] = __( '在庫変動', 'hanmoto' );
@@ -154,6 +166,9 @@ trait BookSelector {
 						switch ( $post_type ) {
 							case ModelOrder::post_type():
 								$new_columns['shipped_at'] = __( '搬送日', 'hanmoto' );
+								break 2;
+							case ModelEvent::POST_TYPE:
+								// Do nothing.
 								break 2;
 							default:
 								$new_columns['capture_at'] = __( '請求日', 'hanmoto' );
@@ -174,7 +189,7 @@ trait BookSelector {
 					if ( $group ) {
 						printf( '<a href="%s">%s</a>', get_edit_post_link( $group ), get_the_title( $group ) );
 					} else {
-						printf( '<span style="color: lightgray;">%s</span>', esc_html__( '未設定', 'hanmoto' ) );
+						printf( '<span style="color: lightgray;">%s</span>', esc_html__( '個別取引', 'hanmoto' ) );
 					}
 					break;
 				case 'item_title':
@@ -189,9 +204,21 @@ trait BookSelector {
 					$move = get_post_meta( $post_id, '_amount', true );
 					printf( '<span style="display:block; text-align: right;">%s</span>', number_format( $move ) );
 					break;
+				case 'total_count':
+					$amount = ModelEvent::calc_total_amount( $post_id );
+					echo number_format( $amount['count'] );
+					break;
+				case 'total_inventory':
+					$amount = ModelEvent::calc_total_amount( $post_id );
+					printf( '<span style="color: green;">%d</span>/<span style="color:red;">%d</span>', $amount['total_minus_amount'], $amount['total_plus_amount'] );
+					break;
+				case 'total_amount':
+					$amount = ModelEvent::calc_total_amount( $post_id );
+					printf( '<strong style="color: %2$s">&yen;%1$s</strong>', number_format(absint( $amount['total_price'] ) ), ( 0 < $amount['total_price'] ? 'green' : 'red' ) );
+					break;
 				case 'sub_total':
 					$sub_total = $this->get_total( $post_id );
-					printf( '<span style="display:block; text-align: right;">%s</span>', number_format( $sub_total ) );
+					printf( '<span style="display:block; text-align: right; color: %2$s">%1$s</span>', number_format( $sub_total ), ( 0 < $sub_total ? 'green' : 'red' ) );
 					break;
 				case 'capture_at':
 				case 'shipped_at':

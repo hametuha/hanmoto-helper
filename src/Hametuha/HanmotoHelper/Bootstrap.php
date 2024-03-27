@@ -43,6 +43,10 @@ class Bootstrap extends Singleton {
 	 * Register assets.
 	 */
 	public function register_assets() {
+		// libraries.
+		wp_register_script( 'chart-js', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js', [], '4.4.1', true );
+		wp_register_script( 'chart-js-adapter-moment', 'https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.1/dist/chartjs-adapter-moment.min.js', [ 'chart-js', 'moment' ], '1.0.1', true );
+		// local files.
 		$json = hanmoto_root_dir() . '/wp-dependencies.json';
 		if ( ! file_exists( $json ) ) {
 			return;

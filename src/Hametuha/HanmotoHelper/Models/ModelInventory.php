@@ -25,6 +25,9 @@ class ModelInventory extends Singleton {
 		add_action( 'save_post_inventory', [ $this, 'save_inventory_boxes' ], 10, 2 );
 		add_action( 'edit_form_after_title', [ $this, 'editor_title' ] );
 		add_action( 'add_meta_boxes', [ $this, 'add_inventory_boxes' ] );
+		// Add setting section for password.
+		add_action( 'save_post_product', [ $this, 'save_product_password' ], 10, 2 );
+		add_action( 'add_meta_boxes', [ $this, 'add_product_meta_box' ] );
 		// Add action.
 		add_filter( 'query_vars', function( $vars ) {
 			$vars[] = 'inventory_parent';
@@ -510,5 +513,76 @@ SQL;
 			];
 		}
 		return $changes;
+	}
+
+	/**
+	 * @param int $post_id
+	 * @param \WP_Post $post
+	 *
+	 * @return void
+	 */
+	public function save_product_password( $post_id, $post ) {
+		if ( isset( $_POST['inventory-password'] ) ) {
+			$password = filter_input( INPUT_POST, 'inventory-password' );
+			if ( empty( $password ) ){
+				delete_post_meta( $post_id, '_inventory_password' );
+			} else {
+				update_post_meta( $post_id, '_inventory_password', $password );
+			}
+		}
+	}
+
+	/**
+	 * Register post type for product.
+	 *
+	 * @param string $post_type
+	 * @return void
+	 */
+	public function add_product_meta_box( $post_type ) {
+		if ( 'product' !== $post_type ) {
+			return;
+		}
+		add_meta_box( 'product_password', __( '在庫確認用パスワード', 'hanmoto' ), function ( \WP_Post $post ) {
+			$password = get_post_meta( $post->ID, '_inventory_password', true );
+			?>
+			<p>
+				<label>
+					<?php esc_html_e( '在庫確認用パスワード', 'hanmoto' ); ?><br />
+					<input class="widefat" name="inventory-password" type="text" value="<?php echo esc_attr( $password ); ?>" />
+				</label>
+			</p>
+			<?php if ( $password ) : ?>
+				<p>
+					<?php esc_html_e( 'この商品の在庫確認URLはこちらです。', 'hanmoto' ); ?><br />
+					<?php
+					printf(
+						'<a href="%1$s" target="_blank" rel="noopener noreferrer" style="word-break: break-all">%1$s</a>',
+						esc_url( home_url( sprintf( '/stock/of/%d/?pw=%s', $post->ID, rawurlencode( $password ) ) ) )
+					);
+					?>
+				</p>
+			<?php else : ?>
+				<p class="description"><?php esc_html_e( 'パスワードを設定すると外部の人が在庫確認をできるようになります。', 'hanmoto' ); ?></p>
+			<?php
+			endif;
+		}, $post_type, 'side', 'default' );
+	}
+
+	/**
+	 * Is password valid for?
+	 *
+	 * @param int $product_id
+	 * @param string $password
+	 *
+	 * @return true|\WP_Error
+	 */
+	public static function is_password_valid_for( $product_id, $password ) {
+		$saved_password = get_post_meta( $product_id, '_inventory_password', true );
+		if ( empty( $saved_password ) || ( $saved_password !== $password ) ) {
+			return new \WP_Error( 'invalid_passord', __( '在庫確認パスワードが間違っています。', 'hanmoto' ), [
+				'status' => 403,
+			] );
+		}
+		return true;
 	}
 }
