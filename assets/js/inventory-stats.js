@@ -45,6 +45,9 @@ wp.apiFetch( {
 						unit: 'day',
 					},
 				},
+				y: {
+					min: 0,
+				}
 			},
 		},
 	} );
