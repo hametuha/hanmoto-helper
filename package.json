@@ -9,8 +9,6 @@
 		"cli:test": "wp-env run tests-cli wp",
 		"package": "npm run build:css && npm run build:js && npm run dump",
 		"watch": "npm-watch",
-		"gulp": "gulp",
-		"gulp:task": "gulp --tasks",
 		"build:css": "sass ./assets/scss/:./dist/css/ --style=compressed && postcss ./dist/css/*.css --use autoprefixer --replace",
 		"build:js": "grab-deps js assets/js dist/js",
 		"dump": "grab-deps dump dist",

@@ -1,8 +1,9 @@
 <?php
 
-namespace Hametuha\HanmotoHelper\Controller;
+namespace Hametuha\HanmotoHelper\Rest;
 
 
+use Hametuha\HanmotoHelper\Controller\PostType;
 use Hametuha\HanmotoHelper\Pattern\RestApiPattern;
 use Hametuha\HanmotoHelper\Utility\OpenDbApi;
 use Hametuha\HanmotoHelper\Utility\SettingsAccessor;
