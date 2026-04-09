@@ -1,0 +1,625 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#2 \$deprecated of function load_plugin_textdomain expects string\|false, true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: hanmoto-helper.php
+
+		-
+			message: '#^Function isbnb_display not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: hooks/shortcode.php
+
+		-
+			message: '#^Function shortcode_ui_register_for_shortcode not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: hooks/shortcode.php
+
+		-
+			message: '#^Binary operation "\*" between string and int\<2, 10\> results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: includes/utility.php
+
+		-
+			message: '#^Function hanmoto_rakuten_product\(\) should return array\|WP_Error but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: includes/utility.php
+
+		-
+			message: '#^Instantiated class Hametuha\\HanmotoHelper\\Utility\\WP_Error not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/Blocks.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/Blocks.php
+
+		-
+			message: '#^Instantiated class Hametuha\\HanmotoHelper\\Utility\\WP_Error not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/PostType.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/PostType.php
+
+		-
+			message: '#^Instantiated class Hametuha\\HanmotoHelper\\Utility\\WP_Error not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/RestBookInfo.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/RestBookInfo.php
+
+		-
+			message: '#^Found usage of constant DOING_AJAX\. Use wp_doing_ajax\(\) instead\.$#'
+			identifier: phpstanWP.wpConstant.fetch
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/Settings.php
+
+		-
+			message: '#^Negated boolean expression is always true\.$#'
+			identifier: booleanNot.alwaysTrue
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/Settings.php
+
+		-
+			message: '#^Parameter \#2 \$raw of method Hametuha\\HanmotoHelper\\Controller\\Settings\:\:get_setting\(\) expects false, true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/Settings.php
+
+		-
+			message: '#^Instantiated class Hametuha\\HanmotoHelper\\Utility\\WP_Error not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/TemplateTags.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/TemplateTags.php
+
+		-
+			message: '#^Call to method get_id\(\) on an unknown class WC_Product\.$#'
+			identifier: class.notFound
+			count: 3
+			path: src/Hametuha/HanmotoHelper/Controller/WooCommerceHelper.php
+
+		-
+			message: '#^Function wc_get_product not found\.$#'
+			identifier: function.notFound
+			count: 3
+			path: src/Hametuha/HanmotoHelper/Controller/WooCommerceHelper.php
+
+		-
+			message: '#^Function woocommerce_wp_checkbox not found\.$#'
+			identifier: function.notFound
+			count: 2
+			path: src/Hametuha/HanmotoHelper/Controller/WooCommerceHelper.php
+
+		-
+			message: '#^Function woocommerce_wp_text_input not found\.$#'
+			identifier: function.notFound
+			count: 6
+			path: src/Hametuha/HanmotoHelper/Controller/WooCommerceHelper.php
+
+		-
+			message: '#^Function woocommerce_wp_textarea_input not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/WooCommerceHelper.php
+
+		-
+			message: '#^Instantiated class Hametuha\\HanmotoHelper\\Utility\\WP_Error not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/WooCommerceHelper.php
+
+		-
+			message: '#^Parameter \$product of method Hametuha\\HanmotoHelper\\Controller\\WooCommerceHelper\:\:get_product_rate\(\) has invalid type WC_Product\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/WooCommerceHelper.php
+
+		-
+			message: '#^Parameter \$product of method Hametuha\\HanmotoHelper\\Controller\\WooCommerceHelper\:\:product_can_order\(\) has invalid type WC_Product\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/WooCommerceHelper.php
+
+		-
+			message: '#^Parameter \$product of method Hametuha\\HanmotoHelper\\Controller\\WooCommerceHelper\:\:save_meta\(\) has invalid type WC_Product\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/WooCommerceHelper.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Controller/WooCommerceHelper.php
+
+		-
+			message: '#^Access to an undefined property Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:\$customer_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Access to an undefined property Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Access to an undefined property Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:\$email_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Access to an undefined property Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Access to an undefined property Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:\$object\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Access to an undefined property Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:\$placeholders\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Access to an undefined property Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:\$plugin_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Access to an undefined property Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:\$recipient\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Access to an undefined property Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Action callback returns array\<string\> but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Call to an undefined method Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:get_attachments\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Call to an undefined method Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:get_content\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Call to an undefined method Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:get_headers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Call to an undefined method Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:get_recipient\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Call to an undefined method Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:get_subject\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Call to an undefined method Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:is_enabled\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Call to an undefined method Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:restore_locale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Call to an undefined method Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:send\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Call to an undefined method Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:setup_locale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Call to function is_a\(\) with WC_Order and ''WC_Order'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Call to method get_billing_email\(\) on an unknown class WC_Order\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Call to method get_date_created\(\) on an unknown class WC_Order\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Call to method get_order_number\(\) on an unknown class WC_Order\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Default value of the parameter \#2 \$order \(false\) of method Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:trigger\(\) is incompatible with type WC_Order\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Function wc_format_datetime not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Function wc_get_order not found\.$#'
+			identifier: function.notFound
+			count: 2
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Parameter \$order of method Hametuha\\HanmotoHelper\\Emails\\ShippingNotice\:\:trigger\(\) has invalid type WC_Order\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Emails/ShippingNotice.php
+
+		-
+			message: '#^Filter callback return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelDelivery.php
+
+		-
+			message: '#^Method Hametuha\\HanmotoHelper\\Models\\ModelDelivery\:\:get_inventories\(\) should return WP_Query but returns null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelDelivery.php
+
+		-
+			message: '#^Method Hametuha\\HanmotoHelper\\Models\\ModelDelivery\:\:override_template\(\) with return type void returns mixed but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelDelivery.php
+
+		-
+			message: '#^Call to function is_wp_error\(\) with WP_Term\|false will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelEvent.php
+
+		-
+			message: '#^Function wc_format_localized_price not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelEvent.php
+
+		-
+			message: '#^Function wc_get_product not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelEvent.php
+
+		-
+			message: '#^Left side of && is always true\.$#'
+			identifier: booleanAnd.leftAlwaysTrue
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelEvent.php
+
+		-
+			message: '#^Parameter \#1 \$post of function get_post expects int\|WP_Post\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelEvent.php
+
+		-
+			message: '#^Parameter \#1 \$post of function get_post_type expects int\|WP_Post\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelEvent.php
+
+		-
+			message: '#^Parameter \#1 \$post_id of function update_post_meta expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelEvent.php
+
+		-
+			message: '#^Parameter \#1 \$term of function has_term expects array\|int\|string, WP_Term given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelEvent.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Hametuha/HanmotoHelper/Models/ModelEvent.php
+
+		-
+			message: '#^Call to function is_wp_error\(\) with WP_Term\|false will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelInventory.php
+
+		-
+			message: '#^Function wc_format_localized_price not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelInventory.php
+
+		-
+			message: '#^Function wc_get_product not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelInventory.php
+
+		-
+			message: '#^Function wc_update_product_stock not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelInventory.php
+
+		-
+			message: '#^Parameter \#1 \$term of function has_term expects array\|int\|string, WP_Term given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Hametuha/HanmotoHelper/Models/ModelInventory.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 4
+			path: src/Hametuha/HanmotoHelper/Models/ModelInventory.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_html expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelInventory.php
+
+		-
+			message: '#^Call to function is_wp_error\(\) with WP_Term\|false will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelOrder.php
+
+		-
+			message: '#^Function wc_format_localized_price not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelOrder.php
+
+		-
+			message: '#^Parameter \#1 \$term of function has_term expects array\|int\|string, WP_Term given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelOrder.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Hametuha/HanmotoHelper/Models/ModelOrder.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_html expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelOrder.php
+
+		-
+			message: '#^Call to function is_wp_error\(\) with WP_Term\|false will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelSupplier.php
+
+		-
+			message: '#^Function wc_format_localized_price not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelSupplier.php
+
+		-
+			message: '#^Parameter \#1 \$term of function has_term expects array\|int\|string, WP_Term given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Models/ModelSupplier.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Hametuha/HanmotoHelper/Models/ModelSupplier.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Pattern/UiPattern.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$sections$#'
+			identifier: parameter.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Services/WooCommerceSetting.php
+
+		-
+			message: '#^Call to method get_amount\(\) on an unknown class WC_Coupon\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Hametuha/HanmotoHelper/Services/WooCommerceTemplate.php
+
+		-
+			message: '#^Function wc_get_page_permalink not found\.$#'
+			identifier: function.notFound
+			count: 3
+			path: src/Hametuha/HanmotoHelper/Services/WooCommerceTemplate.php
+
+		-
+			message: '#^Function wc_get_product not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Services/WooCommerceTemplate.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_html expects string, \(float\|int\<min, 100\>\) given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Services/WooCommerceTemplate.php
+
+		-
+			message: '#^Call to function is_wp_error\(\) with WP_Term\|false will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: src/Hametuha/HanmotoHelper/UI/CsvImporter.php
+
+		-
+			message: '#^Function wc_format_localized_price not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/UI/CsvImporter.php
+
+		-
+			message: '#^Parameter \#1 \$term of function has_term expects array\|int\|string, WP_Term given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Hametuha/HanmotoHelper/UI/CsvImporter.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Hametuha/HanmotoHelper/UI/CsvImporter.php
+
+		-
+			message: '#^Variable \$line in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: src/Hametuha/HanmotoHelper/UI/CsvImporter.php
+
+		-
+			message: '#^Call to static method get_instance\(\) on an unknown class Hametuha\\HanmotoHelper\\Models\\ModelItem\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/UI/ItemsList.php
+
+		-
+			message: '#^Constructor of class Hametuha\\HanmotoHelper\\UI\\ItemsList has an unused parameter \$args\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: src/Hametuha/HanmotoHelper/UI/ItemsList.php
+
+		-
+			message: '#^Call to method addRow\(\) on an unknown class cli\\Table\.$#'
+			identifier: class.notFound
+			count: 3
+			path: src/Hametuha/HanmotoHelper/Utility/Commands.php
+
+		-
+			message: '#^Call to method display\(\) on an unknown class cli\\Table\.$#'
+			identifier: class.notFound
+			count: 3
+			path: src/Hametuha/HanmotoHelper/Utility/Commands.php
+
+		-
+			message: '#^Call to method get_billing_company\(\) on an unknown class WC_Order\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Utility/Commands.php
+
+		-
+			message: '#^Call to method get_formatted_billing_full_name\(\) on an unknown class WC_Order\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Utility/Commands.php
+
+		-
+			message: '#^Call to method get_id\(\) on an unknown class WC_Order\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Utility/Commands.php
+
+		-
+			message: '#^Call to method get_total\(\) on an unknown class WC_Order\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Utility/Commands.php
+
+		-
+			message: '#^Call to method setHeaders\(\) on an unknown class cli\\Table\.$#'
+			identifier: class.notFound
+			count: 3
+			path: src/Hametuha/HanmotoHelper/Utility/Commands.php
+
+		-
+			message: '#^Instantiated class Hametuha\\HanmotoHelper\\Utility\\WP_Error not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Utility/Commands.php
+
+		-
+			message: '#^Instantiated class cli\\Table not found\.$#'
+			identifier: class.notFound
+			count: 3
+			path: src/Hametuha/HanmotoHelper/Utility/Commands.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Utility/Commands.php

@@ -1,0 +1,14 @@
+name: Playground Preview Build
+
+on:
+  pull_request:
+    branches:
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    uses: tarosky/workflows/.github/workflows/playground-preview-build.yml@main

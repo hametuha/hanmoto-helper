@@ -1,0 +1,22 @@
+includes:
+    - phpstan-baseline.neon
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 5
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+    scanFiles:
+        - vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
+        - vendor/php-stubs/wp-cli-stubs/wp-cli-commands-stubs.php
+        - vendor/php-stubs/wp-cli-stubs/wp-cli-i18n-stubs.php
+    paths:
+        - hanmoto-helper.php
+        - src/
+        - hooks/
+        - includes/
+    excludePaths:
+        - src/Hametuha/HanmotoHelper/Services/Pattern/AbstractEmail.php
+        - src/Hametuha/HanmotoHelper/Services/WooCommerceOrder.php
+    scanDirectories:
+        - template-parts/
