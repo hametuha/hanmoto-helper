@@ -19,12 +19,11 @@
 		}
 	],
 	"require": {
-		"php": "^7.0|^8.0"
+		"php": ">=7.4"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "^3.0",
-		"wp-coding-standards/wpcs": "^2.0",
-		"phpcompatibility/php-compatibility": "^9.3",
+		"wp-coding-standards/wpcs": "^3.0",
 		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
 		"phpstan/phpstan": "^2.1",
 		"szepeviktor/phpstan-wordpress": "^2.0",
@@ -39,6 +38,9 @@
 	"config": {
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true
+		},
+		"platform": {
+			"php": "8.0"
 		}
 	}
 }
