@@ -61,7 +61,6 @@ class ModelOrder extends Singleton {
 			'show_admin_column' => true,
 			'meta_box_cb'       => $this->hierarchical_radio( 'source', __( '注文経路', 'hanmoto' ) ),
 		] );
-
 	}
 
 	/**
@@ -150,5 +149,4 @@ class ModelOrder extends Singleton {
 		</p>
 		<?php
 	}
-
 }

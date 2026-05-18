@@ -5,6 +5,12 @@
 	<arg name="colors" />
 	<arg value="ps" />
 
+	<file>./hanmoto-helper.php</file>
+	<file>./includes</file>
+	<file>./hooks</file>
+	<file>./src</file>
+	<file>./template-parts</file>
+
 	<rule ref="WordPress-Core">
 		<exclude name="Generic.Files.LowercasedFilename" />
 		<exclude name="Generic.Commenting.DocComment.ShortNotCapital" />
@@ -24,10 +30,9 @@
 		<exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket" />
 		<exclude name="PEAR.Functions.FunctionCallSignature.MultipleArguments"/>
 		<exclude name="WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound" />
-	</rule>
-
-	<rule ref="PHPCompatibility">
-		<config name="testVersion" value="7.4-"/>
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax.Found" />
+		<exclude name="Universal.Operators.DisallowShortTernary.Found" />
+		<exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames" />
 	</rule>
 
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
@@ -35,4 +40,5 @@
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/wordpress/*</exclude-pattern>
 	<exclude-pattern>*/tests/*</exclude-pattern>
+	<exclude-pattern>*/tmp/*</exclude-pattern>
 </ruleset>

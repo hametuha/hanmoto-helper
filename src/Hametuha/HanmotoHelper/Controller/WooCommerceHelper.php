@@ -28,7 +28,7 @@ class WooCommerceHelper extends Singleton {
 		add_filter( 'woocommerce_product_data_tabs', [ $this, 'product_tab' ] );
 		add_action( 'woocommerce_product_data_panels', [ $this, 'render_product_tab' ] );
 		add_action( 'woocommerce_admin_process_product_object', [ $this, 'save_meta' ] );
-		add_action( 'admin_enqueue_scripts', function() {
+		add_action( 'admin_enqueue_scripts', function () {
 			wp_enqueue_style( 'hanmoto-woocommmerce-admin' );
 		} );
 		// Setting fields.

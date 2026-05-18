@@ -153,5 +153,4 @@ trait OpenDbApi {
 
 		return $response;
 	}
-
 }

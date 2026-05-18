@@ -80,7 +80,7 @@ class ModelEvent extends Singleton {
 						$args['s'] = $reqeust->get_param( 's' );
 					}
 					$query = new \WP_Query( $args );
-					return new \WP_REST_Response( array_map( function( \WP_Post $post ) {
+					return new \WP_REST_Response( array_map( function ( \WP_Post $post ) {
 						return [
 							'id'    => $post->ID,
 							'name'  => get_the_title( $post ),
@@ -95,11 +95,11 @@ class ModelEvent extends Singleton {
 			'type'                => 'int',
 			'description'         => __( '取引イベント', 'hanmoto' ),
 			'required'            => true,
-			'validation_callback' => function( $id ) {
+			'validation_callback' => function ( $id ) {
 				return ( get_post( $id ) && 'inventory-event' === get_post_type( $id ) );
 			},
 		];
-		$permission_callback = function() {
+		$permission_callback = function () {
 			return current_user_can( 'edit_posts' );
 		};
 		register_rest_route( 'hanmoto/v1', 'inventories/(?P<post_id>\d+)', [
@@ -109,7 +109,7 @@ class ModelEvent extends Singleton {
 					'post_id' => $arg_post_id,
 				],
 				'permission_callback' => $permission_callback,
-				'callback'            => function( \WP_REST_Request $request ) {
+				'callback'            => function ( \WP_REST_Request $request ) {
 					$query = new \WP_Query( [
 						'post_type'      => 'inventory',
 						'posts_per_page' => 200,
@@ -121,7 +121,7 @@ class ModelEvent extends Singleton {
 							],
 						],
 					] );
-					return new \WP_REST_Response( array_map( function( $post ) {
+					return new \WP_REST_Response( array_map( function ( $post ) {
 						return ModelInventory::get_instance()->to_rest_response( $post );
 					}, $query->posts ) );
 				},
@@ -216,7 +216,7 @@ class ModelEvent extends Singleton {
 					foreach ( $taxonomies as $taxonomy ) {
 						$terms = get_the_terms( $parent, $taxonomy );
 						if ( $terms && ! is_wp_error( $terms ) ) {
-							wp_set_object_terms( $post_id, array_map( function( $term ) {
+							wp_set_object_terms( $post_id, array_map( function ( $term ) {
 								return $term->term_id;
 							}, $terms ), $taxonomy );
 						}
@@ -252,7 +252,7 @@ class ModelEvent extends Singleton {
 								return false;
 							}
 							$ids   = explode( ',', $ids );
-							$valid = array_filter( $ids, function( $id ) {
+							$valid = array_filter( $ids, function ( $id ) {
 								return get_post( $id ) && 'inventory' === get_post_type( $id );
 							} );
 							return count( $ids ) && count( $valid );

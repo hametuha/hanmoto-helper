@@ -28,7 +28,7 @@ class ItemsList extends UiPattern {
 	/**
 	 * {@inheritdoc}
 	 */
-	static protected function label() {
+	protected static function label() {
 		return __( 'Stocks', 'hanmoto' );
 	}
 
@@ -94,7 +94,7 @@ class ItemsList extends UiPattern {
 	/**
 	 * @return void
 	 */
-	static protected function editor() {
+	protected static function editor() {
 		?>
 		ここにエディターがくる。
 		<?php

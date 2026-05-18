@@ -109,7 +109,7 @@ trait BookSelector {
 	 */
 	public function admin_columns( $post_type ) {
 		// add styles.
-		add_action( 'admin_head', function() use ( $post_type ) {
+		add_action( 'admin_head', function () use ( $post_type ) {
 			$screen = get_current_screen();
 			if ( 'edit-' . $post_type !== $screen->id ) {
 				return;
@@ -131,7 +131,7 @@ trait BookSelector {
 			<?php
 		} );
 		// Add columns.
-		add_filter( 'manage_' . $post_type . '_posts_columns', function( $columns ) use ( $post_type ) {
+		add_filter( 'manage_' . $post_type . '_posts_columns', function ( $columns ) use ( $post_type ) {
 			wp_enqueue_script( 'hanmoto-inventory-bulk-action' );
 			$new_columns = [];
 			foreach ( $columns as $key => $label ) {
@@ -182,7 +182,7 @@ trait BookSelector {
 			return $new_columns;
 		} );
 		// Render columns.
-		add_action( 'manage_' . $post_type . '_posts_custom_column', function( $column, $post_id ) use ( $post_type ) {
+		add_action( 'manage_' . $post_type . '_posts_custom_column', function ( $column, $post_id ) use ( $post_type ) {
 			switch ( $column ) {
 				case 'inventory_group':
 					$group = get_post_meta( $post_id, '_group', true );

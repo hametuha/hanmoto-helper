@@ -61,13 +61,13 @@ class RestOrderRegister extends RestApiPattern {
 		foreach ( $orders as $index => $order ) {
 			$result = $this->create_order( $order, $index );
 			if ( is_wp_error( $result ) ) {
-				$failed++;
+				++$failed;
 				$errors[] = [
 					'index'   => $index,
 					'message' => $result->get_error_message(),
 				];
 			} else {
-				$success++;
+				++$success;
 			}
 		}
 
@@ -188,13 +188,13 @@ class RestOrderRegister extends RestApiPattern {
 	 * @param string $shop_code  Shop code.
 	 */
 	private function maybe_update_shop_meta( $term_id, $wholesaler, $line_code, $shop_code ) {
-		if ( $wholesaler !== get_term_meta( $term_id, 'wholesaler', true ) ) {
+		if ( get_term_meta( $term_id, 'wholesaler', true ) !== $wholesaler ) {
 			update_term_meta( $term_id, 'wholesaler', $wholesaler );
 		}
-		if ( $line_code !== get_term_meta( $term_id, 'line_code', true ) ) {
+		if ( get_term_meta( $term_id, 'line_code', true ) !== $line_code ) {
 			update_term_meta( $term_id, 'line_code', $line_code );
 		}
-		if ( $shop_code !== get_term_meta( $term_id, 'shop_code', true ) ) {
+		if ( get_term_meta( $term_id, 'shop_code', true ) !== $shop_code ) {
 			update_term_meta( $term_id, 'shop_code', $shop_code );
 		}
 	}

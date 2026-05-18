@@ -35,7 +35,7 @@ function hanmoto_publish_date( $book, $format = '', $empty = '-' ) {
 function hanmoto_actions( $book ) {
 	$links     = [];
 	$published = $book['summary']['pubdate'] <= date_i18n( 'Ymd' );
-	$label     = function( $brand, $is_published ) {
+	$label     = function ( $brand, $is_published ) {
 		// translators: %s is a brand name.
 		return sprintf( $is_published ? __( '%sで買う', 'hanmoto' ) : __( '%sで予約', 'hanmoto' ), $brand );
 	};

@@ -319,7 +319,7 @@ foreach ( $supplier_ids as $supplier_id ) {
 			</section>
 			<?php
 		endforeach;
-		$counter++;
+		++$counter;
 	}
 }
 ?>

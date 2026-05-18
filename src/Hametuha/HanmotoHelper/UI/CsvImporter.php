@@ -144,21 +144,21 @@ class CsvImporter extends Singleton {
 			switch ( $type ) {
 				case 'general':
 					// Order sheet.
-					// phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
+					// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
 					while ( $line = $file_object->fgetcsv() ) {
-						$counter++;
+						++$counter;
 						if ( 2 > $counter || empty( $line ) ) {
 							continue 1;
 						}
 						list( $no, $date, $publisher, $wholesaler, $line_code, $shop_code, $shop_name, $isbn, $book_title, $price, $amount, $subtotal, $in_charge, $note, $source ) = $line;
 						$book_shop = $this->get_bookshop( $shop_name, $wholesaler, $line_code, $shop_code, true );
 						if ( is_wp_error( $book_shop ) ) {
-							$failure++;
+							++$failure;
 							continue 1;
 						}
 						$book = $this->get_book_by_isbn( $isbn );
 						if ( ! $book ) {
-							$failure++;
+							++$failure;
 							continue 1;
 						}
 						$date = $this->ensure_date( $date );
@@ -173,7 +173,7 @@ class CsvImporter extends Singleton {
 							'post_parent'  => $book->ID,
 						] );
 						if ( ! $order_id ) {
-							$failure++;
+							++$failure;
 							continue 1;
 						}
 						// Save metadata.
@@ -188,7 +188,7 @@ class CsvImporter extends Singleton {
 						wp_set_object_terms( $order_id, $book_shop->term_id, $book_shop->taxonomy );
 						// Assign source.
 						wp_set_object_terms( $order_id, [ $source ], 'source' );
-						$imported++;
+						++$imported;
 					}
 					// translators: %1$d is imported, %2$d is failure.
 					wp_redirect( admin_url( sprintf( 'tools.php?page=%s&msg=%s', $this->slug, rawurlencode( sprintf( __( '%1$d件インポート　%2$d件失敗', 'hanmoto' ), $imported, $failure ) ) ) ) );

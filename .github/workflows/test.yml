@@ -8,6 +8,8 @@ on:
 jobs:
   phpcs:
     uses: tarosky/workflows/.github/workflows/phpcs.yml@main
+    with:
+      version: 8.2
 
   phpstan:
     name: PHPStan
@@ -18,7 +20,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: '8.2'
           tools: composer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

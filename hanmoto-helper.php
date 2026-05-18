@@ -48,9 +48,9 @@ function hanmoto_plugin_init() {
 	// Load translations.
 	load_plugin_textdomain( 'hanmoto', true, basename( __DIR__ ) . '/languages' );
 	// Hooks
-	require_once  __DIR__ . '/hooks/shortcode.php';
+	require_once __DIR__ . '/hooks/shortcode.php';
 	// Functions.
-	require_once  __DIR__ . '/includes/utility.php';
+	require_once __DIR__ . '/includes/utility.php';
 	// autoloader.
 	$autoloader = __DIR__ . '/vendor/autoload.php';
 	if ( file_exists( $autoloader ) ) {

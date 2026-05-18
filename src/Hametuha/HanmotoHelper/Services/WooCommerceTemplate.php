@@ -31,7 +31,6 @@ class WooCommerceTemplate extends Singleton {
 		// Cart.
 		add_action( 'woocommerce_before_cart_table', [ $this, 'before_cart' ] );
 		add_action( 'woocommerce_after_cart_item_name', [ $this, 'item_in_cart' ], 10, 2 );
-
 	}
 
 	/**
@@ -106,7 +105,7 @@ class WooCommerceTemplate extends Singleton {
 		if ( ! $book ) {
 			return;
 		}
-		$actions = array_filter( hanmoto_actions( $book ), function( $link ) {
+		$actions = array_filter( hanmoto_actions( $book ), function ( $link ) {
 			return ! in_array( $link['id'], [ 'hanmoto', 'direct' ], true );
 		} );
 		if ( empty( $actions ) ) {
@@ -206,7 +205,7 @@ class WooCommerceTemplate extends Singleton {
 			}
 			$book = $this->helper->get_product_book( get_the_ID() );
 			if ( $book ) {
-				$actions = array_filter( hanmoto_actions( $book ), function( $action ) {
+				$actions = array_filter( hanmoto_actions( $book ), function ( $action ) {
 					return 'hanmoto' === $action['id'];
 				} );
 				if ( ! empty( $actions ) ) {

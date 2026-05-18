@@ -1,7 +1,7 @@
 <?php
 
 // Register shortcode.
-add_shortcode( 'book', function( $atts = [], $content = '' ) {
+add_shortcode( 'book', function ( $atts = [], $content = '' ) {
 	$atts = shortcode_atts( [
 		'isbn' => '',
 	], $atts, 'isbn' );
@@ -25,7 +25,7 @@ add_shortcode( 'book', function( $atts = [], $content = '' ) {
  * @param string $content Contents.
  * @return string
  */
-add_shortcode( 'books', function( $atts = [], $content = '' ) {
+add_shortcode( 'books', function ( $atts = [], $content = '' ) {
 	$atts = shortcode_atts( [
 		'limit' => 12,
 	], $atts, 'books' );

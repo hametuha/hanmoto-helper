@@ -58,8 +58,8 @@ class OrderManager extends Singleton {
 	 */
 	public function admin_menu() {
 		add_submenu_page(
-		'edit.php?post_type=book-shop-order',
-		__( '注文・返品登録', 'hanmoto' ),
+			'edit.php?post_type=book-shop-order',
+			__( '注文・返品登録', 'hanmoto' ),
 			__( '注文・返品登録', 'hanmoto' ),
 			'edit_posts',
 			'books-shop-order-register',
@@ -111,7 +111,7 @@ class OrderManager extends Singleton {
 	 */
 	private function get_script_data() {
 		// 受注元（source）タクソノミーを取得
-		$sources = get_terms( [
+		$sources        = get_terms( [
 			'taxonomy'   => 'source',
 			'hide_empty' => false,
 		] );

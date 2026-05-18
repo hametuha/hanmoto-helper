@@ -12,8 +12,8 @@ use Hametuha\HanmotoHelper\Utility\Validator;
  */
 class ModelInventory extends Singleton {
 
-	use BookSelector,
-		Validator;
+	use BookSelector;
+	use Validator;
 
 	/**
 	 * {@inheritdoc }
@@ -29,11 +29,11 @@ class ModelInventory extends Singleton {
 		add_action( 'save_post_product', [ $this, 'save_product_password' ], 10, 2 );
 		add_action( 'add_meta_boxes', [ $this, 'add_product_meta_box' ] );
 		// Add action.
-		add_filter( 'query_vars', function( $vars ) {
+		add_filter( 'query_vars', function ( $vars ) {
 			$vars[] = 'inventory_parent';
 			return $vars;
 		} );
-		add_action( 'pre_get_posts', function( $wp_query ) {
+		add_action( 'pre_get_posts', function ( $wp_query ) {
 			$parent = $wp_query->get( 'inventory_parent' );
 			if ( $parent ) {
 				$wp_query->set( 'post_parent', $parent );
@@ -90,7 +90,7 @@ class ModelInventory extends Singleton {
 			'hierarchical'      => true,
 			'show_admin_column' => true,
 			'show_in_rest'      => true,
-			'meta_box_cb'       => function( \WP_Post $post ) {
+			'meta_box_cb'       => function ( \WP_Post $post ) {
 				// tax_input[transaction_type][]
 				$terms = get_terms( [
 					'taxonomy'   => 'transaction_type',
@@ -130,15 +130,15 @@ class ModelInventory extends Singleton {
 					'inventory_id' => [
 						'required'          => true,
 						'type'              => 'integer',
-						'validate_callback' => function( $var ) {
+						'validate_callback' => function ( $var ) {
 							return is_numeric( $var ) && ( 'inventory' === get_post_type( $var ) );
 						},
 					],
 				],
-				'permission_callback' => function( $request ) {
+				'permission_callback' => function ( $request ) {
 					return current_user_can( 'edit_post', $request->get_param( 'inventory_id' ) );
 				},
-				'callback'            => function( \WP_REST_Request $request ) {
+				'callback'            => function ( \WP_REST_Request $request ) {
 					$inventory = get_post( $request->get_param( 'inventory_id' ) );
 					// Is already applied?
 					$updated = get_post_meta( $inventory->ID, '_applied_at', true );
@@ -414,7 +414,6 @@ class ModelInventory extends Singleton {
 	 * @return void
 	 */
 	public function supplier_detail() {
-
 	}
 
 	/**
