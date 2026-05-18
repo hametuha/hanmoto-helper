@@ -41,8 +41,88 @@ class ModelInventory extends Singleton {
 		} );
 		// Customize admin columns.
 		$this->admin_columns( 'inventory' );
+		// Filter by realization status.
+		add_action( 'restrict_manage_posts', [ $this, 'render_realized_filter' ] );
+		add_action( 'pre_get_posts', [ $this, 'filter_by_realized_status' ] );
+		// Bulk action.
+		add_filter( 'bulk_actions-edit-inventory', [ $this, 'add_bulk_actions' ] );
 		// REST API
 		add_action( 'rest_api_init', [ $this, 'register_apis' ] );
+	}
+
+	/**
+	 * Add bulk action for setting realized date.
+	 *
+	 * @param array $actions Bulk actions on inventory list screen.
+	 * @return array
+	 */
+	public function add_bulk_actions( $actions ) {
+		$actions['set_realized_at'] = __( '実現日を設定', 'hanmoto' );
+		return $actions;
+	}
+
+	/**
+	 * Render dropdown filter for realization status on inventory list screen.
+	 *
+	 * @param string $post_type Current admin list post type.
+	 * @return void
+	 */
+	public function render_realized_filter( $post_type ) {
+		if ( 'inventory' !== $post_type ) {
+			return;
+		}
+		$current = filter_input( INPUT_GET, 'realized_status' );
+		?>
+		<select name="realized_status" aria-label="<?php esc_attr_e( '実現状況で絞り込み', 'hanmoto' ); ?>">
+			<option value=""><?php esc_html_e( '実現状況：すべて', 'hanmoto' ); ?></option>
+			<option value="unrealized" <?php selected( $current, 'unrealized' ); ?>><?php esc_html_e( '未実現の取引', 'hanmoto' ); ?></option>
+			<option value="realized" <?php selected( $current, 'realized' ); ?>><?php esc_html_e( '実現済みの取引', 'hanmoto' ); ?></option>
+		</select>
+		<?php
+	}
+
+	/**
+	 * Apply meta_query for realization status on inventory list screen.
+	 *
+	 * @param \WP_Query $query Main query in admin list.
+	 * @return void
+	 */
+	public function filter_by_realized_status( $query ) {
+		if ( ! is_admin() || ! $query->is_main_query() ) {
+			return;
+		}
+		if ( 'inventory' !== $query->get( 'post_type' ) ) {
+			return;
+		}
+		$status = filter_input( INPUT_GET, 'realized_status' );
+		if ( ! $status ) {
+			return;
+		}
+		$meta_query = $query->get( 'meta_query' );
+		if ( ! is_array( $meta_query ) ) {
+			$meta_query = [];
+		}
+		if ( 'unrealized' === $status ) {
+			$meta_query[] = [
+				'relation' => 'OR',
+				[
+					'key'     => '_realized_at',
+					'compare' => 'NOT EXISTS',
+				],
+				[
+					'key'     => '_realized_at',
+					'value'   => '',
+					'compare' => '=',
+				],
+			];
+		} elseif ( 'realized' === $status ) {
+			$meta_query[] = [
+				'key'     => '_realized_at',
+				'value'   => '',
+				'compare' => '!=',
+			];
+		}
+		$query->set( 'meta_query', $meta_query );
 	}
 
 
@@ -59,6 +139,7 @@ class ModelInventory extends Singleton {
 			'vat',
 			'capture_at',
 			'applied_at',
+			'realized_at',
 		];
 	}
 
@@ -189,6 +270,57 @@ class ModelInventory extends Singleton {
 				},
 			],
 		] );
+		// Bulk update realized_at.
+		register_rest_route( 'hanmoto/v1', 'inventories/bulk-realize', [
+			[
+				'methods'             => 'POST',
+				'args'                => [
+					'ids'         => [
+						'required'          => true,
+						'type'              => 'string',
+						'description'       => __( '対象在庫変動IDのカンマ区切り', 'hanmoto' ),
+						'validate_callback' => function ( $ids ) {
+							return is_string( $ids ) && (bool) preg_match( '/^\d+(,\d+)*$/', $ids );
+						},
+					],
+					'realized_at' => [
+						'required'          => true,
+						'type'              => 'string',
+						'description'       => __( '実現日 (Y-m-d) 。空文字を渡すと未設定に戻す', 'hanmoto' ),
+						'validate_callback' => function ( $date ) {
+							return is_string( $date ) && ( '' === $date || (bool) preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date ) );
+						},
+					],
+				],
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+				'callback'            => function ( \WP_REST_Request $request ) {
+					$ids         = explode( ',', $request->get_param( 'ids' ) );
+					$realized_at = $request->get_param( 'realized_at' );
+					$updated     = 0;
+					foreach ( $ids as $id ) {
+						$id = (int) $id;
+						if ( 'inventory' !== get_post_type( $id ) ) {
+							continue;
+						}
+						if ( ! current_user_can( 'edit_post', $id ) ) {
+							continue;
+						}
+						if ( '' === $realized_at ) {
+							delete_post_meta( $id, '_realized_at' );
+						} else {
+							update_post_meta( $id, '_realized_at', $realized_at );
+						}
+						++$updated;
+					}
+					return new \WP_REST_Response( [
+						'updated' => $updated,
+						'should'  => count( $ids ),
+					] );
+				},
+			],
+		] );
 	}
 
 	/**
@@ -249,9 +381,13 @@ class ModelInventory extends Singleton {
 		if ( ! wp_verify_nonce( filter_input( INPUT_POST, '_hanmotoinventorynonce' ), 'update_inventory' ) ) {
 			return;
 		}
-		// Save all meta.
+		// Save all meta. フォームに含まれないキー（applied_at など REST 経由で更新するもの）はスキップする。
 		foreach ( $this->keys() as $key ) {
-			update_post_meta( $post_id, '_' . $key, filter_input( INPUT_POST, $key ) );
+			$value = filter_input( INPUT_POST, $key );
+			if ( null === $value ) {
+				continue;
+			}
+			update_post_meta( $post_id, '_' . $key, $value );
 		}
 		update_post_meta( $post_id, '_group', (int) filter_input( INPUT_POST, 'group' ) );
 	}
@@ -358,6 +494,16 @@ class ModelInventory extends Singleton {
 					<?php esc_html_e( '請求〆日', 'hanmoto' ); ?><br />
 					<input type="date" name="capture_at" value="<?php echo esc_attr( get_post_meta( $post->ID, '_capture_at', true ) ); ?>" />
 				</label>
+				<?php
+				$capture_at_value  = get_post_meta( $post->ID, '_capture_at', true );
+				$realized_at_value = get_post_meta( $post->ID, '_realized_at', true );
+				if ( $capture_at_value && ! $realized_at_value && $capture_at_value < current_time( 'Y-m-d' ) ) :
+					?>
+					<span style="color: #e67e22; font-weight: bold; margin-left: 10px;">
+						<span class="dashicons dashicons-calendar" style="vertical-align: text-bottom;"></span>
+						<?php esc_html_e( '請求〆日を過ぎています。入金を確認のうえ実現日を入力してください。', 'hanmoto' ); ?>
+					</span>
+				<?php endif; ?>
 				<span style="display: inline-block; margin-left: 10px;">
 				<?php
 				$dates = [
@@ -383,6 +529,15 @@ class ModelInventory extends Singleton {
 						<code><?php echo esc_html( $date ); ?></code>
 					</span>
 				<?php endforeach; ?>
+				</span>
+			</p>
+			<p>
+				<label>
+					<?php esc_html_e( '実現日', 'hanmoto' ); ?><br />
+					<input type="date" name="realized_at" value="<?php echo esc_attr( get_post_meta( $post->ID, '_realized_at', true ) ); ?>" />
+				</label>
+				<span class="description" style="display: inline-block; margin-left: 10px;">
+					<?php esc_html_e( '入金が完了した日付を入力すると「実現済み」になります。', 'hanmoto' ); ?>
 				</span>
 			</p>
 			<p>
