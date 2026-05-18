@@ -28,7 +28,7 @@ class RestBookSearch extends RestApiPattern {
 				'required'          => true,
 				'type'              => 'string',
 				'description'       => 'Search query (ISBN or title)',
-				'validate_callback' => function( $param ) {
+				'validate_callback' => function ( $param ) {
 					return ! empty( $param ) && mb_strlen( $param ) >= 2;
 				},
 			],

@@ -100,13 +100,13 @@
 			display: inline-block;
 			font-size: 14px;
 			padding: 3px 10px;
-			border: currentColor 2px solid;
+			border: currentcolor 2px solid;
 
 			&:link,
 			&:visited {
 				color: #06c;
 				text-decoration: none !important;
-				border-color: currentColor;
+				border-color: currentcolor;
 			}
 
 			&:hover,

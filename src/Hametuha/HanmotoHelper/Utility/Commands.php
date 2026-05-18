@@ -17,9 +17,9 @@ use PHP_CodeSniffer\Standards\Squiz\Sniffs\CSS\OpacitySniff;
  */
 class Commands extends \WP_CLI_Command {
 
-	use OpenDbApi,
-		SettingsAccessor,
-		Validator;
+	use OpenDbApi;
+	use SettingsAccessor;
+	use Validator;
 
 	/**
 	 * Get detailed information of books.
@@ -56,7 +56,7 @@ class Commands extends \WP_CLI_Command {
 			$table->addRow( [
 				$detail['onix']['RecordReference'],
 				$detail['onix']['DescriptiveDetail']['TitleDetail']['TitleElement']['TitleText']['content'],
-				implode( ', ', array_map( function( $author ) {
+				implode( ', ', array_map( function ( $author ) {
 					return $author['PersonName']['content'];
 				}, $detail['onix']['DescriptiveDetail']['Contributor'] ) ),
 				$detail['onix']['DescriptiveDetail']['Subject'][0]['SubjectCode'],

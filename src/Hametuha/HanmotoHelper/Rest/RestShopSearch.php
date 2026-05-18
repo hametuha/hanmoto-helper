@@ -27,7 +27,7 @@ class RestShopSearch extends RestApiPattern {
 				'required'          => true,
 				'type'              => 'string',
 				'description'       => 'Search query',
-				'validate_callback' => function( $param ) {
+				'validate_callback' => function ( $param ) {
 					return ! empty( $param ) && mb_strlen( $param ) >= 2;
 				},
 			],
@@ -57,7 +57,7 @@ class RestShopSearch extends RestApiPattern {
 			return new \WP_REST_Response( [], 200 );
 		}
 
-		$results = array_map( function( $term ) {
+		$results = array_map( function ( $term ) {
 			return [
 				'term_id'    => $term->term_id,
 				'name'       => $term->name,

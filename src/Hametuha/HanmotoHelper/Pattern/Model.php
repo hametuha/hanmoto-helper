@@ -52,12 +52,12 @@ abstract class Model extends Singleton {
 		if ( ! $sql ) {
 			return;
 		}
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
 		// Save current version.
 		update_option( $this->version_key, $this->version );
 		// Display message.
-		add_action( 'admin_notices', function() {
+		add_action( 'admin_notices', function () {
 			printf(
 				'<div class="updated"><p>%s</p></div>',
 				sprintf(
@@ -130,7 +130,7 @@ abstract class Model extends Singleton {
 				}
 				$class_name = explode( '\\', get_called_class() );
 				$class_name = $class_name[ count( $class_name ) - 1 ];
-				return $this->db->prefix . 'hanmoto_' . strtolower( preg_replace( '/^_/u', '', preg_replace_callback( '/[A-Z]/u', function( $matches ) {
+				return $this->db->prefix . 'hanmoto_' . strtolower( preg_replace( '/^_/u', '', preg_replace_callback( '/[A-Z]/u', function ( $matches ) {
 					return '_' . $matches[0];
 				}, $class_name ) ) );
 			case 'version_key':

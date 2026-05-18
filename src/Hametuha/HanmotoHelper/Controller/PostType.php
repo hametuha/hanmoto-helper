@@ -14,8 +14,8 @@ use Hametuha\HanmotoHelper\Utility\SettingsAccessor;
  */
 class PostType extends Singleton {
 
-	use SettingsAccessor,
-		OpenDbApi;
+	use SettingsAccessor;
+	use OpenDbApi;
 
 	const META_KEY_ISBN = 'hanmoto_isbn';
 
@@ -99,7 +99,7 @@ class PostType extends Singleton {
 		$updated = 0;
 		$created = 0;
 		$failed  = 0;
-		$isbns   = array_map( function( $book ) {
+		$isbns   = array_map( function ( $book ) {
 			return $book['summary']['isbn'];
 		}, $books );
 		$exists  = [];
@@ -125,7 +125,7 @@ class PostType extends Singleton {
 			foreach ( $query->posts as $post ) {
 				$exists[ $this->get_isbn( $post ) ] = $post->ID;
 			}
-			$paged++;
+			++$paged;
 		}
 		foreach ( $books as $book ) {
 			$isbn      = $book['summary']['isbn'];
@@ -149,11 +149,11 @@ class PostType extends Singleton {
 			$result = wp_insert_post( $args );
 			// Count.
 			if ( ! $result ) {
-				$failed++;
+				++$failed;
 			} elseif ( $on_update ) {
-				$updated++;
+				++$updated;
 			} else {
-				$created++;
+				++$created;
 			}
 			// Save post meta.
 			if ( $result ) {

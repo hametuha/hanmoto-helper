@@ -21,10 +21,10 @@ class RestInventoryStats extends RestApiPattern {
 	 */
 	protected function init() {
 		parent::init();
-		add_action( 'init', function() {
+		add_action( 'init', function () {
 			add_rewrite_rule( 'stock/of/(\d+)/?$', 'index.php?post_type=product&p=$matches[1]&hanmoto-stats=book', 'top' );
 		} );
-		add_filter( 'query_vars', function( $vars ) {
+		add_filter( 'query_vars', function ( $vars ) {
 			$vars[] = 'hanmoto-stats';
 			return $vars;
 		}  );
@@ -46,14 +46,14 @@ class RestInventoryStats extends RestApiPattern {
 			'post_id'  => [
 				'required'          => true,
 				'type'              => 'int',
-				'validate_callback' => function( $var ) {
+				'validate_callback' => function ( $var ) {
 					return get_post( $var ) && ( 'product' === get_post_type( $var ) );
 				},
 			],
 			'password' => [
 				'required'          => true,
 				'type'              => 'string',
-				'validate_callback' => function( $var, \WP_REST_Request $request ) {
+				'validate_callback' => function ( $var, \WP_REST_Request $request ) {
 					return ModelInventory::is_password_valid_for( $request->get_param( 'post_id' ), $var );
 				},
 			],
@@ -120,7 +120,7 @@ class RestInventoryStats extends RestApiPattern {
 		}
 		// locate template and die.
 		nocache_headers();
-		add_filter( 'template_include', function( $template ) {
+		add_filter( 'template_include', function ( $template ) {
 			return apply_filters( 'hanmoto_stats_template', hanmoto_root_dir() . '/template-parts/hanmoto/stats.php' );
 		} );
 	}

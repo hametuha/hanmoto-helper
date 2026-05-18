@@ -29,7 +29,7 @@ abstract class UiPattern extends \WP_List_Table {
 	 *
 	 * @return string[]
 	 */
-	static protected function scripts() {
+	protected static function scripts() {
 		return [];
 	}
 
@@ -53,7 +53,7 @@ abstract class UiPattern extends \WP_List_Table {
 	 *
 	 * @return string
 	 */
-	static protected function label() {
+	protected static function label() {
 		return '';
 	}
 
@@ -62,7 +62,7 @@ abstract class UiPattern extends \WP_List_Table {
 	 *
 	 * @return string
 	 */
-	static protected function title() {
+	protected static function title() {
 		return static::label();
 	}
 
@@ -71,7 +71,7 @@ abstract class UiPattern extends \WP_List_Table {
 	 *
 	 * @return string
 	 */
-	static protected function description() {
+	protected static function description() {
 		return '';
 	}
 
@@ -80,7 +80,7 @@ abstract class UiPattern extends \WP_List_Table {
 	 *
 	 * @return void
 	 */
-	static public function render() {
+	public static function render() {
 		wp_enqueue_style( 'hanmoto-stock-manager' );
 		?>
 		<div class="wrap">
@@ -112,7 +112,7 @@ abstract class UiPattern extends \WP_List_Table {
 	 *
 	 * @return void
 	 */
-	static protected function editor() {
+	protected static function editor() {
 		// Render editor.
 	}
 }

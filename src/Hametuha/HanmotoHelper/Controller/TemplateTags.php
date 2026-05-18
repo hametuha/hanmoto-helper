@@ -37,7 +37,7 @@ class TemplateTags extends Singleton {
 			return [];
 		}
 		// Sort by published date.
-		usort( $books, function( $a, $b ) {
+		usort( $books, function ( $a, $b ) {
 			$a_date = $a['summary']['pubdate'] ?? 0;
 			$b_date = $b['summary']['pubdate'] ?? 0;
 			if ( $a_date === $b_date ) {
@@ -64,7 +64,7 @@ class TemplateTags extends Singleton {
 		ob_start();
 		$counter = 0;
 		foreach ( $books as $book ) {
-			$counter++;
+			++$counter;
 			if ( $counter > $limit ) {
 				break;
 			}

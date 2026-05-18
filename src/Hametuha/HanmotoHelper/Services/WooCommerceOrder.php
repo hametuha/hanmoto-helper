@@ -109,7 +109,7 @@ class WooCommerceOrder extends Singleton {
 			} else {
 				$caps [] = 'do_not_allow';
 			}
-			$caps = array_values( array_filter( $caps, function( $c ) {
+			$caps = array_values( array_filter( $caps, function ( $c ) {
 				return 'book_shop' !== $c;
 			} ) );
 		}
@@ -355,7 +355,7 @@ class WooCommerceOrder extends Singleton {
 		if ( ! $shop_coupon ) {
 			return $buyer;
 		}
-		$coupons = array_filter( $order->get_coupons(), function( $coupon ) use ( $shop_coupon ) {
+		$coupons = array_filter( $order->get_coupons(), function ( $coupon ) use ( $shop_coupon ) {
 			return $coupon->get_code() === $shop_coupon->get_code();
 		} );
 		if ( ! empty( $coupons ) ) {

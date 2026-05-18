@@ -59,14 +59,14 @@ class Settings extends Singleton {
 		foreach ( $this->get_settings() as $section_id => $section ) {
 			// Register section
 			$section_id = 'hanmoto-helper-' . $section_id;
-			add_settings_section( $section_id, $section['label'], function() use ( $section ) {
+			add_settings_section( $section_id, $section['label'], function () use ( $section ) {
 				if ( ! empty( $section['desc'] ) ) {
 					printf( '<p class="description">%s</p>', esc_html( $section['desc'] ) );
 				}
 			}, 'hanmoto-helper' );
 			foreach ( $section['options']  as $setting ) {
 				$option_id = 'hanmoto_' . $setting['id'];
-				add_settings_field( $option_id, $setting['label'], function() use ( $option_id, $setting ) {
+				add_settings_field( $option_id, $setting['label'], function () use ( $option_id, $setting ) {
 					$value      = $this->get_setting( $setting['id'], true );
 					$predefined = $this->get_predefined( $setting['id'] );
 					switch ( $setting['type'] ) {

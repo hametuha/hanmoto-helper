@@ -85,7 +85,7 @@ class Blocks extends Singleton {
 	public function render_callback( $attributes, $content ) {
 		$attributes = wp_parse_args( $attributes, $this->block_attributes() );
 		$style      = $attributes['style'];
-		$isbn       = array_map( 'trim', array_filter( preg_split( '/(\r\n|\r|\n)/u', $attributes['isbn'] ), function( $var ) {
+		$isbn       = array_map( 'trim', array_filter( preg_split( '/(\r\n|\r|\n)/u', $attributes['isbn'] ), function ( $var ) {
 			return preg_match( '/\d{13}/u', $var );
 		} ) );
 		return $this->render_isbn( $isbn, $style );

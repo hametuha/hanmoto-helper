@@ -15,8 +15,8 @@ use Hametuha\HanmotoHelper\Utility\SettingsAccessor;
  */
 class RestBookInfo extends RestApiPattern {
 
-	use SettingsAccessor,
-		OpenDbApi;
+	use SettingsAccessor;
+	use OpenDbApi;
 
 	/**
 	 * @inheritDoc
@@ -40,7 +40,7 @@ class RestBookInfo extends RestApiPattern {
 			'post_id' => [
 				'require'           => true,
 				'type'              => 'integer',
-				'validate_callback' => function( $var ) {
+				'validate_callback' => function ( $var ) {
 					$post = get_post( $var );
 					return $post && $this->option()->post_type === $post->post_type;
 				},
@@ -48,12 +48,12 @@ class RestBookInfo extends RestApiPattern {
 			'isbn'    => [
 				'type'              => 'string',
 				'default'           => '',
-				'validate_callback' => function( $var ) {
+				'validate_callback' => function ( $var ) {
 					if ( '' === $var ) {
 						return true;
 					}
 					$isbns    = explode( ',', $var );
-					$filtered = array_filter( $isbns, function( $isbn ) {
+					$filtered = array_filter( $isbns, function ( $isbn ) {
 						return preg_match( '/\d{13}/', $isbn );
 					} );
 					return count( $isbns ) === count( $filtered );
