@@ -1,4 +1,4 @@
-name: Test WordPress Plugin
+name: WordPress Plugin Test
 
 on:
   pull_request:
@@ -6,16 +6,19 @@ on:
       - master
 
 jobs:
-  lint:
-    name: PHP Syntax Check
+  phpcs:
+    uses: tarosky/workflows/.github/workflows/phpcs.yml@main
+
+  phpstan:
+    name: PHPStan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@v4
 
-      - name: Setup PHP with composer v2
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: '8.1'
           tools: composer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -23,30 +26,19 @@ jobs:
       - name: Install dependencies
         run: composer install --no-progress
 
-      - name: PHP Syntax Check
-        run: composer lint
+      - name: Run PHPStan
+        run: composer phpstan
+
+  phplint:
+    uses: tarosky/workflows/.github/workflows/phplint.yml@main
 
   assets:
-    name: Assets Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
+    uses: tarosky/workflows/.github/workflows/npm.yml@main
 
-      - name: Install Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: '24'
-
-      - name: Install NPM Packages
-        run: npm install
-
-      - name: Check JS & CSS syntax
-        run: npm run lint
-
-  status-check:
+  status:
     name: Status Check
     runs-on: ubuntu-latest
-    needs: [ lint, assets ]
+    needs: [ phpcs, phpstan, phplint, assets ]
     if: always()
     steps:
       - uses: re-actors/alls-green@release/v1

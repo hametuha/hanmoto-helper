@@ -1,0 +1,14 @@
+name: Playground Preview Publish
+
+on:
+  workflow_run:
+    workflows: [ "Playground Preview Build" ]
+    types:
+      - completed
+
+permissions:
+  pull-requests: write
+
+jobs:
+  publish:
+    uses: tarosky/workflows/.github/workflows/playground-preview-publish.yml@main
