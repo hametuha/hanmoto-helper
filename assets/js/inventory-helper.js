@@ -115,22 +115,8 @@ const InventoryContainer = ( { post } ) => {
 										× { inventory.amount }冊（料率{ inventory.margin }%）</small>
 									＝<span style={ { color: ( subtotal > 0 ? 'green' : 'red' ) } }>&yen; { subtotal }</span>
 									<span>（{ inventory.transaction_type_label } @ { inventory.capture_at }）</span>
-									<InventoryAndStock inventory={ inventory } onChange={ ( inventoryToUpdate ) => {
-										wp.apiFetch( {
-											path: '/hanmoto/v1/inventory/' + inventoryToUpdate.id + '/',
-											method: 'POST',
-										} ).then( ( data ) => {
-											const newInventories = [];
-											for ( const i of inventories ) {
-												if ( i.id === inventoryToUpdate.id ) {
-													i.applied_at = data.updated;
-												}
-												newInventories.push( i );
-											}
-											setInventories( newInventories );
-										} ).catch( ( error ) => {
-											alert( error.message );
-										} );
+									<InventoryAndStock inventory={ inventory } onChange={ ( updated ) => {
+										setInventories( inventories.map( ( i ) => i.id === updated.id ? updated : i ) );
 									} } />
 								</li>
 							);

@@ -127,6 +127,12 @@ trait BookSelector {
 				.wp-list-table th.column-capture_at {
 					width: 14%;
 				}
+				.wp-list-table th.column-applied {
+					width: 110px;
+				}
+				.wp-list-table th.column-realized {
+					width: 110px;
+				}
 			</style>
 			<?php
 		} );
@@ -171,7 +177,9 @@ trait BookSelector {
 								// Do nothing.
 								break 2;
 							default:
-								$new_columns['capture_at'] = __( '請求日', 'hanmoto' );
+								$new_columns['capture_at'] = __( '請求〆日', 'hanmoto' );
+								$new_columns['applied']    = __( '在庫反映', 'hanmoto' );
+								$new_columns['realized']   = __( '実現日', 'hanmoto' );
 								break 2;
 						}
 					default:
@@ -224,6 +232,37 @@ trait BookSelector {
 				case 'shipped_at':
 					$capture_at = get_post_meta( $post_id, '_' . $column, true );
 					echo $capture_at ? mysql2date( __( 'Y年m月d日', 'hanmoto' ), $capture_at ) : '<span style="color:lightgrey">---</spans>';
+					break;
+				case 'applied':
+					$applied_at = get_post_meta( $post_id, '_applied_at', true );
+					if ( $applied_at ) {
+						printf(
+							'<span style="color: green;">%s<br /><small style="color: #666;">%s</small></span>',
+							esc_html__( '反映済', 'hanmoto' ),
+							esc_html( mysql2date( get_option( 'date_format' ), $applied_at ) )
+						);
+					} else {
+						printf( '<span style="color: lightgrey;">%s</span>', esc_html__( '未反映', 'hanmoto' ) );
+					}
+					break;
+				case 'realized':
+					$realized_at = get_post_meta( $post_id, '_realized_at', true );
+					if ( $realized_at ) {
+						printf(
+							'<span style="color: green;">%s</span>',
+							esc_html( mysql2date( __( 'Y年m月d日', 'hanmoto' ), $realized_at ) )
+						);
+					} else {
+						$capture_at = get_post_meta( $post_id, '_capture_at', true );
+						if ( $capture_at && $capture_at < current_time( 'Y-m-d' ) ) {
+							printf(
+								'<span style="color: #e67e22; font-weight: bold;"><span class="dashicons dashicons-calendar" style="vertical-align: text-bottom;"></span> %s</span>',
+								esc_html__( '〆日超過', 'hanmoto' )
+							);
+						} else {
+							printf( '<span style="color: lightgrey;">%s</span>', esc_html__( '未実現', 'hanmoto' ) );
+						}
+					}
 					break;
 			}
 		}, 10, 2 );

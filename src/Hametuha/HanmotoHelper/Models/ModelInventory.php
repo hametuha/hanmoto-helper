@@ -41,8 +41,148 @@ class ModelInventory extends Singleton {
 		} );
 		// Customize admin columns.
 		$this->admin_columns( 'inventory' );
+		// Filter by realization status.
+		add_action( 'restrict_manage_posts', [ $this, 'render_realized_filter' ] );
+		add_action( 'pre_get_posts', [ $this, 'filter_by_realized_status' ] );
+		// Bulk action.
+		add_filter( 'bulk_actions-edit-inventory', [ $this, 'add_bulk_actions' ] );
+		// Statistics above list table.
+		add_action( 'manage_posts_extra_tablenav', [ $this, 'render_inventory_stats' ] );
 		// REST API
 		add_action( 'rest_api_init', [ $this, 'register_apis' ] );
+	}
+
+	/**
+	 * Render aggregated stats above the inventory list table.
+	 *
+	 * @param string $which 'top' or 'bottom'.
+	 * @return void
+	 */
+	public function render_inventory_stats( $which ) {
+		if ( 'top' !== $which ) {
+			return;
+		}
+		$screen = get_current_screen();
+		if ( ! $screen || 'edit-inventory' !== $screen->id ) {
+			return;
+		}
+		global $wp_query;
+		if ( ! $wp_query instanceof \WP_Query ) {
+			return;
+		}
+		$args                   = $wp_query->query_vars;
+		$args['nopaging']       = true;
+		$args['posts_per_page'] = -1;
+		$args['fields']         = 'ids';
+		unset( $args['paged'], $args['offset'] );
+		$all = new \WP_Query( $args );
+		if ( empty( $all->posts ) ) {
+			return;
+		}
+		update_meta_cache( 'post', $all->posts );
+		$total_amount = 0;
+		$total_price  = 0;
+		foreach ( $all->posts as $id ) {
+			$total_amount += (int) get_post_meta( $id, '_amount', true );
+			$total_price  += $this->get_total( $id );
+		}
+		$amount_color = ( 0 > $total_amount ) ? 'red' : 'green';
+		$price_color  = ( 0 > $total_price ) ? 'red' : 'green';
+		?>
+		<div class="alignleft actions hanmoto-inventory-stats" style="margin-left: 8px;">
+			<strong><?php esc_html_e( '統計：', 'hanmoto' ); ?></strong>
+			<span style="margin-left: 6px;">
+				<?php esc_html_e( '在庫変動', 'hanmoto' ); ?>:
+				<strong style="color: <?php echo esc_attr( $amount_color ); ?>;">
+					<?php echo esc_html( number_format( $total_amount ) ); ?>
+				</strong>
+			</span>
+			<span style="margin-left: 12px;">
+				<?php esc_html_e( '総額', 'hanmoto' ); ?>:
+				<strong style="color: <?php echo esc_attr( $price_color ); ?>;">
+					&yen;<?php echo esc_html( number_format( (int) $total_price ) ); ?>
+				</strong>
+			</span>
+			<span style="margin-left: 12px; color: #666;">
+				(<?php echo esc_html( number_format( $all->found_posts ) ); ?><?php esc_html_e( '件', 'hanmoto' ); ?>)
+			</span>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Add bulk action for setting realized date.
+	 *
+	 * @param array $actions Bulk actions on inventory list screen.
+	 * @return array
+	 */
+	public function add_bulk_actions( $actions ) {
+		$actions['set_realized_at'] = __( '実現日を設定', 'hanmoto' );
+		return $actions;
+	}
+
+	/**
+	 * Render dropdown filter for realization status on inventory list screen.
+	 *
+	 * @param string $post_type Current admin list post type.
+	 * @return void
+	 */
+	public function render_realized_filter( $post_type ) {
+		if ( 'inventory' !== $post_type ) {
+			return;
+		}
+		$current = filter_input( INPUT_GET, 'realized_status' );
+		?>
+		<select name="realized_status" aria-label="<?php esc_attr_e( '実現状況で絞り込み', 'hanmoto' ); ?>">
+			<option value=""><?php esc_html_e( '実現状況：すべて', 'hanmoto' ); ?></option>
+			<option value="unrealized" <?php selected( $current, 'unrealized' ); ?>><?php esc_html_e( '未実現の取引', 'hanmoto' ); ?></option>
+			<option value="realized" <?php selected( $current, 'realized' ); ?>><?php esc_html_e( '実現済みの取引', 'hanmoto' ); ?></option>
+		</select>
+		<?php
+	}
+
+	/**
+	 * Apply meta_query for realization status on inventory list screen.
+	 *
+	 * @param \WP_Query $query Main query in admin list.
+	 * @return void
+	 */
+	public function filter_by_realized_status( $query ) {
+		if ( ! is_admin() || ! $query->is_main_query() ) {
+			return;
+		}
+		if ( 'inventory' !== $query->get( 'post_type' ) ) {
+			return;
+		}
+		$status = filter_input( INPUT_GET, 'realized_status' );
+		if ( ! $status ) {
+			return;
+		}
+		$meta_query = $query->get( 'meta_query' );
+		if ( ! is_array( $meta_query ) ) {
+			$meta_query = [];
+		}
+		if ( 'unrealized' === $status ) {
+			$meta_query[] = [
+				'relation' => 'OR',
+				[
+					'key'     => '_realized_at',
+					'compare' => 'NOT EXISTS',
+				],
+				[
+					'key'     => '_realized_at',
+					'value'   => '',
+					'compare' => '=',
+				],
+			];
+		} elseif ( 'realized' === $status ) {
+			$meta_query[] = [
+				'key'     => '_realized_at',
+				'value'   => '',
+				'compare' => '!=',
+			];
+		}
+		$query->set( 'meta_query', $meta_query );
 	}
 
 
@@ -59,6 +199,7 @@ class ModelInventory extends Singleton {
 			'vat',
 			'capture_at',
 			'applied_at',
+			'realized_at',
 		];
 	}
 
@@ -134,6 +275,14 @@ class ModelInventory extends Singleton {
 							return is_numeric( $var ) && ( 'inventory' === get_post_type( $var ) );
 						},
 					],
+					'variation_id' => [
+						'required'          => false,
+						'type'              => 'integer',
+						'default'           => 0,
+						'validate_callback' => function ( $var ) {
+							return is_numeric( $var ) && ( 0 === (int) $var || 'product_variation' === get_post_type( $var ) );
+						},
+					],
 				],
 				'permission_callback' => function ( $request ) {
 					return current_user_can( 'edit_post', $request->get_param( 'inventory_id' ) );
@@ -146,8 +295,16 @@ class ModelInventory extends Singleton {
 						// translators: %s is updated time.
 						return new \WP_Error( 'already_applied', sprintf( __( '既に在庫反映されています: %s', 'hanmoto' ), $updated ), [ 'status' => 400 ] );
 					}
-					// Get product.
-					$product = wc_get_product( $inventory->post_parent );
+					// Get product (or selected variation).
+					$variation_id = (int) $request->get_param( 'variation_id' );
+					if ( $variation_id ) {
+						$product = wc_get_product( $variation_id );
+						if ( ! $product || ! $product->is_type( 'variation' ) || $product->get_parent_id() !== (int) $inventory->post_parent ) {
+							return new \WP_Error( 'invalid_variation', __( '不正なバリエーションが指定されました。', 'hanmoto' ), [ 'status' => 400 ] );
+						}
+					} else {
+						$product = wc_get_product( $inventory->post_parent );
+					}
 					if ( ! $product ) {
 						return new \WP_Error( 'not_found', __( '商品が見つかりませんでした。', 'hanmoto' ), [ 'status' => 404 ] );
 					}
@@ -156,18 +313,70 @@ class ModelInventory extends Singleton {
 						return new \WP_Error( 'stock_is_not_managed', __( 'この商品は在庫管理対象外です。', 'hanmoto' ), [ 'status' => 400 ] );
 					}
 					// 在庫情報を取得
-					$difference =
-					$old_stock  = $product->get_stock_quantity();
-					$new_stock  = $old_stock + (int) get_post_meta( $inventory->ID, '_amount', true );
-					$result     = wc_update_product_stock( $product->get_id(), $new_stock );
-					if ( ! $result ) {
+					$old_stock = $product->get_stock_quantity();
+					$new_stock = $old_stock + (int) get_post_meta( $inventory->ID, '_amount', true );
+					// wc_update_product_stock は更新後の在庫数を返すため、0冊になるケースで失敗扱いしないよう厳密比較する。
+					$result = wc_update_product_stock( $product->get_id(), $new_stock );
+					if ( false === $result ) {
 						return new \WP_Error( 'stock_manage_failed', __( '商品の在庫設定に失敗しました。', 'hanmoto' ), [ 'status' => 400 ] );
 					}
-					update_post_meta( $inventory->ID, '_applied_at', current_time( 'mysql' ) );
+					$applied_at = current_time( 'mysql' );
+					update_post_meta( $inventory->ID, '_applied_at', $applied_at );
 					return new \WP_REST_Response( [
 						'before'  => $old_stock,
 						'after'   => $new_stock,
-						'updated' => date_i18n( get_option( 'date_format' ) ),
+						'updated' => $applied_at,
+					] );
+				},
+			],
+		] );
+		// Bulk update realized_at.
+		register_rest_route( 'hanmoto/v1', 'inventories/bulk-realize', [
+			[
+				'methods'             => 'POST',
+				'args'                => [
+					'ids'         => [
+						'required'          => true,
+						'type'              => 'string',
+						'description'       => __( '対象在庫変動IDのカンマ区切り', 'hanmoto' ),
+						'validate_callback' => function ( $ids ) {
+							return is_string( $ids ) && (bool) preg_match( '/^\d+(,\d+)*$/', $ids );
+						},
+					],
+					'realized_at' => [
+						'required'          => true,
+						'type'              => 'string',
+						'description'       => __( '実現日 (Y-m-d) 。空文字を渡すと未設定に戻す', 'hanmoto' ),
+						'validate_callback' => function ( $date ) {
+							return is_string( $date ) && ( '' === $date || (bool) preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date ) );
+						},
+					],
+				],
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+				'callback'            => function ( \WP_REST_Request $request ) {
+					$ids         = explode( ',', $request->get_param( 'ids' ) );
+					$realized_at = $request->get_param( 'realized_at' );
+					$updated     = 0;
+					foreach ( $ids as $id ) {
+						$id = (int) $id;
+						if ( 'inventory' !== get_post_type( $id ) ) {
+							continue;
+						}
+						if ( ! current_user_can( 'edit_post', $id ) ) {
+							continue;
+						}
+						if ( '' === $realized_at ) {
+							delete_post_meta( $id, '_realized_at' );
+						} else {
+							update_post_meta( $id, '_realized_at', $realized_at );
+						}
+						++$updated;
+					}
+					return new \WP_REST_Response( [
+						'updated' => $updated,
+						'should'  => count( $ids ),
 					] );
 				},
 			],
@@ -190,10 +399,13 @@ class ModelInventory extends Singleton {
 		if ( ! $parent ) {
 			return new \WP_Error( 'not_found', __( '商品が見つかりませんでした。', 'hanmoto' ), [ 'status' => 404 ] );
 		}
-		$response = [
-			'id'      => $post->ID,
-			'name'    => get_the_title( $post ),
-			'product' => get_the_title( $post->post_parent ),
+		$product_obj = wc_get_product( $post->post_parent );
+		$response    = [
+			'id'           => $post->ID,
+			'name'         => get_the_title( $post ),
+			'product'      => get_the_title( $post->post_parent ),
+			'parent_id'    => (int) $post->post_parent,
+			'product_type' => $product_obj ? $product_obj->get_type() : '',
 		];
 		foreach ( array_merge( $this->keys(), [ 'group' ] ) as $key ) {
 			$value = get_post_meta( $post->ID, '_' . $key, true );
@@ -229,9 +441,13 @@ class ModelInventory extends Singleton {
 		if ( ! wp_verify_nonce( filter_input( INPUT_POST, '_hanmotoinventorynonce' ), 'update_inventory' ) ) {
 			return;
 		}
-		// Save all meta.
+		// Save all meta. フォームに含まれないキー（applied_at など REST 経由で更新するもの）はスキップする。
 		foreach ( $this->keys() as $key ) {
-			update_post_meta( $post_id, '_' . $key, filter_input( INPUT_POST, $key ) );
+			$value = filter_input( INPUT_POST, $key );
+			if ( null === $value ) {
+				continue;
+			}
+			update_post_meta( $post_id, '_' . $key, $value );
 		}
 		update_post_meta( $post_id, '_group', (int) filter_input( INPUT_POST, 'group' ) );
 	}
@@ -335,9 +551,19 @@ class ModelInventory extends Singleton {
 			</table>
 			<p>
 				<label>
-					<?php esc_html_e( '請求日', 'hanmoto' ); ?><br />
+					<?php esc_html_e( '請求〆日', 'hanmoto' ); ?><br />
 					<input type="date" name="capture_at" value="<?php echo esc_attr( get_post_meta( $post->ID, '_capture_at', true ) ); ?>" />
 				</label>
+				<?php
+				$capture_at_value  = get_post_meta( $post->ID, '_capture_at', true );
+				$realized_at_value = get_post_meta( $post->ID, '_realized_at', true );
+				if ( $capture_at_value && ! $realized_at_value && $capture_at_value < current_time( 'Y-m-d' ) ) :
+					?>
+					<span style="color: #e67e22; font-weight: bold; margin-left: 10px;">
+						<span class="dashicons dashicons-calendar" style="vertical-align: text-bottom;"></span>
+						<?php esc_html_e( '請求〆日を過ぎています。入金を確認のうえ実現日を入力してください。', 'hanmoto' ); ?>
+					</span>
+				<?php endif; ?>
 				<span style="display: inline-block; margin-left: 10px;">
 				<?php
 				$dates = [
@@ -366,18 +592,40 @@ class ModelInventory extends Singleton {
 				</span>
 			</p>
 			<p>
-				<label style="display: block">
+				<label>
+					<?php esc_html_e( '実現日', 'hanmoto' ); ?><br />
+					<input type="date" name="realized_at" value="<?php echo esc_attr( get_post_meta( $post->ID, '_realized_at', true ) ); ?>" />
+				</label>
+				<span class="description" style="display: inline-block; margin-left: 10px;">
+					<?php esc_html_e( '入金が完了した日付を入力すると「実現済み」になります。', 'hanmoto' ); ?>
+				</span>
+			</p>
+			<p>
+				<label style="display: inline-block">
 					<?php esc_html_e( '商品', 'hanmoto' ); ?>
 					<br />
 					<?php $this->book_select_pull_down( $post->post_parent ); ?>
-				</label>
-				<label style="marign-left: 10px;">
-					<?php
-					$applied_at = get_post_meta( $post->ID, '_applied_at', true );
-					if ( $applied_at ) :
-						?>
-						<span style="color: lightgrey;"><?php echo date_i18n( get_option( 'date_format' ), $applied_at ); ?></span>
-					<?php endif; ?>
+					<span style="margin-left: 10px;">
+						<?php
+						$applied_at = get_post_meta( $post->ID, '_applied_at', true );
+						if ( $applied_at ) :
+							?>
+							<span style="color: green;">
+								<span class="dashicons dashicons-yes"></span>
+								<?php
+								printf(
+									// translators: %s is the date when the inventory was applied.
+									esc_html__( '在庫反映済（%s）', 'hanmoto' ),
+									esc_html( date_i18n( get_option( 'date_format' ), $applied_at ) )
+								);
+								?>
+							</span>
+						<?php else : ?>
+							<span style="color: lightgrey;">
+								<?php esc_html_e( '在庫未反映', 'hanmoto' ); ?>
+							</span>
+						<?php endif; ?>
+					</span>
 				</label>
 			</p>
 			<p>
