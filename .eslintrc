@@ -2,6 +2,14 @@
 	"extends": [
 		"plugin:@wordpress/eslint-plugin/recommended-with-formatting"
 	],
+	"env": {
+		"browser": true,
+		"jquery": true
+	},
+	"globals": {
+		"hanmoto": "readonly",
+		"Chart": "readonly"
+	},
 	"rules": {
 		"no-alert": "off",
 		"prettier/prettier": "off",
