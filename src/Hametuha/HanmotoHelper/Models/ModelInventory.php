@@ -46,8 +46,68 @@ class ModelInventory extends Singleton {
 		add_action( 'pre_get_posts', [ $this, 'filter_by_realized_status' ] );
 		// Bulk action.
 		add_filter( 'bulk_actions-edit-inventory', [ $this, 'add_bulk_actions' ] );
+		// Statistics above list table.
+		add_action( 'manage_posts_extra_tablenav', [ $this, 'render_inventory_stats' ] );
 		// REST API
 		add_action( 'rest_api_init', [ $this, 'register_apis' ] );
+	}
+
+	/**
+	 * Render aggregated stats above the inventory list table.
+	 *
+	 * @param string $which 'top' or 'bottom'.
+	 * @return void
+	 */
+	public function render_inventory_stats( $which ) {
+		if ( 'top' !== $which ) {
+			return;
+		}
+		$screen = get_current_screen();
+		if ( ! $screen || 'edit-inventory' !== $screen->id ) {
+			return;
+		}
+		global $wp_query;
+		if ( ! $wp_query instanceof \WP_Query ) {
+			return;
+		}
+		$args                   = $wp_query->query_vars;
+		$args['nopaging']       = true;
+		$args['posts_per_page'] = -1;
+		$args['fields']         = 'ids';
+		unset( $args['paged'], $args['offset'] );
+		$all = new \WP_Query( $args );
+		if ( empty( $all->posts ) ) {
+			return;
+		}
+		update_meta_cache( 'post', $all->posts );
+		$total_amount = 0;
+		$total_price  = 0;
+		foreach ( $all->posts as $id ) {
+			$total_amount += (int) get_post_meta( $id, '_amount', true );
+			$total_price  += $this->get_total( $id );
+		}
+		$amount_color = ( 0 > $total_amount ) ? 'red' : 'green';
+		$price_color  = ( 0 > $total_price ) ? 'red' : 'green';
+		?>
+		<div class="alignleft actions hanmoto-inventory-stats" style="margin-left: 8px;">
+			<strong><?php esc_html_e( '統計：', 'hanmoto' ); ?></strong>
+			<span style="margin-left: 6px;">
+				<?php esc_html_e( '在庫変動', 'hanmoto' ); ?>:
+				<strong style="color: <?php echo esc_attr( $amount_color ); ?>;">
+					<?php echo esc_html( number_format( $total_amount ) ); ?>
+				</strong>
+			</span>
+			<span style="margin-left: 12px;">
+				<?php esc_html_e( '総額', 'hanmoto' ); ?>:
+				<strong style="color: <?php echo esc_attr( $price_color ); ?>;">
+					&yen;<?php echo esc_html( number_format( (int) $total_price ) ); ?>
+				</strong>
+			</span>
+			<span style="margin-left: 12px; color: #666;">
+				(<?php echo esc_html( number_format( $all->found_posts ) ); ?><?php esc_html_e( '件', 'hanmoto' ); ?>)
+			</span>
+		</div>
+		<?php
 	}
 
 	/**
