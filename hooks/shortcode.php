@@ -18,23 +18,6 @@ add_shortcode( 'book', function( $atts = [], $content = '' ) {
 	return $markup;
 } );
 
-// Register UI for Shortcake
-add_action( 'register_shortcode_ui', function () {
-	// Interviews.
-	shortcode_ui_register_for_shortcode( 'book', [
-		'label'         => __( 'Book Information', 'isbn-beautify' ),
-		'post_type'     => [ 'post' ],
-		'listItemImage' => 'dashicons-book-alt',
-		'attrs'         => [
-			[
-				'label' => 'ISBN',
-				'attr'  => 'isbn',
-				'type'  => 'text',
-			],
-		],
-	] );
-} );
-
 /**
  * List of book shortcode
  *

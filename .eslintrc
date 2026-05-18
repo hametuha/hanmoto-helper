@@ -1,14 +1,4 @@
 {
-	"parser": "@babel/eslint-parser",
-	"env": {
-		"browser": true,
-		"jquery": true
-	},
-	"globals": {
-		"wp": false,
-		"hanmoto": false,
-		"Chart": false
-	},
 	"extends": [
 		"plugin:@wordpress/eslint-plugin/recommended-with-formatting"
 	],
@@ -29,10 +19,5 @@
 		"strict": "off",
 		"@wordpress/valid-sprintf": "off",
 		"camelcase": "off"
-	},
-	"settings": {
-		"react": {
-			"version": "16.9.0"
-		}
 	}
 }

@@ -2,8 +2,7 @@
 
 Tags: publisher, isbn, book
 Contributors: hametuha, Takahashi_Fumiki  
-Tested up to: 5.8  
-Requires at least: 5.5.0  
+Tested up to: 6.8  
 Stable Tag: 1.0.0  
 License: GPLv3 or later  
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
