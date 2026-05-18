@@ -6,10 +6,10 @@ namespace Hametuha\HanmotoHelper;
 use Hametuha\HanmotoHelper\Controller\Blocks;
 use Hametuha\HanmotoHelper\Controller\OrderManager;
 use Hametuha\HanmotoHelper\Controller\PostType;
-use Hametuha\HanmotoHelper\Controller\RestBookInfo;
 use Hametuha\HanmotoHelper\Controller\Settings;
 use Hametuha\HanmotoHelper\Controller\WooCommerceHelper;
 use Hametuha\HanmotoHelper\Pattern\Singleton;
+use Hametuha\HanmotoHelper\Rest\RestBookInfo;
 
 /**
  * Plugin Bootstrap.

@@ -5,6 +5,8 @@ Plugin URI: https://github.com/hametuha/isbn-beautify
 Description: Display Book information with ISBN. Using OpenBD.
 Author: hametuha,Takahashi_Fumiki
 Version: 1.0.0
+Requires PHP: 7.4
+Requires at least: 6.6
 Author URI: https://hametuha.co.jp/
 License: GPL 3.0 or later
 Text Domain: hanmoto

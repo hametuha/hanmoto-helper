@@ -1,0 +1,255 @@
+/*!
+ * 書店注文登録画面
+ *
+ * @handle hanmoto-shop-order-register
+ */
+
+.hanmoto-order-register {
+	margin-top: 20px;
+	max-width: 1200px;
+
+	.notice {
+		margin: 0 0 20px;
+		padding: 10px 15px;
+
+		pre {
+			margin: 0;
+			white-space: pre-wrap;
+		}
+	}
+
+	.order-list {
+		display: flex;
+		flex-direction: column;
+		gap: 15px;
+	}
+
+	.submit {
+		margin-top: 20px;
+	}
+}
+
+// Order row (2-line layout)
+.order-row {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 15px;
+
+	.order-row-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 10px;
+		padding-bottom: 10px;
+		border-bottom: 1px solid #eee;
+
+		.row-number {
+			font-weight: bold;
+			color: #2271b1;
+			font-size: 14px;
+		}
+
+		.order-row-actions {
+			display: flex;
+			gap: 10px;
+		}
+	}
+
+	.order-row-line1 {
+		margin-bottom: 15px;
+	}
+
+	.order-row-line2 {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		align-items: flex-end;
+
+		> div {
+			display: flex;
+			flex-direction: column;
+
+			label {
+				font-size: 12px;
+				color: #50575e;
+				margin-bottom: 4px;
+			}
+		}
+
+		.field-book {
+			flex: 2;
+			min-width: 200px;
+		}
+
+		.field-amount {
+			width: 80px;
+
+			input {
+				text-align: right;
+			}
+		}
+
+		.field-in-charge {
+			width: 100px;
+		}
+
+		.field-note {
+			flex: 1;
+			min-width: 120px;
+		}
+
+		.field-source {
+			width: 130px;
+		}
+
+		.field-date {
+			width: 150px;
+		}
+
+		input,
+		select {
+			width: 100%;
+			box-sizing: border-box;
+		}
+	}
+}
+
+// Field label
+.field-label {
+	display: block;
+	font-size: 12px;
+	color: #50575e;
+	margin-bottom: 4px;
+}
+
+// Shop input group
+.shop-input-group {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	align-items: flex-end;
+
+	.shop-name-field {
+		flex: 2;
+		min-width: 200px;
+		position: relative;
+
+		label {
+			width: 100%;
+		}
+
+		input {
+			width: 100%;
+			box-sizing: border-box;
+		}
+	}
+
+	.shop-code-fields {
+		display: flex;
+		gap: 10px;
+		flex: 1;
+
+		.shop-code-field {
+			flex: 1;
+			min-width: 80px;
+
+			input {
+				width: 100%;
+				box-sizing: border-box;
+			}
+		}
+	}
+}
+
+// Autocomplete
+.hanmoto-autocomplete,
+.shop-name-field {
+	position: relative;
+
+	input[type="text"] {
+		&.has-value {
+			background-color: #e8f5e9;
+		}
+	}
+
+	.clear-btn {
+		position: absolute;
+		right: 5px;
+		bottom: 5px;
+		background: none;
+		border: none;
+		cursor: pointer;
+		font-size: 16px;
+		color: #999;
+		padding: 0 5px;
+		line-height: 1;
+
+		&:hover {
+			color: #d63638;
+		}
+	}
+
+	.loading-indicator {
+		position: absolute;
+		right: 25px;
+		bottom: 8px;
+		color: #999;
+		font-size: 12px;
+	}
+
+	.autocomplete-options {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		z-index: 1000;
+		background: #fff;
+		border: 1px solid #8c8f94;
+		border-top: none;
+		max-height: 250px;
+		overflow-y: auto;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+
+		li {
+			padding: 8px 10px;
+			cursor: pointer;
+			border-bottom: 1px solid #eee;
+
+			&:last-child {
+				border-bottom: none;
+			}
+
+			&:hover,
+			&:focus {
+				background-color: #2271b1;
+				color: #fff;
+				outline: none;
+
+				small {
+					color: rgba(255, 255, 255, 0.8);
+				}
+			}
+
+			strong {
+				display: block;
+			}
+
+			small {
+				display: block;
+				color: #666;
+				font-size: 11px;
+				margin-top: 2px;
+			}
+		}
+	}
+}
+
+.hanmoto-autocomplete {
+	input[type="text"] {
+		padding-right: 25px;
+	}
+}
