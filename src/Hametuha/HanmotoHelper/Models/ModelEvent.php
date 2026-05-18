@@ -90,6 +90,44 @@ class ModelEvent extends Singleton {
 				},
 			],
 		] );
+		// Variations of a variable product.
+		register_rest_route( 'hanmoto/v1', 'products/(?P<product_id>\d+)/variations', [
+			[
+				'methods'             => 'GET',
+				'args'                => [
+					'product_id' => [
+						'required'          => true,
+						'type'              => 'integer',
+						'validate_callback' => function ( $id ) {
+							return get_post( $id ) && 'product' === get_post_type( $id );
+						},
+					],
+				],
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+				'callback'            => function ( \WP_REST_Request $request ) {
+					$product = wc_get_product( $request->get_param( 'product_id' ) );
+					if ( ! $product || ! $product->is_type( 'variable' ) ) {
+						return new \WP_REST_Response( [] );
+					}
+					$items = [];
+					foreach ( $product->get_children() as $child_id ) {
+						$variation = wc_get_product( $child_id );
+						if ( ! $variation instanceof \WC_Product_Variation ) {
+							continue;
+						}
+						$items[] = [
+							'id'             => $variation->get_id(),
+							'name'           => wp_strip_all_tags( wc_get_formatted_variation( $variation, true ) ),
+							'stock'          => $variation->get_stock_quantity(),
+							'managing_stock' => $variation->managing_stock(),
+						];
+					}
+					return new \WP_REST_Response( $items );
+				},
+			],
+		] );
 		// Inventory list
 		$arg_post_id         = [
 			'type'                => 'int',

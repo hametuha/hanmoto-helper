@@ -174,7 +174,7 @@ trait BookSelector {
 								// Do nothing.
 								break 2;
 							default:
-								$new_columns['capture_at'] = __( '請求日', 'hanmoto' );
+								$new_columns['capture_at'] = __( '請求〆日', 'hanmoto' );
 								$new_columns['applied']    = __( '在庫反映', 'hanmoto' );
 								break 2;
 						}

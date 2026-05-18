@@ -134,6 +134,14 @@ class ModelInventory extends Singleton {
 							return is_numeric( $var ) && ( 'inventory' === get_post_type( $var ) );
 						},
 					],
+					'variation_id' => [
+						'required'          => false,
+						'type'              => 'integer',
+						'default'           => 0,
+						'validate_callback' => function ( $var ) {
+							return is_numeric( $var ) && ( 0 === (int) $var || 'product_variation' === get_post_type( $var ) );
+						},
+					],
 				],
 				'permission_callback' => function ( $request ) {
 					return current_user_can( 'edit_post', $request->get_param( 'inventory_id' ) );
@@ -146,8 +154,16 @@ class ModelInventory extends Singleton {
 						// translators: %s is updated time.
 						return new \WP_Error( 'already_applied', sprintf( __( '既に在庫反映されています: %s', 'hanmoto' ), $updated ), [ 'status' => 400 ] );
 					}
-					// Get product.
-					$product = wc_get_product( $inventory->post_parent );
+					// Get product (or selected variation).
+					$variation_id = (int) $request->get_param( 'variation_id' );
+					if ( $variation_id ) {
+						$product = wc_get_product( $variation_id );
+						if ( ! $product || ! $product->is_type( 'variation' ) || $product->get_parent_id() !== (int) $inventory->post_parent ) {
+							return new \WP_Error( 'invalid_variation', __( '不正なバリエーションが指定されました。', 'hanmoto' ), [ 'status' => 400 ] );
+						}
+					} else {
+						$product = wc_get_product( $inventory->post_parent );
+					}
 					if ( ! $product ) {
 						return new \WP_Error( 'not_found', __( '商品が見つかりませんでした。', 'hanmoto' ), [ 'status' => 404 ] );
 					}
@@ -156,18 +172,19 @@ class ModelInventory extends Singleton {
 						return new \WP_Error( 'stock_is_not_managed', __( 'この商品は在庫管理対象外です。', 'hanmoto' ), [ 'status' => 400 ] );
 					}
 					// 在庫情報を取得
-					$difference =
-					$old_stock  = $product->get_stock_quantity();
-					$new_stock  = $old_stock + (int) get_post_meta( $inventory->ID, '_amount', true );
-					$result     = wc_update_product_stock( $product->get_id(), $new_stock );
-					if ( ! $result ) {
+					$old_stock = $product->get_stock_quantity();
+					$new_stock = $old_stock + (int) get_post_meta( $inventory->ID, '_amount', true );
+					// wc_update_product_stock は更新後の在庫数を返すため、0冊になるケースで失敗扱いしないよう厳密比較する。
+					$result = wc_update_product_stock( $product->get_id(), $new_stock );
+					if ( false === $result ) {
 						return new \WP_Error( 'stock_manage_failed', __( '商品の在庫設定に失敗しました。', 'hanmoto' ), [ 'status' => 400 ] );
 					}
-					update_post_meta( $inventory->ID, '_applied_at', current_time( 'mysql' ) );
+					$applied_at = current_time( 'mysql' );
+					update_post_meta( $inventory->ID, '_applied_at', $applied_at );
 					return new \WP_REST_Response( [
 						'before'  => $old_stock,
 						'after'   => $new_stock,
-						'updated' => date_i18n( get_option( 'date_format' ) ),
+						'updated' => $applied_at,
 					] );
 				},
 			],
@@ -190,10 +207,13 @@ class ModelInventory extends Singleton {
 		if ( ! $parent ) {
 			return new \WP_Error( 'not_found', __( '商品が見つかりませんでした。', 'hanmoto' ), [ 'status' => 404 ] );
 		}
-		$response = [
-			'id'      => $post->ID,
-			'name'    => get_the_title( $post ),
-			'product' => get_the_title( $post->post_parent ),
+		$product_obj = wc_get_product( $post->post_parent );
+		$response    = [
+			'id'           => $post->ID,
+			'name'         => get_the_title( $post ),
+			'product'      => get_the_title( $post->post_parent ),
+			'parent_id'    => (int) $post->post_parent,
+			'product_type' => $product_obj ? $product_obj->get_type() : '',
 		];
 		foreach ( array_merge( $this->keys(), [ 'group' ] ) as $key ) {
 			$value = get_post_meta( $post->ID, '_' . $key, true );
@@ -335,7 +355,7 @@ class ModelInventory extends Singleton {
 			</table>
 			<p>
 				<label>
-					<?php esc_html_e( '請求日', 'hanmoto' ); ?><br />
+					<?php esc_html_e( '請求〆日', 'hanmoto' ); ?><br />
 					<input type="date" name="capture_at" value="<?php echo esc_attr( get_post_meta( $post->ID, '_capture_at', true ) ); ?>" />
 				</label>
 				<span style="display: inline-block; margin-left: 10px;">
@@ -366,18 +386,31 @@ class ModelInventory extends Singleton {
 				</span>
 			</p>
 			<p>
-				<label style="display: block">
+				<label style="display: inline-block">
 					<?php esc_html_e( '商品', 'hanmoto' ); ?>
 					<br />
 					<?php $this->book_select_pull_down( $post->post_parent ); ?>
-				</label>
-				<label style="marign-left: 10px;">
-					<?php
-					$applied_at = get_post_meta( $post->ID, '_applied_at', true );
-					if ( $applied_at ) :
-						?>
-						<span style="color: lightgrey;"><?php echo date_i18n( get_option( 'date_format' ), $applied_at ); ?></span>
-					<?php endif; ?>
+					<span style="margin-left: 10px;">
+						<?php
+						$applied_at = get_post_meta( $post->ID, '_applied_at', true );
+						if ( $applied_at ) :
+							?>
+							<span style="color: green;">
+								<span class="dashicons dashicons-yes"></span>
+								<?php
+								printf(
+									// translators: %s is the date when the inventory was applied.
+									esc_html__( '在庫反映済（%s）', 'hanmoto' ),
+									esc_html( date_i18n( get_option( 'date_format' ), $applied_at ) )
+								);
+								?>
+							</span>
+						<?php else : ?>
+							<span style="color: lightgrey;">
+								<?php esc_html_e( '在庫未反映', 'hanmoto' ); ?>
+							</span>
+						<?php endif; ?>
+					</span>
 				</label>
 			</p>
 			<p>
