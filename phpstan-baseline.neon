@@ -25,30 +25,6 @@ parameters:
 			path: includes/utility.php
 
 		-
-			message: '#^Instantiated class Hametuha\\HanmotoHelper\\Utility\\WP_Error not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Hametuha/HanmotoHelper/Controller/Blocks.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: src/Hametuha/HanmotoHelper/Controller/Blocks.php
-
-		-
-			message: '#^Instantiated class Hametuha\\HanmotoHelper\\Utility\\WP_Error not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Hametuha/HanmotoHelper/Controller/PostType.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: src/Hametuha/HanmotoHelper/Controller/PostType.php
-
-		-
 			message: '#^Found usage of constant DOING_AJAX\. Use wp_doing_ajax\(\) instead\.$#'
 			identifier: phpstanWP.wpConstant.fetch
 			count: 1
@@ -65,30 +41,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: src/Hametuha/HanmotoHelper/Controller/Settings.php
-
-		-
-			message: '#^Instantiated class Hametuha\\HanmotoHelper\\Utility\\WP_Error not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Hametuha/HanmotoHelper/Controller/TemplateTags.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: src/Hametuha/HanmotoHelper/Controller/TemplateTags.php
-
-		-
-			message: '#^Instantiated class Hametuha\\HanmotoHelper\\Utility\\WP_Error not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Hametuha/HanmotoHelper/Controller/WooCommerceHelper.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: src/Hametuha/HanmotoHelper/Controller/WooCommerceHelper.php
 
 		-
 			message: '#^Action callback returns array\<string\> but should not return anything\.$#'
@@ -289,18 +241,6 @@ parameters:
 			path: src/Hametuha/HanmotoHelper/Pattern/UiPattern.php
 
 		-
-			message: '#^Instantiated class Hametuha\\HanmotoHelper\\Utility\\WP_Error not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Hametuha/HanmotoHelper/Rest/RestBookInfo.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: src/Hametuha/HanmotoHelper/Rest/RestBookInfo.php
-
-		-
 			message: '#^Call to function is_wp_error\(\) with WP_Term\|false will always evaluate to false\.$#'
 			identifier: function.impossibleType
 			count: 1
@@ -421,19 +361,7 @@ parameters:
 			path: src/Hametuha/HanmotoHelper/Utility/Commands.php
 
 		-
-			message: '#^Instantiated class Hametuha\\HanmotoHelper\\Utility\\WP_Error not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Hametuha/HanmotoHelper/Utility/Commands.php
-
-		-
 			message: '#^Instantiated class cli\\Table not found\.$#'
 			identifier: class.notFound
 			count: 3
-			path: src/Hametuha/HanmotoHelper/Utility/Commands.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
 			path: src/Hametuha/HanmotoHelper/Utility/Commands.php

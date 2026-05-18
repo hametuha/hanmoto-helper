@@ -132,7 +132,6 @@ trait OpenDbApi {
 			default:
 				// translators: %s is method.
 				return new \WP_Error( 400, sprintf( __( 'Method %s is not allowed.', 'isbn-beautify' ), $method ) );
-				break;
 		}
 		$curl_opt[ CURLOPT_URL ] = $endpoint;
 		$ch                      = curl_init();
@@ -143,7 +142,7 @@ trait OpenDbApi {
 			$no  = curl_errno( $ch );
 			curl_close( $ch );
 
-			return new WP_Error( 500, sprintf( 'OpenBD API returns error: %s %s', $no, $err ) );
+			return new \WP_Error( 500, sprintf( 'OpenBD API returns error: %s %s', $no, $err ) );
 		}
 		curl_close( $ch );
 		$response = json_decode( $result );
