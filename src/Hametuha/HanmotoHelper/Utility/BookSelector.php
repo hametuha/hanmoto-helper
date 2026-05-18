@@ -127,6 +127,9 @@ trait BookSelector {
 				.wp-list-table th.column-capture_at {
 					width: 14%;
 				}
+				.wp-list-table th.column-applied {
+					width: 110px;
+				}
 			</style>
 			<?php
 		} );
@@ -172,6 +175,7 @@ trait BookSelector {
 								break 2;
 							default:
 								$new_columns['capture_at'] = __( '請求日', 'hanmoto' );
+								$new_columns['applied']    = __( '在庫反映', 'hanmoto' );
 								break 2;
 						}
 					default:
@@ -224,6 +228,18 @@ trait BookSelector {
 				case 'shipped_at':
 					$capture_at = get_post_meta( $post_id, '_' . $column, true );
 					echo $capture_at ? mysql2date( __( 'Y年m月d日', 'hanmoto' ), $capture_at ) : '<span style="color:lightgrey">---</spans>';
+					break;
+				case 'applied':
+					$applied_at = get_post_meta( $post_id, '_applied_at', true );
+					if ( $applied_at ) {
+						printf(
+							'<span style="color: green;">%s<br /><small style="color: #666;">%s</small></span>',
+							esc_html__( '反映済', 'hanmoto' ),
+							esc_html( mysql2date( get_option( 'date_format' ), $applied_at ) )
+						);
+					} else {
+						printf( '<span style="color: lightgrey;">%s</span>', esc_html__( '未反映', 'hanmoto' ) );
+					}
 					break;
 			}
 		}, 10, 2 );
