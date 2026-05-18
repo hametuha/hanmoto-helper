@@ -253,9 +253,9 @@ class ModelEvent extends Singleton {
 							}
 							$ids   = explode( ',', $ids );
 							$valid = array_filter( $ids, function ( $id ) {
-								return get_post( $id ) && 'inventory' === get_post_type( $id );
+								return get_post( (int) $id ) && 'inventory' === get_post_type( (int) $id );
 							} );
-							return count( $ids ) && count( $valid );
+							return $valid && count( $ids ) === count( $valid );
 						},
 					],
 				],
@@ -266,7 +266,7 @@ class ModelEvent extends Singleton {
 					$event = $request->get_param( 'post_id' );
 					$total = 0;
 					foreach ( $ids as $id ) {
-						$total += update_post_meta( $id, '_group', $event ) ? 1 : 0;
+						$total += update_post_meta( (int) $id, '_group', $event ) ? 1 : 0;
 					}
 					return new \WP_REST_Response( [
 						'updated' => $total,

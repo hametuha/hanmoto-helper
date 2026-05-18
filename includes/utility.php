@@ -100,7 +100,7 @@ function hanmoto_isbn10( $isbn13 ) {
 	$total = 0;
 	for ( $i = 0; $i < 9; $i++ ) {
 		$letter = substr( $isbn9, $i, 1 );
-		$total += $letter * ( 10 - $i );
+		$total += (int) $letter * ( 10 - $i );
 	}
 	$remainder = 11 - ( $total % 11 );
 	switch ( $remainder ) {

@@ -4,6 +4,35 @@ includes:
 
 parameters:
     level: 5
+    ignoreErrors:
+        # esc_attr / esc_html はscalarを安全に文字列化するWP escape関数。
+        # phpstan-wordpressのstubがstring限定なので、int/floatを渡すパターンを許容する。
+        -
+            message: '#^Parameter \#1 \$text of function esc_(attr|html) expects string, [\w|]+ given\.$#'
+            identifier: argument.type
+        # has_term はWP_Termオブジェクトも実装上は受け付ける（term_idで判定）。
+        -
+            message: '#^Parameter \#1 \$term of function has_term expects array\|int\|string, WP_Term given\.$#'
+            identifier: argument.type
+        # WC/WPのnumber/price系関数はDBから取れたstring/floatの両方を受け付ける。
+        -
+            message: '#^Parameter \#1 \$num of function number_format expects float, string given\.$#'
+            identifier: argument.type
+        -
+            message: '#^Parameter \#1 \$value of function wc_format_localized_price expects string, float given\.$#'
+            identifier: argument.type
+        # is_wp_error は防御的チェックとして残す慣習があるため、常にfalse判定は無視。
+        -
+            identifier: function.impossibleType
+        # wp-cli/php-cli-tools の cli\Table は wp-cli-stubs に含まれないため認識できない。
+        -
+            message: '#^(Instantiated class cli\\Table not found|Call to method (setHeaders|display|addRow)\(\) on an unknown class cli\\Table)\.$#'
+        # 別プラグイン (isbn-beautify) が提供する関数なので、本プラグインからは未定義に見える。
+        -
+            message: '#^Function isbnb_display not found\.$#'
+        # DOING_AJAX の wp_doing_ajax() 推奨は WPCS/WPベストプラクティスのお作法警告で、害はないため無視。
+        -
+            identifier: phpstanWP.wpConstant.fetch
     bootstrapFiles:
         - phpstan-bootstrap.php
     scanFiles:
