@@ -247,14 +247,21 @@ trait BookSelector {
 					break;
 				case 'realized':
 					$realized_at = get_post_meta( $post_id, '_realized_at', true );
-					if ( $realized_at ) {
+					$today_ymd   = current_time( 'Y-m-d' );
+					if ( $realized_at && $realized_at <= $today_ymd ) {
 						printf(
 							'<span style="color: green;">%s</span>',
 							esc_html( mysql2date( __( 'Y年m月d日', 'hanmoto' ), $realized_at ) )
 						);
+					} elseif ( $realized_at ) {
+						printf(
+							'<span style="color: #666;"><span class="dashicons dashicons-calendar" style="vertical-align: text-bottom;"></span> %1$s<br /><small>%2$s</small></span>',
+							esc_html__( '実現予定', 'hanmoto' ),
+							esc_html( mysql2date( __( 'Y年m月d日', 'hanmoto' ), $realized_at ) )
+						);
 					} else {
 						$capture_at = get_post_meta( $post_id, '_capture_at', true );
-						if ( $capture_at && $capture_at < current_time( 'Y-m-d' ) ) {
+						if ( $capture_at && $capture_at < $today_ymd ) {
 							printf(
 								'<span style="color: #e67e22; font-weight: bold;"><span class="dashicons dashicons-calendar" style="vertical-align: text-bottom;"></span> %s</span>',
 								esc_html__( '〆日超過', 'hanmoto' )

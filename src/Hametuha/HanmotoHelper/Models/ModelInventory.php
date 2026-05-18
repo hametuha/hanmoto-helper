@@ -89,7 +89,7 @@ class ModelInventory extends Singleton {
 		$amount_color = ( 0 > $total_amount ) ? 'red' : 'green';
 		$price_color  = ( 0 > $total_price ) ? 'red' : 'green';
 		?>
-		<div class="alignleft actions hanmoto-inventory-stats" style="margin-left: 8px;">
+		<div class="actions hanmoto-inventory-stats" style="margin-left: 8px; clear:left; padding-top: 10px;">
 			<strong><?php esc_html_e( '統計：', 'hanmoto' ); ?></strong>
 			<span style="margin-left: 6px;">
 				<?php esc_html_e( '在庫変動', 'hanmoto' ); ?>:
@@ -131,13 +131,29 @@ class ModelInventory extends Singleton {
 		if ( 'inventory' !== $post_type ) {
 			return;
 		}
-		$current = filter_input( INPUT_GET, 'realized_status' );
+		$current       = filter_input( INPUT_GET, 'realized_status' );
+		$capture_from  = filter_input( INPUT_GET, 'capture_at_from' );
+		$capture_to    = filter_input( INPUT_GET, 'capture_at_to' );
+		$realized_from = filter_input( INPUT_GET, 'realized_at_from' );
+		$realized_to   = filter_input( INPUT_GET, 'realized_at_to' );
 		?>
 		<select name="realized_status" aria-label="<?php esc_attr_e( '実現状況で絞り込み', 'hanmoto' ); ?>">
 			<option value=""><?php esc_html_e( '実現状況：すべて', 'hanmoto' ); ?></option>
 			<option value="unrealized" <?php selected( $current, 'unrealized' ); ?>><?php esc_html_e( '未実現の取引', 'hanmoto' ); ?></option>
 			<option value="realized" <?php selected( $current, 'realized' ); ?>><?php esc_html_e( '実現済みの取引', 'hanmoto' ); ?></option>
 		</select>
+		<label style="margin-left: 6px;">
+			<?php esc_html_e( '請求〆日', 'hanmoto' ); ?>
+			<input type="date" name="capture_at_from" value="<?php echo esc_attr( $capture_from ); ?>" aria-label="<?php esc_attr_e( '請求〆日の開始', 'hanmoto' ); ?>" />
+			<span>〜</span>
+			<input type="date" name="capture_at_to" value="<?php echo esc_attr( $capture_to ); ?>" aria-label="<?php esc_attr_e( '請求〆日の終了', 'hanmoto' ); ?>" />
+		</label>
+		<label style="margin-left: 6px;">
+			<?php esc_html_e( '実現日', 'hanmoto' ); ?>
+			<input type="date" name="realized_at_from" value="<?php echo esc_attr( $realized_from ); ?>" aria-label="<?php esc_attr_e( '実現日の開始', 'hanmoto' ); ?>" />
+			<span>〜</span>
+			<input type="date" name="realized_at_to" value="<?php echo esc_attr( $realized_to ); ?>" aria-label="<?php esc_attr_e( '実現日の終了', 'hanmoto' ); ?>" />
+		</label>
 		<?php
 	}
 
@@ -154,14 +170,13 @@ class ModelInventory extends Singleton {
 		if ( 'inventory' !== $query->get( 'post_type' ) ) {
 			return;
 		}
-		$status = filter_input( INPUT_GET, 'realized_status' );
-		if ( ! $status ) {
-			return;
-		}
 		$meta_query = $query->get( 'meta_query' );
 		if ( ! is_array( $meta_query ) ) {
 			$meta_query = [];
 		}
+		$today  = current_time( 'Y-m-d' );
+		$status = filter_input( INPUT_GET, 'realized_status' );
+		// 未実現: _realized_at が空 / 未設定 / 今日より未来。実現済み: _realized_at が今日以前。
 		if ( 'unrealized' === $status ) {
 			$meta_query[] = [
 				'relation' => 'OR',
@@ -174,13 +189,51 @@ class ModelInventory extends Singleton {
 					'value'   => '',
 					'compare' => '=',
 				],
+				[
+					'key'     => '_realized_at',
+					'value'   => $today,
+					'compare' => '>',
+					'type'    => 'DATE',
+				],
 			];
 		} elseif ( 'realized' === $status ) {
 			$meta_query[] = [
-				'key'     => '_realized_at',
-				'value'   => '',
-				'compare' => '!=',
+				'relation' => 'AND',
+				[
+					'key'     => '_realized_at',
+					'value'   => '',
+					'compare' => '!=',
+				],
+				[
+					'key'     => '_realized_at',
+					'value'   => $today,
+					'compare' => '<=',
+					'type'    => 'DATE',
+				],
 			];
+		}
+		// 日付範囲指定（請求〆日・実現日）。
+		foreach ( [ 'capture_at', 'realized_at' ] as $key ) {
+			$from = filter_input( INPUT_GET, $key . '_from' );
+			$to   = filter_input( INPUT_GET, $key . '_to' );
+			if ( empty( $from ) && empty( $to ) ) {
+				continue;
+			}
+			$clause = [
+				'key'  => '_' . $key,
+				'type' => 'DATE',
+			];
+			if ( ! empty( $from ) && ! empty( $to ) ) {
+				$clause['compare'] = 'BETWEEN';
+				$clause['value']   = [ $from, $to ];
+			} elseif ( ! empty( $from ) ) {
+				$clause['compare'] = '>=';
+				$clause['value']   = $from;
+			} else {
+				$clause['compare'] = '<=';
+				$clause['value']   = $to;
+			}
+			$meta_query[] = $clause;
 		}
 		$query->set( 'meta_query', $meta_query );
 	}
