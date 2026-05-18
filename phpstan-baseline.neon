@@ -13,12 +13,6 @@ parameters:
 			path: hooks/shortcode.php
 
 		-
-			message: '#^Function shortcode_ui_register_for_shortcode not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: hooks/shortcode.php
-
-		-
 			message: '#^Binary operation "\*" between string and int\<2, 10\> results in an error\.$#'
 			identifier: binaryOp.invalid
 			count: 1
@@ -53,18 +47,6 @@ parameters:
 			identifier: deadCode.unreachable
 			count: 1
 			path: src/Hametuha/HanmotoHelper/Controller/PostType.php
-
-		-
-			message: '#^Instantiated class Hametuha\\HanmotoHelper\\Utility\\WP_Error not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Hametuha/HanmotoHelper/Controller/RestBookInfo.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: src/Hametuha/HanmotoHelper/Controller/RestBookInfo.php
 
 		-
 			message: '#^Found usage of constant DOING_AJAX\. Use wp_doing_ajax\(\) instead\.$#'
@@ -491,6 +473,48 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: src/Hametuha/HanmotoHelper/Pattern/UiPattern.php
+
+		-
+			message: '#^Instantiated class Hametuha\\HanmotoHelper\\Utility\\WP_Error not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Rest/RestBookInfo.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Rest/RestBookInfo.php
+
+		-
+			message: '#^Call to function is_wp_error\(\) with WP_Term\|false will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Rest/RestOrderRegister.php
+
+		-
+			message: '#^Call to function is_wp_error\(\) with int\<1, max\> will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Rest/RestOrderRegister.php
+
+		-
+			message: '#^Function wc_format_localized_price not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Rest/RestOrderRegister.php
+
+		-
+			message: '#^Parameter \#1 \$term of function has_term expects array\|int\|string, WP_Term given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Hametuha/HanmotoHelper/Rest/RestOrderRegister.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Hametuha/HanmotoHelper/Rest/RestOrderRegister.php
 
 		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$sections$#'
