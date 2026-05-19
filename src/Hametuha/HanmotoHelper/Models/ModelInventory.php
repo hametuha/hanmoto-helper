@@ -80,22 +80,38 @@ class ModelInventory extends Singleton {
 			return;
 		}
 		update_meta_cache( 'post', $all->posts );
-		$total_amount = 0;
-		$total_price  = 0;
+		$total_in    = 0; // 入荷（プラス分の合計）。
+		$total_out   = 0; // 出荷（マイナス分の絶対値合計）。
+		$total_price = 0;
 		foreach ( $all->posts as $id ) {
-			$total_amount += (int) get_post_meta( $id, '_amount', true );
-			$total_price  += $this->get_total( $id );
+			$amount = (int) get_post_meta( $id, '_amount', true );
+			if ( 0 < $amount ) {
+				$total_in += $amount;
+			} else {
+				$total_out += abs( $amount );
+			}
+			$total_price += $this->get_total( $id );
 		}
-		$amount_color = ( 0 > $total_amount ) ? 'red' : 'green';
+		$net          = $total_in - $total_out;
+		$amount_color = ( 0 > $net ) ? 'red' : 'green';
 		$price_color  = ( 0 > $total_price ) ? 'red' : 'green';
+		$rate_text    = ( 0 < $total_in )
+			? sprintf( '%d%%', (int) round( $net / $total_in * 100 ) )
+			: '-';
 		?>
 		<div class="actions hanmoto-inventory-stats" style="margin-left: 8px; clear:left; padding-top: 10px;">
 			<strong><?php esc_html_e( '統計：', 'hanmoto' ); ?></strong>
 			<span style="margin-left: 6px;">
 				<?php esc_html_e( '在庫変動', 'hanmoto' ); ?>:
+				<strong style="color: red;">-<?php echo esc_html( number_format( $total_out ) ); ?></strong>
+				/
+				<strong style="color: green;"><?php echo esc_html( number_format( $total_in ) ); ?></strong>
+				<?php esc_html_e( '残部', 'hanmoto' ); ?>
 				<strong style="color: <?php echo esc_attr( $amount_color ); ?>;">
-					<?php echo esc_html( number_format( $total_amount ) ); ?>
+					<?php echo esc_html( number_format( $net ) ); ?>
 				</strong>
+				<?php esc_html_e( '在庫率', 'hanmoto' ); ?>
+				<strong><?php echo esc_html( $rate_text ); ?></strong>
 			</span>
 			<span style="margin-left: 12px;">
 				<?php esc_html_e( '総額', 'hanmoto' ); ?>:
@@ -131,16 +147,54 @@ class ModelInventory extends Singleton {
 		if ( 'inventory' !== $post_type ) {
 			return;
 		}
-		$current       = filter_input( INPUT_GET, 'realized_status' );
-		$capture_from  = filter_input( INPUT_GET, 'capture_at_from' );
-		$capture_to    = filter_input( INPUT_GET, 'capture_at_to' );
-		$realized_from = filter_input( INPUT_GET, 'realized_at_from' );
-		$realized_to   = filter_input( INPUT_GET, 'realized_at_to' );
+		$current          = filter_input( INPUT_GET, 'realized_status' );
+		$capture_from     = filter_input( INPUT_GET, 'capture_at_from' );
+		$capture_to       = filter_input( INPUT_GET, 'capture_at_to' );
+		$realized_from    = filter_input( INPUT_GET, 'realized_at_from' );
+		$realized_to      = filter_input( INPUT_GET, 'realized_at_to' );
+		$current_supplier = (int) filter_input( INPUT_GET, 'filter_supplier' );
+		$current_tt       = (int) filter_input( INPUT_GET, 'filter_transaction_type' );
+		$current_product  = (int) filter_input( INPUT_GET, 'filter_product' );
 		?>
 		<select name="realized_status" aria-label="<?php esc_attr_e( '実現状況で絞り込み', 'hanmoto' ); ?>">
 			<option value=""><?php esc_html_e( '実現状況：すべて', 'hanmoto' ); ?></option>
 			<option value="unrealized" <?php selected( $current, 'unrealized' ); ?>><?php esc_html_e( '未実現の取引', 'hanmoto' ); ?></option>
 			<option value="realized" <?php selected( $current, 'realized' ); ?>><?php esc_html_e( '実現済みの取引', 'hanmoto' ); ?></option>
+		</select>
+		<?php
+		wp_dropdown_categories( [
+			'taxonomy'        => 'supplier',
+			'name'            => 'filter_supplier',
+			'show_option_all' => __( '取引先：すべて', 'hanmoto' ),
+			'hierarchical'    => true,
+			'hide_empty'      => false,
+			'value_field'     => 'term_id',
+			'selected'        => $current_supplier,
+		] );
+		wp_dropdown_categories( [
+			'taxonomy'        => 'transaction_type',
+			'name'            => 'filter_transaction_type',
+			'show_option_all' => __( '取引種別：すべて', 'hanmoto' ),
+			'hierarchical'    => true,
+			'hide_empty'      => false,
+			'value_field'     => 'term_id',
+			'selected'        => $current_tt,
+		] );
+		$products = get_posts( [
+			'post_type'   => 'product',
+			'post_status' => 'any',
+			'numberposts' => -1,
+			'orderby'     => 'title',
+			'order'       => 'ASC',
+		] );
+		?>
+		<select name="filter_product" aria-label="<?php esc_attr_e( '商品で絞り込み', 'hanmoto' ); ?>">
+			<option value="0"><?php esc_html_e( '商品：すべて', 'hanmoto' ); ?></option>
+			<?php foreach ( $products as $product ) : ?>
+				<option value="<?php echo esc_attr( $product->ID ); ?>" <?php selected( $current_product, $product->ID ); ?>>
+					<?php echo esc_html( get_the_title( $product ) ); ?>
+				</option>
+			<?php endforeach; ?>
 		</select>
 		<label style="margin-left: 6px;">
 			<?php esc_html_e( '請求〆日', 'hanmoto' ); ?>
@@ -236,6 +290,33 @@ class ModelInventory extends Singleton {
 			$meta_query[] = $clause;
 		}
 		$query->set( 'meta_query', $meta_query );
+		// 取引先・取引種別の tax_query。
+		$tax_query = $query->get( 'tax_query' );
+		if ( ! is_array( $tax_query ) ) {
+			$tax_query = [];
+		}
+		foreach ( [
+			'filter_supplier'         => 'supplier',
+			'filter_transaction_type' => 'transaction_type',
+		] as $param => $taxonomy ) {
+			$term_id = (int) filter_input( INPUT_GET, $param );
+			if ( $term_id ) {
+				$tax_query[] = [
+					'taxonomy'         => $taxonomy,
+					'field'            => 'term_id',
+					'terms'            => [ $term_id ],
+					'include_children' => true,
+				];
+			}
+		}
+		if ( ! empty( $tax_query ) ) {
+			$query->set( 'tax_query', $tax_query );
+		}
+		// 商品（post_parent）。
+		$product_id = (int) filter_input( INPUT_GET, 'filter_product' );
+		if ( $product_id ) {
+			$query->set( 'post_parent', $product_id );
+		}
 	}
 
 
