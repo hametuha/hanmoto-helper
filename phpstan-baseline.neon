@@ -1,12 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Parameter \#2 \$deprecated of function load_plugin_textdomain expects string\|false, true given\.$#'
-			identifier: argument.type
-			count: 1
-			path: hanmoto-helper.php
-
-		-
 			message: '#^Function hanmoto_rakuten_product\(\) should return array\|WP_Error but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
