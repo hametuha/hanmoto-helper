@@ -46,7 +46,7 @@ function hanmoto_root_dir() {
  */
 function hanmoto_plugin_init() {
 	// Load translations.
-	load_plugin_textdomain( 'hanmoto', true, basename( __DIR__ ) . '/languages' );
+	load_plugin_textdomain( 'hanmoto', false, basename( __DIR__ ) . '/languages' );
 	// Hooks
 	require_once __DIR__ . '/hooks/shortcode.php';
 	// Functions.
