@@ -7,6 +7,7 @@ use Hametuha\HanmotoHelper\Pattern\Singleton;
 use Hametuha\HanmotoHelper\Services\WooCommerceOrder;
 use Hametuha\HanmotoHelper\Services\WooCommerceSetting;
 use Hametuha\HanmotoHelper\Services\WooCommerceTemplate;
+use Hametuha\HanmotoHelper\UI\ProductList;
 use Hametuha\HanmotoHelper\Utility\OpenDbApi;
 
 /**
@@ -37,6 +38,8 @@ class WooCommerceHelper extends Singleton {
 		WooCommerceTemplate::get_instance();
 		// Order page.
 		WooCommerceOrder::get_instance();
+		// Product list page.
+		ProductList::get_instance();
 	}
 
 	/**
