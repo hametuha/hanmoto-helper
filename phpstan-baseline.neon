@@ -67,12 +67,6 @@ parameters:
 			path: src/Hametuha/HanmotoHelper/Services/WooCommerceSetting.php
 
 		-
-			message: '#^Variable \$line in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: src/Hametuha/HanmotoHelper/UI/CsvImporter.php
-
-		-
 			message: '#^Call to static method get_instance\(\) on an unknown class Hametuha\\HanmotoHelper\\Models\\ModelItem\.$#'
 			identifier: class.notFound
 			count: 1
