@@ -15,8 +15,14 @@ trait ShopCodes {
 
 	/**
 	 * Meta key to keep the codes of the past.
+	 *
+	 * A constant is not used here because a trait can not have one until PHP 8.2.
+	 *
+	 * @return string
 	 */
-	const META_FORMER_CODES = 'former_codes';
+	public function former_codes_meta_key() {
+		return 'former_codes';
+	}
 
 	/**
 	 * Normalize the codes of a bookshop.
@@ -57,7 +63,7 @@ trait ShopCodes {
 	 * @return string[]
 	 */
 	public function get_former_shop_codes( $term_id ) {
-		$codes = array_map( 'strval', (array) get_term_meta( $term_id, self::META_FORMER_CODES ) );
+		$codes = array_map( 'strval', (array) get_term_meta( $term_id, $this->former_codes_meta_key() ) );
 		return array_values( array_unique( $this->reject_empty( $codes ) ) );
 	}
 
@@ -84,9 +90,9 @@ trait ShopCodes {
 	 * @return void
 	 */
 	public function set_former_shop_codes( $term_id, $codes ) {
-		delete_term_meta( $term_id, self::META_FORMER_CODES );
+		delete_term_meta( $term_id, $this->former_codes_meta_key() );
 		foreach ( array_unique( $this->reject_empty( array_map( 'strval', $codes ) ) ) as $code ) {
-			add_term_meta( $term_id, self::META_FORMER_CODES, $code );
+			add_term_meta( $term_id, $this->former_codes_meta_key(), $code );
 		}
 	}
 
@@ -140,7 +146,7 @@ trait ShopCodes {
 			'hide_empty' => false,
 			'meta_query' => [
 				[
-					'key'   => self::META_FORMER_CODES,
+					'key'   => $this->former_codes_meta_key(),
 					'value' => $key,
 				],
 			],
