@@ -29,6 +29,11 @@ class CsvImporter extends Singleton {
 	protected $book_cache = [];
 
 	/**
+	 * @var array Codes of bookshops which are not registered yet, keyed by name.
+	 */
+	protected $new_shops = [];
+
+	/**
 	 * Columns of 書店注文総合シート.
 	 *
 	 * The 5th column「取次書店コード」is the numeric shop code and
@@ -295,6 +300,7 @@ class CsvImporter extends Singleton {
 		}
 		$this->shop_cache = [];
 		$this->book_cache = [];
+		$this->new_shops  = [];
 		// Fetch every registered order at once so that each row costs no query.
 		$registered = $this->get_registered_order_keys();
 		$columns    = count( self::GENERAL_COLUMNS );
@@ -494,14 +500,41 @@ SQL;
 						get_term_meta( $duplicated->term_id, 'line_code', true ),
 						get_term_meta( $duplicated->term_id, 'shop_code', true ),
 					] ),
-					implode( '/', [ trim( $row['wholesaler'] ), trim( $row['line_code'] ), trim( $row['shop_code'] ) ] )
+					$this->shop_codes( $row )
 				)
 			);
 		}
+		// The bookshop is not registered yet, but a former row of this CSV may have
+		// the same name with other codes. The actual import creates the bookshop at
+		// the former row and fails here, so the dry run has to detect it by itself.
+		$name  = trim( $row['shop_name'] );
+		$codes = $this->shop_codes( $row );
+		if ( isset( $this->new_shops[ $name ] ) && $this->new_shops[ $name ] !== $codes ) {
+			return new \WP_Error(
+				'bookshop_code_changed',
+				sprintf(
+					// translators: %1$s is codes of the former row, %2$s is codes of this row.
+					__( '同じCSV内で同名の書店に別のコードが指定されています。取次や番線が変わった可能性があります。先の行: %1$s ／ この行: %2$s', 'hanmoto' ),
+					$this->new_shops[ $name ],
+					$codes
+				)
+			);
+		}
+		$this->new_shops[ $name ] = $codes;
 		if ( ! $create ) {
 			return null;
 		}
 		return $this->get_bookshop( $row['shop_name'], $row['wholesaler'], $row['line_code'], $row['shop_code'], true );
+	}
+
+	/**
+	 * Get the codes of the row to display.
+	 *
+	 * @param array $row Parsed CSV row.
+	 * @return string
+	 */
+	protected function shop_codes( $row ) {
+		return implode( '/', [ trim( $row['wholesaler'] ), trim( $row['line_code'] ), trim( $row['shop_code'] ) ] );
 	}
 
 	/**
