@@ -188,15 +188,12 @@ class RestOrderRegister extends RestApiPattern {
 	 * @param string $shop_code  Shop code.
 	 */
 	private function maybe_update_shop_meta( $term_id, $wholesaler, $line_code, $shop_code ) {
-		if ( get_term_meta( $term_id, 'wholesaler', true ) !== $wholesaler ) {
-			update_term_meta( $term_id, 'wholesaler', $wholesaler );
+		if ( '' === $this->shop_codes_key( $wholesaler, $line_code, $shop_code ) ) {
+			// Do not wipe the registered codes when nothing is sent.
+			return;
 		}
-		if ( get_term_meta( $term_id, 'line_code', true ) !== $line_code ) {
-			update_term_meta( $term_id, 'line_code', $line_code );
-		}
-		if ( get_term_meta( $term_id, 'shop_code', true ) !== $shop_code ) {
-			update_term_meta( $term_id, 'shop_code', $shop_code );
-		}
+		// The replaced codes are kept as former codes so that the past orders can be found.
+		$this->update_shop_codes( $term_id, $wholesaler, $line_code, $shop_code );
 	}
 
 	/**
