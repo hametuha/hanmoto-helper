@@ -317,11 +317,11 @@ const OrderRow = ( { order, index, onUpdate, onRemove, onDuplicate, sources } ) 
 					/>
 				</div>
 				<div className="field-source">
-					<span className="field-label">{ __( '受注元', 'hanmoto' ) }</span>
+					<span className="field-label">{ __( '注文経路', 'hanmoto' ) }</span>
 					<select
 						value={ order.source }
 						onChange={ ( e ) => updateField( 'source', e.target.value ) }
-						aria-label={ __( '受注元', 'hanmoto' ) }
+						aria-label={ __( '注文経路', 'hanmoto' ) }
 					>
 						<option value="">{ __( '選択', 'hanmoto' ) }</option>
 						{ sources.map( ( src ) => (

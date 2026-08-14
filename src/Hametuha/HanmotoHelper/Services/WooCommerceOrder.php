@@ -287,7 +287,10 @@ class WooCommerceOrder extends Singleton {
 	 * @return bool
 	 */
 	public function is_shop_order( $order ) {
-		$order       = wc_get_order( $order );
+		$order = wc_get_order( $order );
+		if ( ! $order ) {
+			return false;
+		}
 		$shop_coupon = $this->get_shop_coupon();
 		if ( ! $shop_coupon ) {
 			return false;
