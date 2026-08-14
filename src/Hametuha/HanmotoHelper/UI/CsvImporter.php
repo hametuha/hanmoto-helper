@@ -30,14 +30,18 @@ class CsvImporter extends Singleton {
 
 	/**
 	 * Columns of 書店注文総合シート.
+	 *
+	 * The 5th column「取次書店コード」is the numeric shop code and
+	 * the 6th column「作業コード」is the alphanumeric line code(番線),
+	 * so they are the opposite order of line_code and shop_code.
 	 */
 	const GENERAL_COLUMNS = [
 		'no',
 		'date',
 		'publisher',
 		'wholesaler',
-		'line_code',
 		'shop_code',
+		'line_code',
 		'shop_name',
 		'isbn',
 		'book_title',
