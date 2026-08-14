@@ -13,6 +13,8 @@ use Hametuha\HanmotoHelper\Models\ModelOrder;
  */
 trait BookSelector {
 
+	use ShopCodes;
+
 	/**
 	 * Render book select pulldown.
 	 *
@@ -370,6 +372,11 @@ trait BookSelector {
 		$terms        = $term_query->get_terms();
 		if ( $terms ) {
 			return $terms[0];
+		}
+		// The bookshop may have had these codes before its 取次 or 番線 changed.
+		$former = $this->get_shop_by_former_codes( $wholesaler, $line_code, $shop_code );
+		if ( $former ) {
+			return $former;
 		}
 		if ( ! $create ) {
 			return null;

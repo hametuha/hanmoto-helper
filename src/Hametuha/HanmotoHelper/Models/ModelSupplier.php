@@ -60,9 +60,17 @@ class ModelSupplier extends Singleton {
 		if ( ! wp_verify_nonce( filter_input( INPUT_POST, '_habmotononce' ), 'update_supplier' ) ) {
 			return;
 		}
-		foreach ( [ 'address', 'in_charge', 'tel', 'fax', 'mail', 'wholesaler', 'line_code', 'shop_code' ] as $key ) {
+		foreach ( [ 'address', 'in_charge', 'tel', 'fax', 'mail' ] as $key ) {
 			update_term_meta( $term_id, $key, filter_input( INPUT_POST, $key ) );
 		}
+		// Apply the typed codes of the past first, then archive the replaced ones.
+		$this->set_former_shop_codes( $term_id, $this->parse_shop_codes( filter_input( INPUT_POST, self::META_FORMER_CODES ) ) );
+		$this->update_shop_codes(
+			$term_id,
+			filter_input( INPUT_POST, 'wholesaler' ),
+			filter_input( INPUT_POST, 'line_code' ),
+			filter_input( INPUT_POST, 'shop_code' )
+		);
 	}
 
 	/**
@@ -97,6 +105,20 @@ class ModelSupplier extends Singleton {
 			</tr>
 
 		<?php endforeach; ?>
+		<tr>
+			<th>
+				<label for="hanmoto-former-codes"><?php esc_html_e( '過去のコード', 'hanmoto' ); ?></label>
+			</th>
+			<td>
+				<textarea style="box-sizing: border-box" class="widefat" rows="4" id="hanmoto-former-codes"
+					name="<?php echo esc_attr( self::META_FORMER_CODES ); ?>"
+					placeholder="<?php esc_attr_e( '例・日販/B6303/751253', 'hanmoto' ); ?>"
+				><?php echo esc_textarea( implode( "\n", $this->get_former_shop_codes( $tag->term_id ) ) ); ?></textarea>
+				<p class="description">
+					<?php esc_html_e( '取次や番線が変わる前のコードを「取次/番線/書店コード」の形式で1行ずつ記録します。過去の注文を取り込むときに照合されます。上の欄を書き換えると、元のコードが自動でここに追加されます。', 'hanmoto' ); ?>
+				</p>
+			</td>
+		</tr>
 		<tr>
 			<th><label for="hanmoto-address"><?php esc_html_e( '住所', 'hanmoto' ); ?></label></th>
 			<td>
