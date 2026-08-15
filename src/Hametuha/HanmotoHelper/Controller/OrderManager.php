@@ -8,6 +8,7 @@ use Hametuha\HanmotoHelper\Models\ModelEvent;
 use Hametuha\HanmotoHelper\Models\ModelInventory;
 use Hametuha\HanmotoHelper\Models\ModelItem;
 use Hametuha\HanmotoHelper\Models\ModelOrder;
+use Hametuha\HanmotoHelper\Models\ModelOrderFax;
 use Hametuha\HanmotoHelper\Models\ModelSupplier;
 use Hametuha\HanmotoHelper\Pattern\Singleton;
 use Hametuha\HanmotoHelper\Rest\RestBookSearch;
@@ -39,6 +40,7 @@ class OrderManager extends Singleton {
 		ModelDelivery::get_instance();
 		ModelSupplier::get_instance();
 		ModelOrder::get_instance();
+		ModelOrderFax::get_instance();
 		// Importer
 		CsvImporter::get_instance();
 		// REST API
