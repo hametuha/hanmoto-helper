@@ -122,6 +122,9 @@ $table = array_chunk( $slips, ModelOrderFax::PER_PAGE );
 			display: block;
 			margin: 3mm 0 0;
 		}
+		.shop-name.is-long {
+			font-size: 12pt;
+		}
 		.scode {
 			font-weight: normal;
 			font-size: 12pt;
@@ -196,7 +199,7 @@ $table = array_chunk( $slips, ModelOrderFax::PER_PAGE );
 				<th class="cell-store">
 					<span class="agent"><?php echo esc_html( $slip['wholesaler'] ); ?></span>
 					<code class="acode"><?php echo esc_html( $slip['line_code'] ); ?></code><br />
-					<span class="shop-name"><?php echo esc_html( $slip['shop_name'] ); ?></span>
+					<span class="shop-name <?php echo esc_attr( $model->is_long_shop_name( $slip['shop_name'] ) ? 'is-long' : '' ); ?>"><?php echo esc_html( $slip['shop_name'] ); ?></span>
 					<span class="scode-title"><?php esc_html_e( '取次書店コード', 'hanmoto' ); ?></span>
 					<code class="scode"><?php echo esc_html( $slip['shop_code'] ); ?></code>
 				</th>

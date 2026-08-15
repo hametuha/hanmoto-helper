@@ -427,7 +427,7 @@ class ModelOrderFax extends Singleton {
 			'source'     => ( ! empty( $sources ) && ! is_wp_error( $sources ) ) ? $sources[0]->name : '',
 			'in_charge'  => (string) get_post_meta( $order->ID, '_in_charge_of', true ),
 			'note'       => (string) $order->post_excerpt,
-			'shop_name'  => $shop ? $shop->name : '',
+			'shop_name'  => $shop ? $this->shop_display_name( $shop->name ) : '',
 			'wholesaler' => $shop ? (string) get_term_meta( $shop->term_id, 'wholesaler', true ) : '',
 			'line_code'  => $shop ? (string) get_term_meta( $shop->term_id, 'line_code', true ) : '',
 			'shop_code'  => $shop ? (string) get_term_meta( $shop->term_id, 'shop_code', true ) : '',
@@ -437,6 +437,32 @@ class ModelOrderFax extends Singleton {
 			'isbn'       => $product ? (string) get_post_meta( $product->ID, PostType::META_KEY_ISBN, true ) : '',
 			'price'      => is_numeric( $price ) ? (int) $price : 0,
 		];
+	}
+
+	/**
+	 * Normalize a bookshop name for printing.
+	 *
+	 * 全角英数のままだとブラウザがCJKとして1文字ずつ折り返すので、
+	 * 「ＴＳＵＴＡＹＡ　ＢＯＯＫＳＴＯＲＥ」が単語の途中で切れてしまう。
+	 * 半角に直せばスペースで折り返せる。書店名の登録は変えない。
+	 *
+	 * @param string $name Registered name of bookshop.
+	 * @return string
+	 */
+	public function shop_display_name( $name ) {
+		return mb_convert_kana( (string) $name, 'as' );
+	}
+
+	/**
+	 * Should the bookshop name be shrunk to fit in a slip?
+	 *
+	 * 短冊の書店欄はおよそ半角40文字分。それを超えると3行になって窮屈になる。
+	 *
+	 * @param string $name Name of bookshop.
+	 * @return bool
+	 */
+	public function is_long_shop_name( $name ) {
+		return 40 < mb_strwidth( (string) $name );
 	}
 
 	/**
