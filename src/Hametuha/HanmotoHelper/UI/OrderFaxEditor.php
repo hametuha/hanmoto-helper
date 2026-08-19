@@ -121,6 +121,23 @@ class OrderFaxEditor extends Singleton {
 	 */
 	public function render_meta_box( $post ) {
 		wp_nonce_field( 'update_order_fax', '_hanmotofaxnonce', false );
+		if ( 'publish' === $post->post_status ) :
+			?>
+			<div class="notice notice-success inline">
+				<p>
+					<strong><?php esc_html_e( '送付済み', 'hanmoto' ); ?></strong>
+					<?php echo esc_html( mysql2date( __( 'Y年n月j日 H:i', 'hanmoto' ), $post->post_date ) ); ?>
+					<?php esc_html_e( 'に公開されました。入っている注文は「送付済み」として扱われます。', 'hanmoto' ); ?>
+				</p>
+			</div>
+		<?php else : ?>
+			<div class="notice notice-warning inline">
+				<p>
+					<?php esc_html_e( 'この送付分はまだ下書きです。FAXを送ったら「公開」にしてください。公開すると、入っている注文が「送付済み」になります。', 'hanmoto' ); ?>
+				</p>
+			</div>
+			<?php
+		endif;
 		?>
 		<p>
 			<label>

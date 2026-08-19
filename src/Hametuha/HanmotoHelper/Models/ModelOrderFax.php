@@ -54,9 +54,6 @@ class ModelOrderFax extends Singleton {
 		add_filter( 'template_include', [ $this, 'override_template' ] );
 		// 送付分を完全に消したら、注文側に残る紐付けも掃除する。
 		add_action( 'before_delete_post', [ $this, 'before_delete_post' ] );
-		// Filter the order list by the sending status.
-		add_action( 'restrict_manage_posts', [ $this, 'render_fax_filter' ] );
-		add_action( 'pre_get_posts', [ $this, 'filter_by_fax_status' ] );
 	}
 
 	/**
@@ -145,6 +142,7 @@ class ModelOrderFax extends Singleton {
 		$targets   = [];
 		$returning = 0;
 		$sent      = 0;
+		$preparing = 0;
 		foreach ( $ids as $id ) {
 			$order = get_post( $id );
 			if ( ! $order || ModelOrder::post_type() !== $order->post_type ) {
@@ -155,9 +153,15 @@ class ModelOrderFax extends Singleton {
 				++$returning;
 				continue;
 			}
-			if ( $this->get_fax_ids( $id ) ) {
-				// 二重発注は実損になるので、送付済みは除外する。
-				++$sent;
+			$faxes = $this->get_faxes_of_order( $id );
+			if ( $faxes ) {
+				// 二重発注は実損になるので、すでに送付分に入っている注文は除外する。
+				// まだ送っていない（下書きの）送付分なら、そちらに足せばよい。
+				if ( wp_list_filter( $faxes, [ 'sent' => true ] ) ) {
+					++$sent;
+				} else {
+					++$preparing;
+				}
 				continue;
 			}
 			$targets[] = $id;
@@ -166,12 +170,14 @@ class ModelOrderFax extends Singleton {
 			return new \WP_Error( 'bad_request', $this->exclusion_message(
 				__( '短冊にできる注文がありませんでした。', 'hanmoto' ),
 				$returning,
-				$sent
+				$sent,
+				$preparing
 			), [ 'status' => 400 ] );
 		}
 		$post_id = wp_insert_post( [
 			'post_type'   => self::POST_TYPE,
-			'post_status' => 'publish',
+			// 下書きで作る。公開したら「送付済み」の意味になる。
+			'post_status' => 'draft',
 			'post_title'  => sprintf(
 				// translators: %s is date.
 				__( 'FAX送付分 %s', 'hanmoto' ),
@@ -195,11 +201,12 @@ class ModelOrderFax extends Singleton {
 			'message'  => $this->exclusion_message(
 				sprintf(
 					// translators: %d is the number of orders.
-					__( '%d件の注文でFAX送付分を作成しました。', 'hanmoto' ),
+					__( '%d件の注文でFAX送付分を下書きで作成しました。FAXを送ったら「公開」にしてください。', 'hanmoto' ),
 					count( $targets )
 				),
 				$returning,
-				$sent
+				$sent,
+				$preparing
 			),
 			'id'       => $post_id,
 			'edit_url' => get_edit_post_link( $post_id, 'raw' ),
@@ -212,9 +219,10 @@ class ModelOrderFax extends Singleton {
 	 * @param string $message   Base message.
 	 * @param int    $returning Number of returning orders.
 	 * @param int    $sent      Number of already sent orders.
+	 * @param int    $preparing Number of orders which are in a draft fax.
 	 * @return string
 	 */
-	protected function exclusion_message( $message, $returning, $sent ) {
+	protected function exclusion_message( $message, $returning, $sent, $preparing = 0 ) {
 		if ( $returning ) {
 			$message .= "\n" . sprintf(
 				// translators: %d is the number of orders.
@@ -227,6 +235,13 @@ class ModelOrderFax extends Singleton {
 				// translators: %d is the number of orders.
 				__( '送付済みの%d件は二重発注になるので除外しました。再送する場合は既存のFAX送付分を開いて印刷してください。', 'hanmoto' ),
 				$sent
+			);
+		}
+		if ( $preparing ) {
+			$message .= "\n" . sprintf(
+				// translators: %d is the number of orders.
+				__( '準備中の送付分に入っている%d件は除外しました。まとめたい場合はその送付分を開いて追加してください。', 'hanmoto' ),
+				$preparing
 			);
 		}
 		return $message;
@@ -268,70 +283,6 @@ class ModelOrderFax extends Singleton {
 			$template = hanmoto_root_dir() . '/template-parts/hanmoto/order-fax.php';
 		}
 		return $template;
-	}
-
-	/**
-	 * Render the filter of sending status.
-	 *
-	 * @param string $post_type Post type.
-	 * @return void
-	 */
-	public function render_fax_filter( $post_type ) {
-		if ( ModelOrder::post_type() !== $post_type ) {
-			return;
-		}
-		$current = filter_input( INPUT_GET, 'fax_status' );
-		?>
-		<select name="fax_status" aria-label="<?php esc_attr_e( 'FAX送付状況で絞り込み', 'hanmoto' ); ?>">
-			<option value=""><?php esc_html_e( 'FAX送付状況：すべて', 'hanmoto' ); ?></option>
-			<option value="unsent" <?php selected( $current, 'unsent' ); ?>><?php esc_html_e( '未送付の注文', 'hanmoto' ); ?></option>
-			<option value="sent" <?php selected( $current, 'sent' ); ?>><?php esc_html_e( '送付済みの注文', 'hanmoto' ); ?></option>
-		</select>
-		<?php
-	}
-
-	/**
-	 * Filter the order list by the sending status.
-	 *
-	 * @param \WP_Query $query Main query in admin list.
-	 * @return void
-	 */
-	public function filter_by_fax_status( $query ) {
-		if ( ! is_admin() || ! $query->is_main_query() ) {
-			return;
-		}
-		if ( ModelOrder::post_type() !== $query->get( 'post_type' ) ) {
-			return;
-		}
-		$status = filter_input( INPUT_GET, 'fax_status' );
-		if ( ! in_array( $status, [ 'sent', 'unsent' ], true ) ) {
-			return;
-		}
-		$meta_query = $query->get( 'meta_query' );
-		if ( ! is_array( $meta_query ) ) {
-			$meta_query = [];
-		}
-		if ( 'unsent' === $status ) {
-			$meta_query[] = [
-				'relation' => 'OR',
-				[
-					'key'     => self::META_FAX,
-					'compare' => 'NOT EXISTS',
-				],
-				[
-					'key'     => self::META_FAX,
-					'value'   => '',
-					'compare' => '=',
-				],
-			];
-		} else {
-			// 複数の送付分に入っている注文もあるので EXISTS で見る。
-			$meta_query[] = [
-				'key'     => self::META_FAX,
-				'compare' => 'EXISTS',
-			];
-		}
-		$query->set( 'meta_query', $meta_query );
 	}
 
 	/**

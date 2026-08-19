@@ -155,6 +155,13 @@ $table = array_chunk( $slips, ModelOrderFax::PER_PAGE );
 		<button type="button" onclick="window.print();"><?php esc_html_e( '印刷する', 'hanmoto' ); ?></button>
 		<a href="<?php echo esc_url( (string) get_edit_post_link( get_the_ID() ) ); ?>"><?php esc_html_e( '編集画面に戻る', 'hanmoto' ); ?></a>
 	</p>
+	<?php if ( 'publish' !== get_post_status() ) : ?>
+		<p>
+			<strong>
+				<?php esc_html_e( '※ この送付分はまだ「下書き」です。FAXを送ったら編集画面で「公開」にしてください。公開すると注文が「送付済み」になります。', 'hanmoto' ); ?>
+			</strong>
+		</p>
+	<?php endif; ?>
 	<?php if ( 0 < $excluded ) : ?>
 		<p>
 			<strong>

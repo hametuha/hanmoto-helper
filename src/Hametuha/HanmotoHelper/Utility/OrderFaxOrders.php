@@ -41,28 +41,46 @@ trait OrderFaxOrders {
 	}
 
 	/**
-	 * Get the other faxes which an order belongs to.
+	 * Get the faxes which an order belongs to.
+	 *
+	 * 公開されている送付分に入っていれば「送付済み」、下書きだけなら「準備中」。
+	 * FAXを送ったかどうかは送付分を公開したかどうかで表す。
 	 *
 	 * @param int $order_id Post ID of order.
-	 * @param int $fax_id   Post ID of fax to exclude.
-	 * @return array[] id, title and edit_url of each fax.
+	 * @return array[] id, title, status, sent and edit_url of each fax.
 	 */
-	public function get_other_faxes( $order_id, $fax_id ) {
-		$others = [];
+	public function get_faxes_of_order( $order_id ) {
+		$faxes = [];
 		foreach ( $this->get_fax_ids( $order_id ) as $id ) {
-			if ( (int) $fax_id === $id ) {
-				continue;
-			}
 			$fax = get_post( $id );
 			if ( ! $fax || ModelOrderFax::POST_TYPE !== $fax->post_type ) {
 				// 消えた送付分への参照は無視する。
 				continue;
 			}
-			$others[] = [
+			$faxes[] = [
 				'id'       => $id,
 				'title'    => get_the_title( $fax ),
+				'status'   => $fax->post_status,
+				'sent'     => 'publish' === $fax->post_status,
 				'edit_url' => (string) get_edit_post_link( $id, 'raw' ),
 			];
+		}
+		return $faxes;
+	}
+
+	/**
+	 * Get the other faxes which an order belongs to.
+	 *
+	 * @param int $order_id Post ID of order.
+	 * @param int $fax_id   Post ID of fax to exclude.
+	 * @return array[]
+	 */
+	public function get_other_faxes( $order_id, $fax_id ) {
+		$others = [];
+		foreach ( $this->get_faxes_of_order( $order_id ) as $fax ) {
+			if ( (int) $fax_id !== $fax['id'] ) {
+				$others[] = $fax;
+			}
 		}
 		return $others;
 	}

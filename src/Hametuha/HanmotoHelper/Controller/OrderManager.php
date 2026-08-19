@@ -20,6 +20,7 @@ use Hametuha\HanmotoHelper\Rest\RestShopSearch;
 use Hametuha\HanmotoHelper\UI\CsvImporter;
 use Hametuha\HanmotoHelper\UI\ItemsList;
 use Hametuha\HanmotoHelper\UI\OrderFaxEditor;
+use Hametuha\HanmotoHelper\UI\OrderList;
 use Hametuha\HanmotoHelper\UI\StatisticHandler;
 
 /**
@@ -44,8 +45,9 @@ class OrderManager extends Singleton {
 		ModelSupplier::get_instance();
 		ModelOrder::get_instance();
 		ModelOrderFax::get_instance();
-		// Editor screen of fax.
+		// Screens of fax.
 		OrderFaxEditor::get_instance();
+		OrderList::get_instance();
 		// Importer
 		CsvImporter::get_instance();
 		// REST API
