@@ -2,18 +2,21 @@
 
 namespace Hametuha\HanmotoHelper\Models;
 
-use Hametuha\HanmotoHelper\Controller\PostType;
 use Hametuha\HanmotoHelper\Pattern\Singleton;
+use Hametuha\HanmotoHelper\Utility\OrderFaxOrders;
 
 /**
  * 注文短冊（FAX送付分）
  *
  * 書店注文をまとめて「FAX送付分」として記録し、取次に送る短冊を印刷する。
- * 送付済みの注文には _order_fax が付くので、二重発注を防げる。
+ * 注文側の _order_fax は複数値。1つの注文が複数の送付分に入ることがある。
+ * 一括操作は送付済みを弾くが、編集画面からは人間の判断で追加できる。
  *
  * @package hanmoto
  */
 class ModelOrderFax extends Singleton {
+
+	use OrderFaxOrders;
 
 	/**
 	 * Post type name.
@@ -48,9 +51,9 @@ class ModelOrderFax extends Singleton {
 		add_action( 'admin_head', [ $this, 'enqueue_assets' ] );
 		add_filter( 'bulk_actions-edit-' . ModelOrder::post_type(), [ $this, 'add_bulk_actions' ] );
 		add_action( 'rest_api_init', [ $this, 'register_apis' ] );
-		add_action( 'add_meta_boxes', [ $this, 'add_meta_boxes' ] );
-		add_action( 'save_post_' . self::POST_TYPE, [ $this, 'save_post' ], 10, 2 );
 		add_filter( 'template_include', [ $this, 'override_template' ] );
+		// 送付分を完全に消したら、注文側に残る紐付けも掃除する。
+		add_action( 'before_delete_post', [ $this, 'before_delete_post' ] );
 		// Filter the order list by the sending status.
 		add_action( 'restrict_manage_posts', [ $this, 'render_fax_filter' ] );
 		add_action( 'pre_get_posts', [ $this, 'filter_by_fax_status' ] );
@@ -132,20 +135,6 @@ class ModelOrderFax extends Singleton {
 	}
 
 	/**
-	 * Convert comma separated IDs to the array of order IDs.
-	 *
-	 * @param string|int[] $ids IDs to parse.
-	 * @return int[]
-	 */
-	protected function parse_ids( $ids ) {
-		if ( ! is_array( $ids ) ) {
-			$ids = explode( ',', (string) $ids );
-		}
-		$ids = array_values( array_unique( array_filter( array_map( 'intval', $ids ) ) ) );
-		return $ids;
-	}
-
-	/**
 	 * Create a fax post from the selected orders.
 	 *
 	 * @param \WP_REST_Request $request REST request.
@@ -166,7 +155,7 @@ class ModelOrderFax extends Singleton {
 				++$returning;
 				continue;
 			}
-			if ( get_post_meta( $id, self::META_FAX, true ) ) {
+			if ( $this->get_fax_ids( $id ) ) {
 				// 二重発注は実損になるので、送付済みは除外する。
 				++$sent;
 				continue;
@@ -195,7 +184,7 @@ class ModelOrderFax extends Singleton {
 		}
 		foreach ( $targets as $id ) {
 			add_post_meta( $post_id, self::META_ORDER, $id );
-			update_post_meta( $id, self::META_FAX, $post_id );
+			add_post_meta( $id, self::META_FAX, $post_id );
 		}
 		// 前回の宛先を初期値にしておく。毎回入力しなくてよい。
 		$last = $this->get_last_fax_to( $post_id );
@@ -269,264 +258,6 @@ class ModelOrderFax extends Singleton {
 	}
 
 	/**
-	 * Register meta box.
-	 *
-	 * @param string $post_type Post type.
-	 * @return void
-	 */
-	public function add_meta_boxes( $post_type ) {
-		if ( self::POST_TYPE !== $post_type ) {
-			return;
-		}
-		add_meta_box( 'order-fax-meta', __( 'FAX送付情報', 'hanmoto' ), [ $this, 'render_meta_box' ], $post_type, 'normal', 'high' );
-	}
-
-	/**
-	 * Render meta box.
-	 *
-	 * @param \WP_Post $post Post object.
-	 * @return void
-	 */
-	public function render_meta_box( $post ) {
-		wp_nonce_field( 'update_order_fax', '_hanmotofaxnonce', false );
-		$slips = $this->get_slips( $post->ID );
-		?>
-		<p>
-			<label>
-				<?php esc_html_e( '宛先', 'hanmoto' ); ?><br />
-				<input class="regular-text" type="text" name="fax_to"
-					value="<?php echo esc_attr( get_post_meta( $post->ID, self::META_FAX_TO, true ) ); ?>"
-					placeholder="<?php esc_attr_e( '例・八木書店', 'hanmoto' ); ?>" />
-			</label>
-			<span class="description"><?php esc_html_e( '短冊の見出しに「◯◯様」と入ります。', 'hanmoto' ); ?></span>
-		</p>
-		<?php if ( empty( $slips ) ) : ?>
-			<div class="notice notice-error inline">
-				<p><?php esc_html_e( '注文が紐付けられていません。', 'hanmoto' ); ?></p>
-			</div>
-			<?php
-			return;
-		endif;
-		?>
-		<p>
-			<a class="button button-primary" href="<?php echo esc_url( get_permalink( $post ) ); ?>" target="_blank" rel="noopener">
-				<?php esc_html_e( '短冊を印刷', 'hanmoto' ); ?>
-			</a>
-			<span class="description">
-				<?php
-				printf(
-					// translators: %1$d is the number of orders, %2$d is the number of books, %3$d is the number of pages.
-					esc_html__( '%1$d件 %2$d冊（%3$dページ）', 'hanmoto' ),
-					count( $slips ),
-					esc_html( $this->count_books( $slips ) ),
-					(int) ceil( count( $slips ) / self::PER_PAGE )
-				);
-				?>
-			</span>
-		</p>
-		<table class="widefat striped">
-			<thead>
-			<tr>
-				<th><?php esc_html_e( '注文', 'hanmoto' ); ?></th>
-				<th><?php esc_html_e( '受注日', 'hanmoto' ); ?></th>
-				<th><?php esc_html_e( '書店', 'hanmoto' ); ?></th>
-				<th><?php esc_html_e( '商品', 'hanmoto' ); ?></th>
-				<th style="text-align: right;"><?php esc_html_e( '冊数', 'hanmoto' ); ?></th>
-			</tr>
-			</thead>
-			<tbody>
-			<?php foreach ( $slips as $slip ) : ?>
-				<tr>
-					<td>
-						<a href="<?php echo esc_url( (string) get_edit_post_link( $slip['order']->ID ) ); ?>">
-							#<?php echo esc_html( $slip['order']->ID ); ?>
-						</a>
-					</td>
-					<td><?php echo esc_html( mysql2date( 'Y-m-d', $slip['order']->post_date ) ); ?></td>
-					<td><?php echo esc_html( $slip['shop_name'] ); ?></td>
-					<td><?php echo esc_html( $slip['title'] ); ?></td>
-					<td style="text-align: right;"><?php echo esc_html( number_format( $slip['amount'] ) ); ?></td>
-				</tr>
-			<?php endforeach; ?>
-			</tbody>
-		</table>
-		<?php
-	}
-
-	/**
-	 * Save meta data.
-	 *
-	 * @param int      $post_id Post ID.
-	 * @param \WP_Post $post    Post object.
-	 * @return void
-	 */
-	public function save_post( $post_id, $post ) {
-		if ( ! wp_verify_nonce( filter_input( INPUT_POST, '_hanmotofaxnonce' ), 'update_order_fax' ) ) {
-			return;
-		}
-		update_post_meta( $post_id, self::META_FAX_TO, trim( (string) filter_input( INPUT_POST, 'fax_to' ) ) );
-	}
-
-	/**
-	 * Get the slips of a fax post.
-	 *
-	 * 印刷に必要な値をすべて解決して返す。テンプレートはこれを並べるだけでよい。
-	 * 返品などで短冊にできないものは除外する。
-	 *
-	 * @param int $post_id Post ID of fax.
-	 * @return array[]
-	 */
-	public function get_slips( $post_id ) {
-		$ids = $this->parse_ids( get_post_meta( $post_id, self::META_ORDER ) );
-		if ( empty( $ids ) ) {
-			return [];
-		}
-		$orders = get_posts( [
-			'post_type'   => ModelOrder::post_type(),
-			'post__in'    => $ids,
-			'post_status' => 'any',
-			'numberposts' => -1,
-		] );
-		$slips  = [];
-		foreach ( $orders as $order ) {
-			$amount = (int) get_post_meta( $order->ID, '_amount', true );
-			if ( 0 >= $amount ) {
-				continue;
-			}
-			$slips[] = $this->build_slip( $order, $amount );
-		}
-		// 受注日順。同じ日は書店ごと・書名ごとにまとめると仕分けやすい。
-		usort( $slips, function ( $a, $b ) {
-			foreach ( [ 'date', 'shop_name', 'title' ] as $key ) {
-				$compared = strcmp( $a[ $key ], $b[ $key ] );
-				if ( 0 !== $compared ) {
-					return $compared;
-				}
-			}
-			return $a['order']->ID - $b['order']->ID;
-		} );
-		return $slips;
-	}
-
-	/**
-	 * Resolve everything printed on a slip.
-	 *
-	 * @param \WP_Post $order  Order post.
-	 * @param int      $amount Amount of books.
-	 * @return array
-	 */
-	protected function build_slip( $order, $amount ) {
-		$shop    = $this->get_bookshop_term( $order->ID );
-		$sources = get_the_terms( $order, 'source' );
-		$product = $order->post_parent ? get_post( $order->post_parent ) : null;
-		$price   = $product ? get_post_meta( $product->ID, '_regular_price', true ) : '';
-		return [
-			'order'      => $order,
-			'amount'     => $amount,
-			'date'       => mysql2date( 'Y-m-d', $order->post_date ),
-			'source'     => ( ! empty( $sources ) && ! is_wp_error( $sources ) ) ? $sources[0]->name : '',
-			'in_charge'  => (string) get_post_meta( $order->ID, '_in_charge_of', true ),
-			'note'       => (string) $order->post_excerpt,
-			'shop_name'  => $shop ? $this->shop_display_name( $shop->name ) : '',
-			'wholesaler' => $shop ? (string) get_term_meta( $shop->term_id, 'wholesaler', true ) : '',
-			'line_code'  => $shop ? (string) get_term_meta( $shop->term_id, 'line_code', true ) : '',
-			'shop_code'  => $shop ? (string) get_term_meta( $shop->term_id, 'shop_code', true ) : '',
-			'title'      => $product ? get_the_title( $product ) : '',
-			'authors'    => $product ? (string) get_post_meta( $product->ID, 'hanmoto_authors', true ) : '',
-			'publisher'  => $product ? (string) get_post_meta( $product->ID, 'hanmoto_publisher', true ) : '',
-			'isbn'       => $product ? (string) get_post_meta( $product->ID, PostType::META_KEY_ISBN, true ) : '',
-			'price'      => is_numeric( $price ) ? (int) $price : 0,
-		];
-	}
-
-	/**
-	 * Normalize a bookshop name for printing.
-	 *
-	 * 全角英数のままだとブラウザがCJKとして1文字ずつ折り返すので、
-	 * 「ＴＳＵＴＡＹＡ　ＢＯＯＫＳＴＯＲＥ」が単語の途中で切れてしまう。
-	 * 半角に直せばスペースで折り返せる。書店名の登録は変えない。
-	 *
-	 * @param string $name Registered name of bookshop.
-	 * @return string
-	 */
-	public function shop_display_name( $name ) {
-		return mb_convert_kana( (string) $name, 'as' );
-	}
-
-	/**
-	 * Should the bookshop name be shrunk to fit in a slip?
-	 *
-	 * 短冊の書店欄はおよそ半角40文字分。それを超えると3行になって窮屈になる。
-	 *
-	 * @param string $name Name of bookshop.
-	 * @return bool
-	 */
-	public function is_long_shop_name( $name ) {
-		return 40 < mb_strwidth( (string) $name );
-	}
-
-	/**
-	 * Get the bookshop term of an order.
-	 *
-	 * @param int $order_id Post ID of order.
-	 * @return \WP_Term|null
-	 */
-	protected function get_bookshop_term( $order_id ) {
-		$terms = get_the_terms( $order_id, 'supplier' );
-		if ( empty( $terms ) || is_wp_error( $terms ) ) {
-			return null;
-		}
-		return $terms[0];
-	}
-
-	/**
-	 * Count total books of slips.
-	 *
-	 * @param array[] $slips Slips.
-	 * @return int
-	 */
-	public function count_books( $slips ) {
-		$total = 0;
-		foreach ( $slips as $slip ) {
-			$total += $slip['amount'];
-		}
-		return $total;
-	}
-
-	/**
-	 * Get publishers of slips.
-	 *
-	 * @param array[] $slips Slips.
-	 * @return string
-	 */
-	public function get_publishers( $slips ) {
-		$publishers = [];
-		foreach ( $slips as $slip ) {
-			if ( '' !== $slip['publisher'] && ! in_array( $slip['publisher'], $publishers, true ) ) {
-				$publishers[] = $slip['publisher'];
-			}
-		}
-		return implode( '・', $publishers );
-	}
-
-	/**
-	 * Get order number printed on a slip.
-	 *
-	 * 旧システムはCSVの連番に経路を埋め込んでいたが、いまは注文経路がタクソノミーにある。
-	 *
-	 * @param array $slip Slip.
-	 * @return string
-	 */
-	public function get_order_number( $slip ) {
-		if ( $slip['source'] ) {
-			// translators: %1$s is order source, %2$d is order ID.
-			return sprintf( __( '%1$sNo.%2$d', 'hanmoto' ), $slip['source'], $slip['order']->ID );
-		}
-		// translators: %d is order ID.
-		return sprintf( __( 'No.%d', 'hanmoto' ), $slip['order']->ID );
-	}
-
-	/**
 	 * Override template for printing.
 	 *
 	 * @param string $template Template file.
@@ -594,12 +325,29 @@ class ModelOrderFax extends Singleton {
 				],
 			];
 		} else {
+			// 複数の送付分に入っている注文もあるので EXISTS で見る。
 			$meta_query[] = [
 				'key'     => self::META_FAX,
-				'value'   => '',
-				'compare' => '!=',
+				'compare' => 'EXISTS',
 			];
 		}
 		$query->set( 'meta_query', $meta_query );
+	}
+
+	/**
+	 * Clean up the links when a fax is deleted for good.
+	 *
+	 * 掃除しないと、注文が永久に「送付済み」のまま一括操作から弾かれる。
+	 * ゴミ箱は復元できるので、完全削除のときだけ掃除する。
+	 *
+	 * @param int $post_id Post ID being deleted.
+	 * @return void
+	 */
+	public function before_delete_post( $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post || self::POST_TYPE !== $post->post_type ) {
+			return;
+		}
+		$this->detach_orders( $post_id, $this->get_order_ids( $post_id ) );
 	}
 }
