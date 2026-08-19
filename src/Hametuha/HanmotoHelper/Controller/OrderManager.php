@@ -8,14 +8,19 @@ use Hametuha\HanmotoHelper\Models\ModelEvent;
 use Hametuha\HanmotoHelper\Models\ModelInventory;
 use Hametuha\HanmotoHelper\Models\ModelItem;
 use Hametuha\HanmotoHelper\Models\ModelOrder;
+use Hametuha\HanmotoHelper\Models\ModelOrderFax;
 use Hametuha\HanmotoHelper\Models\ModelSupplier;
 use Hametuha\HanmotoHelper\Pattern\Singleton;
 use Hametuha\HanmotoHelper\Rest\RestBookSearch;
 use Hametuha\HanmotoHelper\Rest\RestInventoryStats;
+use Hametuha\HanmotoHelper\Rest\RestOrderFaxCandidates;
+use Hametuha\HanmotoHelper\Rest\RestOrderFaxOrders;
 use Hametuha\HanmotoHelper\Rest\RestOrderRegister;
 use Hametuha\HanmotoHelper\Rest\RestShopSearch;
 use Hametuha\HanmotoHelper\UI\CsvImporter;
 use Hametuha\HanmotoHelper\UI\ItemsList;
+use Hametuha\HanmotoHelper\UI\OrderFaxEditor;
+use Hametuha\HanmotoHelper\UI\OrderList;
 use Hametuha\HanmotoHelper\UI\StatisticHandler;
 
 /**
@@ -39,6 +44,10 @@ class OrderManager extends Singleton {
 		ModelDelivery::get_instance();
 		ModelSupplier::get_instance();
 		ModelOrder::get_instance();
+		ModelOrderFax::get_instance();
+		// Screens of fax.
+		OrderFaxEditor::get_instance();
+		OrderList::get_instance();
 		// Importer
 		CsvImporter::get_instance();
 		// REST API
@@ -46,6 +55,8 @@ class OrderManager extends Singleton {
 		RestShopSearch::get_instance();
 		RestBookSearch::get_instance();
 		RestOrderRegister::get_instance();
+		RestOrderFaxOrders::get_instance();
+		RestOrderFaxCandidates::get_instance();
 		// Register Screen
 		add_action( 'admin_menu', [ $this, 'admin_menu' ] );
 		add_action( 'admin_bar_menu', [ $this, 'admin_bar' ], 20 );
