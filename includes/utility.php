@@ -125,27 +125,51 @@ function hanmoto_isbn10( $isbn13 ) {
  * @return array|WP_Error
  */
 function hanmoto_rakuten_product( $isbn ) {
-	$rakuten_app_id = \Hametuha\HanmotoHelper\Controller\Settings::get_instance()->get_setting( 'rakuten_app_id' );
-	if ( empty( $rakuten_app_id ) ) {
-		return new WP_Error( 'no_app_id', __( '楽天アプリIDが設定されていません。', 'hanmoto' ) );
+	$settings           = \Hametuha\HanmotoHelper\Controller\Settings::get_instance();
+	$rakuten_app_id     = $settings->get_setting( 'rakuten_app_id' );
+	$rakuten_access_key = $settings->get_setting( 'rakuten_access_key' );
+	if ( empty( $rakuten_app_id ) || empty( $rakuten_access_key ) ) {
+		return new WP_Error( 'no_credentials', __( '楽天アプリIDまたはアクセスキーが設定されていません。', 'hanmoto' ) );
 	}
-	$rakuten_affiliate_id = \Hametuha\HanmotoHelper\Controller\Settings::get_instance()->get_setting( 'rakuten_affiliate_id' ) ?: '0e9cde67.8fb388cd.0e9cde68.6632f7db';
+	$rakuten_affiliate_id = $settings->get_setting( 'rakuten_affiliate_id' ) ?: '0e9cde67.8fb388cd.0e9cde68.6632f7db';
 	// Check cache exists.
-	$cache = wp_cache_get( $isbn, 'hanmotoo_rakuten' );
+	$cache = wp_cache_get( $isbn, 'hanmoto_rakuten' );
 	if ( false !== $cache ) {
 		return $cache;
 	}
 	// Generate request URL.
+	// NOTE: 2026年の移行でドメインが app.rakuten.co.jp から openapi.rakuten.co.jp へ変更され、
+	// accessKey による認証が必須になった。エンドポイントのパスとバージョンは従来通り。
 	$url = add_query_arg( [
 		'format'        => 'json',
 		'isbn'          => $isbn,
 		'affiliateId'   => $rakuten_affiliate_id,
 		'applicationId' => $rakuten_app_id,
-	], 'https://app.rakuten.co.jp/services/api/BooksBook/Search/20170404' );
+		'accessKey'     => $rakuten_access_key,
+	], 'https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404' );
+	// 2026年の移行後、新APIは Origin / Referer の両ヘッダを要求し、
+	// その値はアプリに登録した「リファラ」と一致している必要がある。
+	// home_url() を使うことで環境（本番・ローカル）ごとに登録済みドメインを送る。
+	$referrer = apply_filters( 'hanmoto_rakuten_referrer', home_url( '/' ) );
 	// Get result.
-	$result = wp_remote_get( $url );
+	$result = wp_remote_get( $url, [
+		'headers' => [
+			'Origin'  => $referrer,
+			'Referer' => $referrer,
+		],
+	] );
 	if ( is_wp_error( $result ) ) {
 		return $result;
+	}
+	$code = (int) wp_remote_retrieve_response_code( $result );
+	if ( 200 !== $code ) {
+		// 403(リファラ不許可)や429(レート制限)を「結果なし」と誤認しないよう、実エラーを返す。
+		return new WP_Error( 'rakuten_http_error', sprintf(
+			// translators: %1$d is HTTP status code, %2$s is response body.
+			__( '楽天APIがHTTP %1$dを返しました: %2$s', 'hanmoto' ),
+			$code,
+			wp_remote_retrieve_body( $result )
+		) );
 	}
 	$response = json_decode( $result['body'], true );
 	if ( empty( $response['Items'] ) ) {
