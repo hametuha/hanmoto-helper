@@ -166,7 +166,14 @@ class Settings extends Singleton {
 						'label'       => __( '楽天アプリID', 'hanmoto' ),
 						'type'        => 'text',
 						'placeholder' => '1051183079836014250',
-						'help'        => __( 'If set, generate link to Rakuten Books.', 'hanmoto' ),
+						'help'        => __( '楽天ウェブサービスのアプリID。アプリIDとアクセスキーの両方が設定されている場合のみ、楽天ブックスへのリンクを生成します。', 'hanmoto' ),
+					],
+					[
+						'id'          => 'rakuten_access_key',
+						'label'       => __( '楽天アクセスキー', 'hanmoto' ),
+						'type'        => 'text',
+						'placeholder' => '',
+						'help'        => __( '2026年の楽天ウェブサービス移行で必須になった認証情報。アプリ管理画面で発行できます。', 'hanmoto' ),
 					],
 					[
 						'id'          => 'rakuten_affiliate_id',
