@@ -65,6 +65,13 @@ class OrderFaxEditor extends Singleton {
 			.hanmoto-fax-orders tr.is-not-printable td {
 				color: #a7aaad;
 			}
+			.hanmoto-fax-orders tfoot th {
+				font-weight: 600;
+			}
+			.hanmoto-fax-orders tfoot .description {
+				font-weight: normal;
+				margin-left: 6px;
+			}
 			.hanmoto-fax-badge {
 				display: inline-block;
 				margin-left: 6px;
@@ -167,6 +174,13 @@ class OrderFaxEditor extends Singleton {
 				</tr>
 				</thead>
 				<tbody></tbody>
+				<tfoot class="hanmoto-fax-total">
+				<tr>
+					<th colspan="4" class="hanmoto-fax-total-label"></th>
+					<th class="column-amount hanmoto-fax-total-amount"></th>
+					<th></th>
+				</tr>
+				</tfoot>
 			</table>
 			<div class="hanmoto-fax-add">
 				<h4><?php esc_html_e( '注文を追加', 'hanmoto' ); ?></h4>

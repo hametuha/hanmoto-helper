@@ -222,7 +222,7 @@ $table = array_chunk( $slips, ModelOrderFax::PER_PAGE );
 					（<?php echo esc_html( $model->get_order_number( $slip ) ); ?>）
 					<br />
 					<small><?php esc_html_e( '【ご担当者様】', 'hanmoto' ); ?></small><br />
-					<?php echo esc_html( $slip['in_charge'] ? $slip['in_charge'] : __( '記載なし', 'hanmoto' ) ); ?>
+					<?php echo esc_html( $model->get_in_charge( $slip ) ); ?>
 					<?php if ( $slip['note'] ) : ?>
 						<br />
 						<span class="order-note">※<?php echo esc_html( $slip['note'] ); ?></span>

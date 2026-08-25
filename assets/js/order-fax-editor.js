@@ -19,6 +19,9 @@ if ( container.length && window.HanmotoOrderFax ) {
 	const path = `hanmoto/v1/order-fax/${ faxId }/orders`;
 	const tbody = container.find( '.hanmoto-fax-orders tbody' );
 	const stats = container.find( '.hanmoto-fax-stats' );
+	const footer = container.find( '.hanmoto-fax-total' );
+	const footerLabel = footer.find( '.hanmoto-fax-total-label' );
+	const footerAmount = footer.find( '.hanmoto-fax-total-amount' );
 	const results = container.find( '.hanmoto-fax-results' );
 	const query = container.find( '.hanmoto-fax-query' );
 	const spinner = container.find( '.hanmoto-fax-spinner' );
@@ -105,6 +108,43 @@ if ( container.length && window.HanmotoOrderFax ) {
 			stat.total,
 			stat.books,
 			stat.pages
+		) );
+		renderTotal( orders, stat );
+	};
+
+	/**
+	 * 合計をテーブルの脚（tfoot）に描く。
+	 *
+	 * 冊数は印刷対象の合計。印刷対象外（返品・冊数なし）は短冊にならないので足さない。
+	 *
+	 * @param {Array}  orders 注文。
+	 * @param {Object} stat   集計。
+	 */
+	const renderTotal = ( orders, stat ) => {
+		if ( ! orders.length ) {
+			footer.hide();
+			return;
+		}
+		footer.show();
+		footerLabel.text( sprintf(
+			// translators: %d is the number of printable orders.
+			__( '合計 %d件', 'hanmoto' ),
+			stat.total
+		) );
+		const excluded = orders.filter( ( order ) => ! order.printable ).length;
+		if ( excluded ) {
+			footerLabel.append(
+				$( '<span class="description" />' ).text( sprintf(
+					// translators: %d is the number of orders which are not printed.
+					__( '（印刷対象外の%d件を除く）', 'hanmoto' ),
+					excluded
+				) )
+			);
+		}
+		footerAmount.text( sprintf(
+			// translators: %d is the total amount of books.
+			__( '%d冊', 'hanmoto' ),
+			stat.books
 		) );
 	};
 
