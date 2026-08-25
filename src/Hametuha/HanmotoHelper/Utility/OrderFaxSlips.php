@@ -174,6 +174,27 @@ trait OrderFaxSlips {
 	}
 
 	/**
+	 * Get the person in charge printed on a slip.
+	 *
+	 * 注文の担当者は敬称抜きで登録されているので、印刷するときに「様」を足す。
+	 * すでに敬称が入っている古い注文もあるので、その場合は二重にしない。
+	 *
+	 * @param array $slip Slip.
+	 * @return string
+	 */
+	public function get_in_charge( $slip ) {
+		$name = trim( (string) $slip['in_charge'] );
+		if ( '' === $name ) {
+			return __( '記載なし', 'hanmoto' );
+		}
+		if ( preg_match( '/(様|さま|サマ|殿|さん|氏)\z/u', $name ) ) {
+			return $name;
+		}
+		// translators: %s is the name of the person in charge.
+		return sprintf( __( '%s様', 'hanmoto' ), $name );
+	}
+
+	/**
 	 * Get order number printed on a slip.
 	 *
 	 * 旧システムはCSVの連番に経路を埋め込んでいたが、いまは注文経路がタクソノミーにある。
