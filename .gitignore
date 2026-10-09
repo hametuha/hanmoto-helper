@@ -2,6 +2,5 @@ node_modules/
 dist/
 wordpress/
 vendor/
-composer.lock
 wp-dependencies.json
 tmp/
