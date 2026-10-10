@@ -12,7 +12,7 @@ echo "Building Hanmoto Helper v${VERSION}..."
 composer install --no-dev --prefer-dist
 
 # Install NPM.
-npm install
+npm ci --ignore-scripts
 npm run package
 
 # Create README.txt
