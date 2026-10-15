@@ -72,13 +72,13 @@ const InventoryAndStock = ( props ) => {
 						// translators: %1$s is variation name, %2$d is current stock.
 						__( '%1$s (在庫: %2$d)', 'hanmoto' ),
 						v.name,
-						v.stock || 0
+						v.stock || 0,
 					);
 				} else {
 					label = sprintf(
 						// translators: %s is variation name.
 						__( '%s (在庫管理なし)', 'hanmoto' ),
-						v.name
+						v.name,
 					);
 				}
 				return { value: v.id, label };

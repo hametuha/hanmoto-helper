@@ -13,7 +13,7 @@
 		"build:js": "grab-deps js assets/js dist/js",
 		"dump": "grab-deps dump dist",
 		"fix": "npm run fix:js && npm run fix:css",
-		"fix:js": "wp-scripts lint-js --fix ./assets/js",
+		"fix:js": "wp-scripts lint-js ./assets/js --fix",
 		"fix:css": "stylelint --fix assets/scss",
 		"lint": "npm run lint:css && npm run lint:js",
 		"lint:css": "wp-scripts lint-style './assets/scss/**/*.scss'",

@@ -68,9 +68,9 @@ if ( container.length && window.HanmotoOrderFax ) {
 			tbody.append(
 				$( '<tr />' ).append(
 					$( '<td colspan="6" />' ).text(
-						__( '注文が入っていません。下の検索から追加してください。', 'hanmoto' )
-					)
-				)
+						__( '注文が入っていません。下の検索から追加してください。', 'hanmoto' ),
+					),
+				),
 			);
 		}
 		orders.forEach( ( order ) => {
@@ -97,8 +97,8 @@ if ( container.length && window.HanmotoOrderFax ) {
 				$( '<td class="column-action" />' ).append(
 					$( '<button type="button" class="button button-small" />' )
 						.text( __( '外す', 'hanmoto' ) )
-						.on( 'click', () => detach( order ) )
-				)
+						.on( 'click', () => detach( order ) ),
+				),
 			);
 			tbody.append( row );
 		} );
@@ -107,7 +107,7 @@ if ( container.length && window.HanmotoOrderFax ) {
 			__( '%1$d件 %2$d冊（%3$dページ）', 'hanmoto' ),
 			stat.total,
 			stat.books,
-			stat.pages
+			stat.pages,
 		) );
 		renderTotal( orders, stat );
 	};
@@ -129,7 +129,7 @@ if ( container.length && window.HanmotoOrderFax ) {
 		footerLabel.text( sprintf(
 			// translators: %d is the number of printable orders.
 			__( '合計 %d件', 'hanmoto' ),
-			stat.total
+			stat.total,
 		) );
 		const excluded = orders.filter( ( order ) => ! order.printable ).length;
 		if ( excluded ) {
@@ -137,14 +137,14 @@ if ( container.length && window.HanmotoOrderFax ) {
 				$( '<span class="description" />' ).text( sprintf(
 					// translators: %d is the number of orders which are not printed.
 					__( '（印刷対象外の%d件を除く）', 'hanmoto' ),
-					excluded
-				) )
+					excluded,
+				) ),
 			);
 		}
 		footerAmount.text( sprintf(
 			// translators: %d is the total amount of books.
 			__( '%d冊', 'hanmoto' ),
-			stat.books
+			stat.books,
 		) );
 	};
 
@@ -157,7 +157,7 @@ if ( container.length && window.HanmotoOrderFax ) {
 		const message = order.other_faxes && order.other_faxes.length
 			? __( 'この送付分から外します。他の送付分に入っている分はそのまま残ります。', 'hanmoto' )
 			: __( 'この送付分から外します。注文は「未送付」に戻ります。', 'hanmoto' );
-		// eslint-disable-next-line no-alert
+
 		if ( ! window.confirm( message ) ) {
 			return;
 		}
@@ -170,7 +170,6 @@ if ( container.length && window.HanmotoOrderFax ) {
 			// 外した注文が候補に戻るので、検索結果は消しておく。
 			results.empty();
 		} ).catch( ( res ) => {
-			// eslint-disable-next-line no-alert
 			window.alert( res.message );
 		} );
 	};
@@ -181,7 +180,6 @@ if ( container.length && window.HanmotoOrderFax ) {
 	const attach = () => {
 		const ids = results.find( 'input:checked' ).map( ( index, input ) => $( input ).val() ).get();
 		if ( ! ids.length ) {
-			// eslint-disable-next-line no-alert
 			window.alert( __( '追加する注文が選ばれていません。', 'hanmoto' ) );
 			return;
 		}
@@ -194,7 +192,6 @@ if ( container.length && window.HanmotoOrderFax ) {
 			results.empty();
 			query.val( '' );
 		} ).catch( ( res ) => {
-			// eslint-disable-next-line no-alert
 			window.alert( res.message );
 		} );
 	};
@@ -225,7 +222,7 @@ if ( container.length && window.HanmotoOrderFax ) {
 					order.date,
 					order.shop_name,
 					order.title,
-					order.amount
+					order.amount,
 				) ) );
 				const mark = badge( order.other_faxes );
 				if ( mark ) {
@@ -237,8 +234,8 @@ if ( container.length && window.HanmotoOrderFax ) {
 				$( '<p />' ).append(
 					$( '<button type="button" class="button button-primary" />' )
 						.text( __( '選んだ注文を追加', 'hanmoto' ) )
-						.on( 'click', attach )
-				)
+						.on( 'click', attach ),
+				),
 			);
 		} ).catch( ( res ) => {
 			results.append( $( '<p />' ).text( res.message ) );
