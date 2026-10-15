@@ -13,14 +13,14 @@
 		"build:js": "grab-deps js assets/js dist/js",
 		"dump": "grab-deps dump dist",
 		"fix": "npm run fix:js && npm run fix:css",
-		"fix:js": "eslint --fix -c .eslintrc assets/js",
+		"fix:js": "wp-scripts lint-js --fix ./assets/js",
 		"fix:css": "stylelint --fix assets/scss",
 		"lint": "npm run lint:css && npm run lint:js",
 		"lint:css": "wp-scripts lint-style './assets/scss/**/*.scss'",
 		"lint:js": "wp-scripts lint-js ./assets/js"
 	},
 	"engines": {
-		"node": ">= 24.13.0"
+		"node": ">= 24.15.0"
 	},
 	"author": "Hametuha INC.",
 	"license": "LGPL-3.0-or-later",
@@ -29,6 +29,7 @@
 		"@wordpress/env": "^11.16",
 		"@wordpress/scripts": "^36.0.0",
 		"autoprefixer": "^10.6.1",
+		"globals": "^17.13.0",
 		"npm-watch": "^0.13.0",
 		"postcss": "^8.4.33",
 		"postcss-cli": "^12.0.0",
