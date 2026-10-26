@@ -26,8 +26,8 @@
 	"license": "LGPL-3.0-or-later",
 	"devDependencies": {
 		"@kunoichi/grab-deps": "^3.3.0",
-		"@wordpress/env": "^11.16",
-		"@wordpress/scripts": "^36.0.0",
+		"@wordpress/env": "^11.17",
+		"@wordpress/scripts": "^36.1.0",
 		"autoprefixer": "^10.6.1",
 		"globals": "^17.13.0",
 		"npm-watch": "^0.13.0",
