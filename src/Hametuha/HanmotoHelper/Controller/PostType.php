@@ -4,6 +4,7 @@ namespace Hametuha\HanmotoHelper\Controller;
 
 
 use Hametuha\HanmotoHelper\Pattern\Singleton;
+use Hametuha\HanmotoHelper\Rest\PrivatePostsController;
 use Hametuha\HanmotoHelper\Utility\OpenDbApi;
 use Hametuha\HanmotoHelper\Utility\SettingsAccessor;
 
@@ -39,15 +40,17 @@ class PostType extends Singleton {
 	 */
 	public function create_post_type() {
 		$post_type_args = apply_filters( 'hanmoto_post_type_args', [
-			'label'        => __( 'Books', 'hanmoto' ),
-			'labels'       => [
+			'label'                 => __( 'Books', 'hanmoto' ),
+			'labels'                => [
 				'singular_name' => __( 'Book', 'hanmoto' ),
 			],
-			'public'       => false,
-			'show_ui'      => true,
-			'show_in_rest' => true,
-			'menu_icon'    => 'dashicons-book',
-			'supports'     => [ 'title', 'editor', 'author', 'custom-fields' ],
+			'public'                => false,
+			'show_ui'               => true,
+			'show_in_rest'          => true,
+			// public => false でも publish の投稿は REST で匿名に読めてしまうため、編集権限を要求する。
+			'rest_controller_class' => PrivatePostsController::class,
+			'menu_icon'             => 'dashicons-book',
+			'supports'              => [ 'title', 'editor', 'author', 'custom-fields' ],
 		] );
 		register_post_type( 'books', $post_type_args );
 	}
