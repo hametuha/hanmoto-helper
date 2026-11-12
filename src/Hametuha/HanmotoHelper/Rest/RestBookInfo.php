@@ -63,6 +63,18 @@ class RestBookInfo extends RestApiPattern {
 	}
 
 	/**
+	 * Only editors of the book can fetch its information.
+	 *
+	 * Without this, anyone could use this endpoint as a proxy to openBD.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return bool
+	 */
+	public function permission_callback( $request ) {
+		return current_user_can( 'edit_post', $request->get_param( 'post_id' ) );
+	}
+
+	/**
 	 * Get ISBN information.
 	 *
 	 * @param \WP_REST_Request $request
