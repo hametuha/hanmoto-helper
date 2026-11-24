@@ -24,9 +24,15 @@ class WooCommerceOrder extends Singleton {
 	 */
 	const STATUS = 'shipped';
 
-	const META_KEY_WILL_CAPTURE = '_order_will_captured';
+	/**
+	 * @deprecated Use OrderCapture::META_KEY_PROCESSING.
+	 */
+	const META_KEY_WILL_CAPTURE = OrderCapture::META_KEY_PROCESSING;
 
-	const CRON_EVENT = 'hanmoto_capture_order';
+	/**
+	 * @deprecated Use OrderCapture::CRON_EVENT.
+	 */
+	const CRON_EVENT = OrderCapture::CRON_EVENT;
 
 	/**
 	 * @inheritDoc
@@ -48,7 +54,6 @@ class WooCommerceOrder extends Singleton {
 		// Add status.
 		add_action( 'init', [ $this, 'register_status' ] );
 		add_filter( 'wc_order_statuses', [ $this, 'order_statuses' ] );
-		add_action( 'woocommerce_order_status_processing', [ $this, 'set_processing_date' ], 1 );
 		add_filter( 'click_post_for_woo_imported_order_status', [ $this, 'imported_order_status' ], 10, 2 );
 		// Notifications.
 		add_action( 'woocommerce_thankyou_order_received_text', [ $this, 'thank_you_notice' ], 10, 2 );
@@ -56,9 +61,8 @@ class WooCommerceOrder extends Singleton {
 		// todo: この処理がなんだったかを再確認
 		//      add_action( 'woocommerce_email_before_order_table', [ $this, 'order_notification' ], 10, 4 );
 		add_filter( 'woocommerce_email_classes', [ $this, 'email_classes' ] );
-		// Status update via cron.
-		add_action( 'init', [ $this, 'register_cron' ] );
-		add_action( self::CRON_EVENT, [ $this, 'do_cron' ] );
+		// Capture schedule.
+		OrderCapture::get_instance();
 	}
 
 	/**
@@ -386,23 +390,6 @@ class WooCommerceOrder extends Singleton {
 	}
 
 	/**
-	 * Save order action.
-	 *
-	 * @param int $order_id
-	 * @return void
-	 */
-	public function set_processing_date( $order_id ) {
-		$order = wc_get_order( $order_id );
-		if ( ! $this->is_shop_order( $order ) ) {
-			return;
-		}
-		$now = current_time( 'mysql', true );
-		update_post_meta( $order_id, self::META_KEY_WILL_CAPTURE, $now );
-		// translators: %s is date.
-		$order->add_order_note( sprintf( __( 'この注文は%sに請求されます。', 'hanmoto' ), $this->will_captured( $order ) ) );
-	}
-
-	/**
 	 * Email message.
 	 *
 	 * @param \WC_Order $order         Order.
@@ -436,16 +423,7 @@ class WooCommerceOrder extends Singleton {
 	 * @return string
 	 */
 	public function will_captured( $order, $format = '' ) {
-		$order = wc_get_order( $order );
-		if ( ! $order ) {
-			return '';
-		}
-		if ( ! $format ) {
-			$format = get_option( 'date_format' );
-		}
-		$ordered  = strtotime( get_post_meta( $order->get_id(), self::META_KEY_WILL_CAPTURE, true ) );
-		$ordered += 60 * 60 * 24 * WooCommerceSetting::capture_days();
-		return date_i18n( $format, $ordered );
+		return OrderCapture::get_instance()->will_captured( $order, $format );
 	}
 
 	/**
@@ -468,51 +446,7 @@ class WooCommerceOrder extends Singleton {
 	 * @return \WC_Order[]
 	 */
 	public function get_order_to_capture( $offset = -1, $date = 'now' ) {
-		if ( 0 > $offset ) {
-			$offset = WooCommerceSetting::capture_days();
-		}
-		if ( 'now' === $date ) {
-			$date = current_time( 'mysql', true );
-		}
-		$time   = strtotime( $date ) - 60 * 60 * 24 * $offset;
-		$should = gmdate( 'Y-m-d H:i:s', $time );
-		$query  = new \WP_Query( [
-			'post_type'      => 'shop_order',
-			'post_status'    => 'wc-' . self::STATUS,
-			'posts_per_page' => -1,
-			'meta_query'     => [
-				[
-					'key'     => self::META_KEY_WILL_CAPTURE,
-					'value'   => $should,
-					'compare' => '<=',
-					'type'    => 'DATETIME',
-				],
-			],
-		] );
-		return array_map( 'wc_get_order', $query->posts );
-	}
-
-	/**
-	 * Register cron
-	 */
-	public function register_cron() {
-		if ( wp_next_scheduled( self::CRON_EVENT ) ) {
-			return;
-		}
-		wp_schedule_event( current_time( 'timestamp', true ), 'hourly', self::CRON_EVENT );
-	}
-
-	/**
-	 * Execute cron.
-	 */
-	public function do_cron() {
-		foreach ( $this->get_order_to_capture() as $order ) {
-			if ( ! $this->is_shop_order( $order ) ) {
-				continue;
-			}
-			// Complete order.
-			$order->update_status( 'completed' );
-		}
+		return OrderCapture::get_instance()->get_order_to_capture( $offset, $date );
 	}
 
 	/**

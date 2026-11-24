@@ -72,7 +72,7 @@ class WooCommerceSetting extends Singleton {
 					'id'          => 'hanmoto_capture_date',
 					'type'        => 'number',
 					'placeholder' => self::$default_capture_days,
-					'desc'        => __( '注文品受付のあと、指定日数が経過するとクレジットカードに請求をかけます。', 'hanmoto' ),
+					'desc'        => __( '出荷済みの書店注文は、WooPay.jpの与信期限の前日に請求をかけます。与信期限がない注文は、注文品受付のあと指定日数が経過すると請求をかけます。', 'hanmoto' ),
 				],
 				[
 					'title'       => __( '外部注文サイト名称', 'hanmoto' ),
