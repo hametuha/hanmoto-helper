@@ -149,11 +149,18 @@ class OrderCapture extends Singleton {
 		if ( ! $order ) {
 			return '';
 		}
+		$format   = $format ?: get_option( 'date_format' );
+		$captured = (string) $order->get_meta( self::META_KEY_PAYJP_CAPTURED );
+		if ( $captured ) {
+			// Already captured: show when it actually happened (site timezone).
+			return wp_date( $format, ( new \DateTimeImmutable( $captured, wp_timezone() ) )->getTimestamp() );
+		}
 		$timestamp = $this->capture_timestamp( $order );
 		if ( ! $timestamp ) {
 			return '';
 		}
-		return wp_date( $format ?: get_option( 'date_format' ), $timestamp );
+		// Shipped after the scheduled date: it will be captured on the next cron run.
+		return wp_date( $format, max( $timestamp, time() ) );
 	}
 
 	/**
@@ -187,6 +194,9 @@ class OrderCapture extends Singleton {
 			'limit'  => -1,
 		] );
 		return array_values( array_filter( $orders, function ( $order ) use ( $offset, $now ) {
+			if ( ! $this->shop_order()->is_shop_order( $order ) ) {
+				return false;
+			}
 			$timestamp = $this->capture_timestamp( $order, (int) $offset );
 			return $timestamp && $timestamp <= $now;
 		} ) );
@@ -207,7 +217,10 @@ class OrderCapture extends Singleton {
 	 */
 	public function do_cron() {
 		foreach ( $this->get_order_to_capture() as $order ) {
-			if ( ! $this->shop_order()->is_shop_order( $order ) ) {
+			$expires = $this->authorization_expires( $order );
+			if ( $expires && $expires <= time() ) {
+				// Cron did not run in time. Completing would leave it unpaid.
+				$order->update_status( 'on-hold', __( '与信期限が切れたため請求できませんでした。購入者に連絡して再決済してください。', 'hanmoto' ) );
 				continue;
 			}
 			$order->update_status( 'completed' );
@@ -227,7 +240,7 @@ class OrderCapture extends Singleton {
 		$will_captured = $this->will_captured( $order, get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) );
 		?>
 		<p class="form-field form-field-wide">
-			<strong><?php esc_html_e( '書店注文の請求予定', 'hanmoto' ); ?></strong><br />
+			<strong><?php echo esc_html( $order->get_meta( self::META_KEY_PAYJP_CAPTURED ) ? __( '書店注文の請求日', 'hanmoto' ) : __( '書店注文の請求予定', 'hanmoto' ) ); ?></strong><br />
 			<?php echo esc_html( $will_captured ?: __( '未定（処理中になっていません）', 'hanmoto' ) ); ?>
 			<?php if ( 'payjp' === $order->get_payment_method() ) : ?>
 				<br />

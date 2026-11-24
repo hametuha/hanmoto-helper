@@ -251,11 +251,18 @@ class WooCommerceHelper extends Singleton {
 	}
 
 	/**
-	 * Get capture date.
+	 * Get the maximum days until a book shop order is captured.
+	 *
+	 * If WooPay.jp defers capture, its authorization days decide it.
+	 * Otherwise the fallback setting does.
 	 *
 	 * @return int
 	 */
 	public function get_capture_date() {
+		$payjp = get_option( 'woocommerce_payjp_settings', [] );
+		if ( is_array( $payjp ) && 'yes' === ( $payjp['should_capture'] ?? '' ) && ! empty( $payjp['capture_expiry'] ) ) {
+			return (int) $payjp['capture_expiry'];
+		}
 		return (int) get_option( 'hanmoto_capture_date', 30 );
 	}
 }
