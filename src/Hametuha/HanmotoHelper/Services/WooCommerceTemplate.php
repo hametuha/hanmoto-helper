@@ -178,8 +178,8 @@ class WooCommerceTemplate extends Singleton {
 			$props['date'] = [
 				'label' => __( '請求日', 'hanmoto' ),
 				// translators: %d is days.
-				'value' => sprintf( esc_html__( '%d日後請求確定', 'hanmoto' ), $this->helper->get_capture_date() ),
-				'desc'  => esc_html__( '注文日から指定の日数が経過すると請求が確定します。', 'hanmoto' ),
+				'value' => sprintf( esc_html__( '最大%d日程度で請求確定', 'hanmoto' ), $this->helper->get_capture_date() ),
+				'desc'  => esc_html__( 'カードの与信期限の前日に請求が確定します。与信期限はカードによって異なり、5日程度の場合もあります。', 'hanmoto' ),
 			];
 			$order_sheet   = get_post_meta( get_the_ID(), 'hanmoto_order_sheet', true );
 			if ( $order_sheet ) {
